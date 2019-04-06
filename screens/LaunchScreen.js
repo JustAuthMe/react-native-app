@@ -4,15 +4,17 @@ import {
     Text,
     View,
     Image,
-    TouchableOpacity,
-    Platform,
-    StatusBar
+    TouchableOpacity
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 export default class LaunchScreen extends React.Component {
+    static navigationOptions = {
+        header: null,
+    };
+
     state = {
-        step: this.props.step ? this.props.step : 'default'
+        step: this.props.navigation.getParam('step') ? this.props.navigation.state.params.step : 'default'
     };
 
     render() {
@@ -24,10 +26,9 @@ export default class LaunchScreen extends React.Component {
             default:
                 return (
                     <View style={styles.container}>
-                        {Platform.OS === 'ios' && <StatusBar barStyle="light-content"/>}
                         <Image style={styles.logo} source={require('../assets/images/logo-small.png')}/>
-                        <Text style={styles.baseline}>Join the revolution</Text>
-                        <TouchableOpacity style={styles.startBtn} /*onPress={() => this.setState({step: 'firstname'})}*/>
+                        <Text style={styles.baseline}>Join the revolution {this.state.step}</Text>
+                        <TouchableOpacity style={styles.startBtn} onPress={() => this.props.navigation.push('Launch', {step: 'firstname'})}>
                             <Ionicons name="ios-arrow-forward" size={56} color="white" style={styles.arrowIcon}/>
                         </TouchableOpacity>
                         <View style={styles.footer}>

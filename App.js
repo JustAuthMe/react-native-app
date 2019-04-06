@@ -2,7 +2,7 @@ import React from 'react';
 import {Platform, StatusBar, StyleSheet, Text, View, AsyncStorage} from 'react-native';
 import {AppLoading, Asset, Font, Icon, SplashScreen} from 'expo';
 import AppNavigator from './navigation/AppNavigator';
-import LaunchScreen from "./screens/LaunchScreen";
+import LaunchNavigator from "./navigation/LaunchNavigator";
 
 export default class App extends React.Component {
     state = {
@@ -45,13 +45,16 @@ export default class App extends React.Component {
 
         if (!this.state.initDone) {
             return (
-                <LaunchScreen step={this.state.initStep} />
+                <View style={styles.container}>
+                    {Platform.OS === 'ios' && <StatusBar barStyle="light-content"/>}
+                    <LaunchNavigator/>
+                </View>
             );
         }
 
         return (
             <View style={styles.container}>
-                {Platform.OS === 'ios' && <StatusBar barStyle="light-content'"/>}
+                {Platform.OS === 'ios' && <StatusBar barStyle="light-content"/>}
                 <AppNavigator/>
             </View>
         );
