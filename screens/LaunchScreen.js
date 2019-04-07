@@ -4,7 +4,8 @@ import {
     Text,
     View,
     Image,
-    TouchableOpacity
+    TouchableOpacity,
+    TextInput
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -19,15 +20,29 @@ export default class LaunchScreen extends React.Component {
 
     render() {
         switch (this.state.step) {
-            case 'firstname':
+            case 'firstname'://
+                return (
+                    <View style={styles.container}>
+                        <Image style={styles.logo} source={require('../assets/images/logo-small.png')}/>
+                        <Text style={styles.baseline}>What's your firstname?</Text>
+                        <TextInput
 
+                        />
+                        <View style={styles.footer}>
+                            <Text style={styles.alreadyMember}>Are you already a JustAuth.Me member?</Text>
+                            <TouchableOpacity>
+                                <Text style={styles.recover}>Recover your account</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                );
                 break;
 
             default:
                 return (
                     <View style={styles.container}>
                         <Image style={styles.logo} source={require('../assets/images/logo-small.png')}/>
-                        <Text style={styles.baseline}>Join the revolution {this.state.step}</Text>
+                        <Text style={styles.baseline}>Join the revolution</Text>
                         <TouchableOpacity style={styles.startBtn} onPress={() => this.props.navigation.push('Launch', {step: 'firstname'})}>
                             <Ionicons name="ios-arrow-forward" size={56} color="white" style={styles.arrowIcon}/>
                         </TouchableOpacity>
