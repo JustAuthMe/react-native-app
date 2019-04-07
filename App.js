@@ -43,7 +43,7 @@ export default class App extends React.Component {
             );
         }
 
-        if (!this.state.initDone) {
+        if (!this.state.storedItems.initDone) {
             return (
                 <View style={styles.container}>
                     {Platform.OS === 'ios' && <StatusBar barStyle="light-content"/>}
