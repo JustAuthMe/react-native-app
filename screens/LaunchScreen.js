@@ -54,12 +54,13 @@ export default class LaunchScreen extends React.Component {
     }
 
     changeBirthdate(date) {
-        this.onInputChange('birthdate', date);
         const day = (date.getDate() < 10 ? '0' : '') + date.getDate();
         const month = (date.getMonth() + 1 < 10 ? '0' : '') + (date.getMonth() + 1);
+        const humanDate = day + '/' + month + '/' + date.getFullYear();
+        this.onInputChange('birthdate', humanDate);
         this.setState({
             currentBirthdate: date,
-            birthdateInputValue: day + '/' + month + '/' + date.getFullYear()
+            birthdateInputValue: humanDate
         });
     }
 
