@@ -6,10 +6,12 @@ import {
     Image,
     TouchableOpacity,
     TextInput,
-    Alert,
     AsyncStorage
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import LaunchFooter from "../components/LaunchFooter";
+import ContinueButton from "../components/ContinueButton";
+import DatePickerKeyboardIOS from "../components/DatePickerKeyboardIOS";
 
 export default class LaunchScreen extends React.Component {
 
@@ -18,22 +20,50 @@ export default class LaunchScreen extends React.Component {
     };
 
     state = {
-        step: this.props.navigation.getParam('step') ? this.props.navigation.state.params.step : 'launch'
+        step: this.props.navigation.getParam('step') ? this.props.navigation.state.params.step : 'launch',
+        currentBirthdate: new Date(),
+        birthdateInputValue: ''
     };
+
+    constructor(props) {
+        super(props);
+        this.personnalInfos = {};
+    }
 
     onInputChange(key, value) {
         this.personnalInfos[key] = value;
+        this.refs.continueBtn.setState({
+            disabled: this.isEmpty(key)
+        });
+    }
+
+    isEmpty(key) {
+        return !this.personnalInfos[key] || this.personnalInfos[key] === '';
     }
 
     storeValue(key, nextStep) {
+        if (this.isEmpty(key)) {
+            console.log(this.personnalInfos[key]);
+            return;
+        }
+
         AsyncStorage.setItem(key, this.personnalInfos[key], () => this.props.navigation.push('Launch', {step: nextStep}));
         AsyncStorage.getItem(key).then(value => {
             console.log(key + ':', value);
         });
     }
 
+    changeBirthdate(date) {
+        this.onInputChange('birthdate', date);
+        const day = (date.getDate() < 10 ? '0' : '') + date.getDate();
+        const month = (date.getMonth() + 1 < 10 ? '0' : '') + (date.getMonth() + 1);
+        this.setState({
+            currentBirthdate: date,
+            birthdateInputValue: day + '/' + month + '/' + date.getFullYear()
+        });
+    }
+
     render() {
-        this.personnalInfos = {};
         switch (this.state.step) {
             case 'firstname':
                 return (
@@ -49,17 +79,10 @@ export default class LaunchScreen extends React.Component {
                             spellCheck={false}
                             textContentType={"givenName"}
                             clearButtonMode={"always"}
-                            onChangeText={(text) => {this.onInputChange('firstname', text)}}
+                            onChangeText={(text) => this.onInputChange('firstname', text)}
                         />
-                        <TouchableOpacity onPress={() => this.storeValue('firstname', 'lastname')}>
-                            <Text style={styles.continueBtn}>Continue</Text>
-                        </TouchableOpacity>
-                        <View style={styles.footer}>
-                            <Text style={styles.alreadyMember}>Are you already a JustAuth.Me member?</Text>
-                            <TouchableOpacity onPress={() => Alert.alert('We\'re sorry...', 'This feature isn\'t implemented yet.')}>
-                                <Text style={styles.recover}>Recover your account</Text>
-                            </TouchableOpacity>
-                        </View>
+                        <ContinueButton ref={'continueBtn'} disabled={true} onPress={() => this.storeValue('firstname', 'lastname')} />
+                        <LaunchFooter/>
                     </View>
                 );
 
@@ -77,45 +100,40 @@ export default class LaunchScreen extends React.Component {
                             spellCheck={false}
                             textContentType={"familyName"}
                             clearButtonMode={"always"}
-                            onChangeText={(text) => {this.onInputChange('lastname', text)}}
+                            onChangeText={(text) => this.onInputChange('lastname', text)}
                         />
-                        <TouchableOpacity onPress={() => this.storeValue('lastname', 'birthdate')}>
-                            <Text style={styles.continueBtn}>Continue</Text>
-                        </TouchableOpacity>
-                        <View style={styles.footer}>
-                            <Text style={styles.alreadyMember}>Are you already a JustAuth.Me member?</Text>
-                            <TouchableOpacity onPress={() => Alert.alert('We\'re sorry...', 'This feature isn\'t implemented yet.')}>
-                                <Text style={styles.recover}>Recover your account</Text>
-                            </TouchableOpacity>
-                        </View>
+                        <ContinueButton ref={'continueBtn'} disabled={true} onPress={() => this.storeValue('lastname', 'birthdate')} />
+                        <LaunchFooter/>
                     </View>
                 );
 
             case 'birthdate':
                 return (
                     <View style={styles.container}>
-                        <Image style={styles.logo} source={require('../assets/images/logo-small.png')}/>
-                        <Text style={styles.baseline}>Thank you!</Text>
-                        <TextInput
-                            style={{display: 'none'}}
-                            placeholder={"e.g. Peter"}
-                            placeholderTextColor={"rgba(255,255,255,.5)"}
-                            returnKeyType={"done"}
-                            autoCorrect={false}
-                            spellCheck={false}
-                            textContentType={"givenName"}
-                            clearButtonMode={"always"}
-                            onChangeText={(text) => {this.onInputChange('firstname', text)}}
+                        <DatePickerKeyboardIOS
+                            ref={'datePicker'}
+                            date={this.state.currentBirthdate}
+                            onDateChange={(date) => this.changeBirthdate(date)}
                         />
-                        <TouchableOpacity style={{display: 'none'}} onPress={() => this.storeValue('firstname', 'lastname')}>
-                            <Text style={styles.continueBtn}>Continue</Text>
+                        <Image style={styles.logo} source={require('../assets/images/logo-small.png')}/>
+                        <Text style={styles.baseline}>What about your birthdate?</Text>
+                        <TouchableOpacity activeOpacity={.5} style={styles.inputTouchable} onPress={() => this.refs.datePicker.setState({opened: true})}>
+                            <TextInput
+                                ref={'birthdateInput'}
+                                style={styles.textInput}
+                                placeholder={"e.g. 11/11/1994"}
+                                placeholderTextColor={"rgba(255,255,255,.5)"}
+                                returnKeyType={"done"}
+                                autoCorrect={false}
+                                spellCheck={false}
+                                editable={false}
+                                onChangeText={(text) => this.onInputChange('birthdate', text)}
+                                pointerEvents={"none"}
+                                value={this.state.birthdateInputValue}
+                            />
                         </TouchableOpacity>
-                        <View style={styles.footer}>
-                            <Text style={styles.alreadyMember}>Are you already a JustAuth.Me member?</Text>
-                            <TouchableOpacity onPress={() => Alert.alert('We\'re sorry...', 'This feature isn\'t implemented yet.')}>
-                                <Text style={styles.recover}>Recover your account</Text>
-                            </TouchableOpacity>
-                        </View>
+                        <ContinueButton ref={'continueBtn'} disabled={true} onPress={() => this.storeValue('birthdate', 'email')} />
+                        <LaunchFooter/>
                     </View>
                 );
 
@@ -127,12 +145,7 @@ export default class LaunchScreen extends React.Component {
                         <TouchableOpacity style={styles.startBtn} onPress={() => this.props.navigation.push('Launch', {step: 'firstname'})}>
                             <Ionicons name="ios-arrow-forward" size={56} color="white" style={styles.arrowIcon}/>
                         </TouchableOpacity>
-                        <View style={styles.footer}>
-                            <Text style={styles.alreadyMember}>Are you already a JustAuth.Me member?</Text>
-                            <TouchableOpacity onPress={() => Alert.alert('We\'re sorry...', 'This feature isn\'t implemented yet.')}>
-                                <Text style={styles.recover}>Recover your account</Text>
-                            </TouchableOpacity>
-                        </View>
+                        <LaunchFooter/>
                     </View>
                 );
         }
@@ -175,20 +188,6 @@ const styles = StyleSheet.create({
         marginTop: 5,
         marginLeft: 5
     },
-    footer: {
-        flex: 1,
-        justifyContent: 'flex-end',
-        marginBottom: 70
-    },
-    alreadyMember: {
-        color: 'white',
-        textAlign: 'center'
-    },
-    recover: {
-        color: '#A7CADD',
-        textAlign: 'center',
-        marginTop: 15
-    },
     textInput: {
         width: '70%',
         height: 50,
@@ -211,5 +210,9 @@ const styles = StyleSheet.create({
         fontSize: 22,
         fontWeight: '300',
         color: 'white'
+    },
+    inputTouchable: {
+        width: '100%',
+        alignItems: 'center'
     }
 });
