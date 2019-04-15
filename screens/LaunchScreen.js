@@ -134,7 +134,28 @@ export default class LaunchScreen extends React.Component {
                                 value={this.state.birthdateInputValue}
                             />
                         </TouchableOpacity>
-                        <ContinueButton ref={'continueBtn'} disabled={true} onPress={() => this.storeValue('birthdate', 'email')} />
+                        <ContinueButton ref={'continueBtn'} disabled={true} onPress={() => this.storeValue('birthdate', 'address')} />
+                        <LaunchFooter/>
+                    </View>
+                );
+
+            case 'address':
+                return (
+                    <View style={styles.container}>
+                        <Image style={styles.logo} source={require('../assets/images/logo-small.png')}/>
+                        <Text style={styles.baseline}>Do you have an address?</Text>
+                        <TextInput
+                            style={styles.textInput}
+                            placeholder={"e.g. 7 Boulevard de Strasbourg"}
+                            placeholderTextColor={"rgba(255,255,255,.5)"}
+                            returnKeyType={"done"}
+                            autoCorrect={false}
+                            spellCheck={false}
+                            textContentType={"fullStreetAddress"}
+                            clearButtonMode={"always"}
+                            onChangeText={(text) => this.onInputChange('address', text)}
+                        />
+                        <ContinueButton ref={'continueBtn'} disabled={true} onPress={() => this.storeValue('address', 'email')} />
                         <LaunchFooter/>
                     </View>
                 );
