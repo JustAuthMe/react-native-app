@@ -43,7 +43,6 @@ export default class LaunchScreen extends React.Component {
 
     storeValue(key, nextStep) {
         if (this.isEmpty(key)) {
-            console.log(this.personnalInfos[key]);
             return;
         }
 
@@ -53,15 +52,16 @@ export default class LaunchScreen extends React.Component {
         });
     }
 
-    changeBirthdate(date) {
+    changeBirthdate() {
+        const date = this.state.currentBirthdate;
         const day = (date.getDate() < 10 ? '0' : '') + date.getDate();
         const month = (date.getMonth() + 1 < 10 ? '0' : '') + (date.getMonth() + 1);
         const humanDate = day + '/' + month + '/' + date.getFullYear();
         this.onInputChange('birthdate', humanDate);
         this.setState({
-            currentBirthdate: date,
             birthdateInputValue: humanDate
         });
+        this.refs.datePicker.setState({opened: false});
     }
 
     render() {
@@ -114,7 +114,8 @@ export default class LaunchScreen extends React.Component {
                         <DatePickerKeyboardIOS
                             ref={'datePicker'}
                             date={this.state.currentBirthdate}
-                            onDateChange={(date) => this.changeBirthdate(date)}
+                            onDateChange={(date) => this.setState({currentBirthdate: date})}
+                            onDone={() => this.changeBirthdate()}
                         />
                         <Image style={styles.logo} source={require('../assets/images/logo-small.png')}/>
                         <Text style={styles.baseline}>What about your birthdate?</Text>

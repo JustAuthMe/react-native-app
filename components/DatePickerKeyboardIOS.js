@@ -21,6 +21,8 @@ export default class DatePickerKeyboardIOS extends React.Component {
         opened: false
     };
 
+
+
     render() {
         return (
             <View
@@ -30,17 +32,26 @@ export default class DatePickerKeyboardIOS extends React.Component {
                     bottom: 0,
                     width: '100%',
                     height: DatePickerKeyboardIOS.size,
-                    backgroundColor: '#cfd3d9',
+                    backgroundColor: 'white',
                     marginBottom: this.state.opened ?
                         DatePickerKeyboardIOS.styles.margin.opened :
-                        DatePickerKeyboardIOS.styles.margin.closed
+                        DatePickerKeyboardIOS.styles.margin.closed,
+                    borderTopWidth: 1,
+                    borderTopColor: '#ccc',
+                    borderTopStyle: 'solid'
                 }}>
                 <View style={styles.tabBar}>
                     <Button
                         style={styles.button}
                         onPress={() => this.setState({opened: false})}
-                        title={"OK"}
+                        title={"Cancel"}
                         accessibilityLabel={"Close the date picker"}
+                    />
+                    <Button
+                        style={styles.button}
+                        onPress={() => this.props.onDone()}
+                        title={"Done"}
+                        accessibilityLabel={"Validate the date"}
                     />
                 </View>
                 <DatePickerIOS
@@ -63,6 +74,7 @@ const styles = StyleSheet.create({
         height: 220
     },
     tabBar: {
-        alignItems: 'flex-end'
+        flexDirection: 'row',
+        justifyContent: 'space-between'
     }
 });
