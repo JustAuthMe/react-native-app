@@ -8,6 +8,7 @@ import {
     TextInput,
     AsyncStorage
 } from 'react-native';
+import { Constants } from 'expo';
 import { Ionicons } from '@expo/vector-icons';
 import LaunchFooter from "../components/LaunchFooter";
 import ContinueButton from "../components/ContinueButton";
@@ -134,7 +135,29 @@ export default class LaunchScreen extends React.Component {
                                 value={this.state.birthdateInputValue}
                             />
                         </TouchableOpacity>
-                        <ContinueButton ref={'continueBtn'} disabled={true} onPress={() => this.storeValue('birthdate', 'address')} />
+                        <ContinueButton ref={'continueBtn'} disabled={true} onPress={() => this.storeValue('birthdate', 'email')} />
+                        <LaunchFooter/>
+                    </View>
+                );
+
+            case 'email':
+                return (
+                    <View style={styles.container}>
+                        <Image style={styles.logo} source={require('../assets/images/logo-small.png')}/>
+                        <Text style={styles.baseline}>And your E-Mail?</Text>
+                        <TextInput
+                            style={styles.textInput}
+                            placeholder={"e.g. peter@justauth.me"}
+                            placeholderTextColor={"rgba(255,255,255,.5)"}
+                            returnKeyType={"done"}
+                            autoCorrect={false}
+                            spellCheck={false}
+                            textContentType={"emailAddress"}
+                            keyboardType={"email-address"}
+                            clearButtonMode={"always"}
+                            onChangeText={(text) => this.onInputChange('email', text)}
+                        />
+                        <ContinueButton ref={'continueBtn'} disabled={true} onPress={() => this.storeValue('email', 'address')} />
                         <LaunchFooter/>
                     </View>
                 );
@@ -146,7 +169,7 @@ export default class LaunchScreen extends React.Component {
                         <Text style={styles.baseline}>Do you have an address?</Text>
                         <TextInput
                             style={styles.textInput}
-                            placeholder={"e.g. 7 Boulevard de Strasbourg"}
+                            placeholder={"e.g. 42 Avenue des Champs Elysées"}
                             placeholderTextColor={"rgba(255,255,255,.5)"}
                             returnKeyType={"done"}
                             autoCorrect={false}
@@ -155,7 +178,7 @@ export default class LaunchScreen extends React.Component {
                             clearButtonMode={"always"}
                             onChangeText={(text) => this.onInputChange('address', text)}
                         />
-                        <ContinueButton ref={'continueBtn'} disabled={true} onPress={() => this.storeValue('address', 'email')} />
+                        <ContinueButton ref={'continueBtn'} disabled={true} onPress={() => this.storeValue('address', 'phone')} />
                         <LaunchFooter/>
                     </View>
                 );
@@ -174,7 +197,7 @@ export default class LaunchScreen extends React.Component {
         }
     }
 }
-
+const isBorderless = Constants.statusBarHeight > 20;
 const styles = StyleSheet.create({
     container: {
         backgroundColor: '#3598DB',
@@ -184,7 +207,7 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     logo: {
-        marginTop: 150,
+        marginTop: isBorderless > 20 ? 150 : 80,
         width: '100%',
         height: 65,
         resizeMode: 'contain'

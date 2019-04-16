@@ -6,6 +6,7 @@ import {
     TouchableOpacity,
     Alert,
 } from 'react-native';
+import { Constants } from 'expo';
 
 export default class LaunchFooter extends React.Component {
     render() {
@@ -20,11 +21,12 @@ export default class LaunchFooter extends React.Component {
     }
 }
 
+const isBorderless = Constants.statusBarHeight > 20;
 const styles = StyleSheet.create({
     footer: {
         flex: 1,
         justifyContent: 'flex-end',
-        marginBottom: 70
+        marginBottom: isBorderless ? 70 : 30
     },
     alreadyMember: {
         color: 'white',
