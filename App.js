@@ -2,7 +2,7 @@ import React from 'react';
 import {Platform, StatusBar, StyleSheet, Text, View, AsyncStorage} from 'react-native';
 import {AppLoading, Asset, Font, Icon, SplashScreen} from 'expo';
 import AppNavigator from './navigation/AppNavigator';
-import LaunchNavigator from "./navigation/LaunchNavigator";
+import Config from "./constants/Config";
 
 export default class App extends React.Component {
     state = {
@@ -22,35 +22,9 @@ export default class App extends React.Component {
             );
         }
 
-        if (!this.state.storedItems) {
-            const it = this;
-            AsyncStorage.getItem('init_done').then(value => {
-                if (value === 'done') {
-                    SplashScreen.hide();
-                    it.setState({storedItems: {initDone: true}});
-                } else {
-                    let storedItems = {initDone: false};
-                    AsyncStorage.getItem('init_step').then(step => {
-                        SplashScreen.hide();
-                        storedItems.initStep = step !== null ? step : 'launch';
-                        it.setState({storedItems: storedItems});
-                    });
-                }
-            });
-
-            return (
-                <Text style={{flex: 1, marginTop: 300, justifyContent: 'center', textAlign: 'center'}}>Nothing rendered</Text>
-            );
-        }
-
-        if (!this.state.storedItems.initDone) {
-            return (
-                <View style={styles.container}>
-                    {Platform.OS === 'ios' && <StatusBar barStyle="light-content"/>}
-                    <LaunchNavigator/>
-                </View>
-            );
-        }
+        AsyncStorage.getItem(Config.initDone.key).then(value => {
+            console.log('init done at app init:', value);
+        });
 
         return (
             <View style={styles.container}>

@@ -8,11 +8,15 @@ import {
     TextInput,
     AsyncStorage
 } from 'react-native';
-import { Constants } from 'expo';
+import {
+    Constants,
+    SplashScreen
+} from 'expo';
 import { Ionicons } from '@expo/vector-icons';
 import LaunchFooter from "../components/LaunchFooter";
 import ContinueButton from "../components/ContinueButton";
 import DatePickerKeyboardIOS from "../components/DatePickerKeyboardIOS";
+import Config from "../constants/Config";
 
 export default class LaunchScreen extends React.Component {
 
@@ -29,6 +33,13 @@ export default class LaunchScreen extends React.Component {
     constructor(props) {
         super(props);
         this.personnalInfos = {};
+
+        AsyncStorage.getItem(Config.initDone.key).then(value => {
+            SplashScreen.hide();
+            if (value === Config.initDone.value) {
+                this.props.navigation.navigate('Main');
+            }
+        });
     }
 
     onInputChange(key, value) {
@@ -42,14 +53,29 @@ export default class LaunchScreen extends React.Component {
         return !this.personnalInfos[key] || this.personnalInfos[key] === '';
     }
 
-    storeValue(key, nextStep) {
+    storeValue(key, nextStep, isInitDone) {
+        isInitDone = isInitDone || false;
+
         if (this.isEmpty(key)) {
             return;
         }
 
-        AsyncStorage.setItem(key, this.personnalInfos[key], () => this.props.navigation.push('Launch', {step: nextStep}));
-        AsyncStorage.getItem(key).then(value => {
-            console.log(key + ':', value);
+        AsyncStorage.setItem(key, this.personnalInfos[key], () => {
+            AsyncStorage.getItem(key).then(value => {
+                console.log(key + ':', value);
+            });
+
+            if (isInitDone) {
+                AsyncStorage.setItem(Config.initDone.key, Config.initDone.value, () => {
+                    AsyncStorage.getItem(Config.initDone.key).then(value => {
+                        console.log('init done at and of launch:', value);
+                    });
+
+                    this.props.navigation.navigate('Main');
+                });
+            } else {
+                this.props.navigation.push('LaunchScreen', {step: nextStep})
+            }
         });
     }
 
@@ -74,7 +100,7 @@ export default class LaunchScreen extends React.Component {
                         <Text style={styles.baseline}>What's your firstname?</Text>
                         <TextInput
                             style={styles.textInput}
-                            placeholder={"e.g. Peter"}
+                            placeholder={"e.g. Aiden"}
                             placeholderTextColor={"rgba(255,255,255,.5)"}
                             returnKeyType={"done"}
                             autoCorrect={false}
@@ -95,7 +121,7 @@ export default class LaunchScreen extends React.Component {
                         <Text style={styles.baseline}>And your lastname?</Text>
                         <TextInput
                             style={styles.textInput}
-                            placeholder={"e.g. Cauty"}
+                            placeholder={"e.g. Pearce"}
                             placeholderTextColor={"rgba(255,255,255,.5)"}
                             returnKeyType={"done"}
                             autoCorrect={false}
@@ -124,7 +150,7 @@ export default class LaunchScreen extends React.Component {
                             <TextInput
                                 ref={'birthdateInput'}
                                 style={styles.textInput}
-                                placeholder={"e.g. 11/11/1994"}
+                                placeholder={"e.g. 02/05/1974"}
                                 placeholderTextColor={"rgba(255,255,255,.5)"}
                                 returnKeyType={"done"}
                                 autoCorrect={false}
@@ -147,7 +173,7 @@ export default class LaunchScreen extends React.Component {
                         <Text style={styles.baseline}>And your E-Mail?</Text>
                         <TextInput
                             style={styles.textInput}
-                            placeholder={"e.g. peter@justauth.me"}
+                            placeholder={"e.g. aiden@pearce.me"}
                             placeholderTextColor={"rgba(255,255,255,.5)"}
                             returnKeyType={"done"}
                             autoCorrect={false}
@@ -157,7 +183,7 @@ export default class LaunchScreen extends React.Component {
                             clearButtonMode={"always"}
                             onChangeText={(text) => this.onInputChange('email', text)}
                         />
-                        <ContinueButton ref={'continueBtn'} disabled={true} onPress={() => this.storeValue('email', 'address')} />
+                        <ContinueButton ref={'continueBtn'} disabled={true} onPress={() => this.storeValue('email', 'address', true)} />
                         <LaunchFooter/>
                     </View>
                 );
@@ -188,7 +214,7 @@ export default class LaunchScreen extends React.Component {
                     <View style={styles.container}>
                         <Image style={styles.logo} source={require('../assets/images/logo-small.png')}/>
                         <Text style={styles.baseline}>Join the revolution</Text>
-                        <TouchableOpacity style={styles.startBtn} onPress={() => this.props.navigation.push('Launch', {step: 'firstname'})}>
+                        <TouchableOpacity style={styles.startBtn} onPress={() => this.props.navigation.push('LaunchScreen', {step: 'firstname'})}>
                             <Ionicons name="ios-arrow-forward" size={56} color="white" style={styles.arrowIcon}/>
                         </TouchableOpacity>
                         <LaunchFooter/>
@@ -207,7 +233,7 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     logo: {
-        marginTop: isBorderless > 20 ? 150 : 80,
+        marginTop: isBorderless ? 150 : 80,
         width: '100%',
         height: 65,
         resizeMode: 'contain'
