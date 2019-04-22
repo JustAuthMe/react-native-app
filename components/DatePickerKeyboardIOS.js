@@ -18,7 +18,8 @@ export default class DatePickerKeyboardIOS extends React.Component {
     };
 
     state = {
-        opened: false
+        opened: false,
+        maximumDate: new Date((new Date().getFullYear()) + '-12-31T00:00:00')
     };
 
 
@@ -57,7 +58,7 @@ export default class DatePickerKeyboardIOS extends React.Component {
                 <DatePickerIOS
                     date={this.props.date}
                     onDateChange={this.props.onDateChange}
-                    maximumDate={new Date()}
+                    maximumDate={this.state.maximumDate}
                     mode={'date'}
                 />
             </View>

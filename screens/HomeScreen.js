@@ -8,7 +8,8 @@ import {
     TouchableOpacity,
     View,
     Button,
-    AsyncStorage
+    AsyncStorage,
+    Alert
 } from 'react-native';
 import {
     WebBrowser,
@@ -16,7 +17,6 @@ import {
 } from 'expo';
 
 import {MonoText} from '../components/StyledText';
-import {Encryption} from '../models/Encryption';
 import Config from "../constants/Config";
 
 export default class HomeScreen extends React.Component {
@@ -31,7 +31,6 @@ export default class HomeScreen extends React.Component {
     constructor(props) {
         super(props);
         this._bootstrapAsync().then();
-        this.user = {};
     }
 
     async _bootstrapAsync() {
@@ -53,36 +52,29 @@ export default class HomeScreen extends React.Component {
                 SecureStore.getItemAsync('privkey').then(value => {
                     console.log(value);
                 }).catch(err => console.log(err));
-            } else {
-                console.log('Generating...');
-                // Giving time to UI to update
-                window.setTimeout(() => {
-                    const enc = new Encryption();
-                    enc.generateKeypair();
-                }, 100);
             }
         }).catch(err => console.log(err));
     }
 
-    wipe() {
-        SecureStore.deleteItemAsync('pubkey');
-        SecureStore.deleteItemAsync('privkey');
-    }
-
     logout = () => {
-        AsyncStorage.multiRemove([
-            Config.initDone.key,
-            'firstname',
-            'lastname',
-            'birthdate',
-            'email'
-        ], () => {
-            AsyncStorage.getItem(Config.initDone.key).then(value => {
-                console.log('init done at logout:', value);
-            });
+        Alert.alert('Are you sure?', '', [
+            {text: 'Cancel', onPress: () => {}, style:'cancel'},
+            {text: 'OK', onPress: () => {
+                    AsyncStorage.multiRemove([
+                        Config.initDone.key,
+                        'firstname',
+                        'lastname',
+                        'birthdate',
+                        'email'
+                    ], () => {
+                        AsyncStorage.getItem(Config.initDone.key).then(value => {
+                            console.log('init done at logout:', value);
+                        });
 
-            this.props.navigation.navigate('Launch');
-        });
+                        this.props.navigation.navigate('Launch');
+                    });
+                }}
+        ]);
     };
 
     render() {
@@ -102,8 +94,7 @@ export default class HomeScreen extends React.Component {
 
                     <View style={styles.getStartedContainer}>
                         {this._maybeRenderDevelopmentModeWarning()}
-                        <Button title="Generate keypair" onPress={this.run}/>
-                        <Button title="Delete keypair" onPress={this.wipe}/>
+                        <Button title="Display keypair" onPress={this.run}/>
                         <Text>{this.state.user.firstname}</Text>
                         <Text>{this.state.user.lastname}</Text>
                         <Text>{this.state.user.birthdate}</Text>

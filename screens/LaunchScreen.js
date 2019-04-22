@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import {
     Constants,
+    SecureStore,
     SplashScreen
 } from 'expo';
 import { Ionicons } from '@expo/vector-icons';
@@ -17,6 +18,7 @@ import LaunchFooter from "../components/LaunchFooter";
 import ContinueButton from "../components/ContinueButton";
 import DatePickerKeyboardIOS from "../components/DatePickerKeyboardIOS";
 import Config from "../constants/Config";
+import {Encryption} from "../models/Encryption";
 
 export default class LaunchScreen extends React.Component {
 
@@ -27,7 +29,8 @@ export default class LaunchScreen extends React.Component {
     state = {
         step: this.props.navigation.getParam('step') ? this.props.navigation.state.params.step : 'launch',
         currentBirthdate: new Date(),
-        birthdateInputValue: ''
+        birthdateInputValue: '',
+        generationStatus: 'Generating...'
     };
 
     constructor(props) {
@@ -38,6 +41,10 @@ export default class LaunchScreen extends React.Component {
             SplashScreen.hide();
             if (value === Config.initDone.value) {
                 this.props.navigation.navigate('Main');
+            } else {
+                if (this.state.step === 'keygen') {
+                    this.keygen();
+                }
             }
         });
     }
@@ -53,9 +60,7 @@ export default class LaunchScreen extends React.Component {
         return !this.personnalInfos[key] || this.personnalInfos[key] === '';
     }
 
-    storeValue(key, nextStep, isInitDone) {
-        isInitDone = isInitDone || false;
-
+    storeValue(key, nextStep) {
         if (this.isEmpty(key)) {
             return;
         }
@@ -64,18 +69,7 @@ export default class LaunchScreen extends React.Component {
             AsyncStorage.getItem(key).then(value => {
                 console.log(key + ':', value);
             });
-
-            if (isInitDone) {
-                AsyncStorage.setItem(Config.initDone.key, Config.initDone.value, () => {
-                    AsyncStorage.getItem(Config.initDone.key).then(value => {
-                        console.log('init done at and of launch:', value);
-                    });
-
-                    this.props.navigation.navigate('Main');
-                });
-            } else {
-                this.props.navigation.push('LaunchScreen', {step: nextStep})
-            }
+            this.props.navigation.push('LaunchScreen', {step: nextStep});
         });
     }
 
@@ -90,6 +84,31 @@ export default class LaunchScreen extends React.Component {
         });
         this.refs.datePicker.setState({opened: false});
     }
+
+    keygen() {
+        console.log('Generating...');
+        // Giving time to UI to update
+        window.setTimeout(() => {
+            const enc = new Encryption();
+            enc.generateKeypair();
+            this.setState({generationStatus: 'Done!'});
+            this.refs.continueBtn.setState({disabled: false});
+        }, 500);
+    }
+
+    lastStep = () => {
+        this.props.navigation.push('LaunchScreen', {step: 'done'});
+    };
+
+    finish = () => {
+        AsyncStorage.setItem(Config.initDone.key, Config.initDone.value, () => {
+            AsyncStorage.getItem(Config.initDone.key).then(value => {
+                console.log('init done at and of launch:', value);
+            });
+
+            this.props.navigation.navigate('Main');
+        });
+    };
 
     render() {
         switch (this.state.step) {
@@ -183,19 +202,20 @@ export default class LaunchScreen extends React.Component {
                             clearButtonMode={"always"}
                             onChangeText={(text) => this.onInputChange('email', text)}
                         />
-                        <ContinueButton ref={'continueBtn'} disabled={true} onPress={() => this.storeValue('email', 'address', true)} />
+                        <ContinueButton ref={'continueBtn'} disabled={true} onPress={() => this.storeValue('email', 'keygen')} />
                         <LaunchFooter/>
                     </View>
                 );
 
             case 'address':
+                // TODO: Add address screen to launch process
                 return (
                     <View style={styles.container}>
                         <Image style={styles.logo} source={require('../assets/images/logo-small.png')}/>
                         <Text style={styles.baseline}>Do you have an address?</Text>
                         <TextInput
                             style={styles.textInput}
-                            placeholder={"e.g. 42 Avenue des Champs Elysées"}
+                            placeholder={"e.g. Owl Motel, Parker Square"}
                             placeholderTextColor={"rgba(255,255,255,.5)"}
                             returnKeyType={"done"}
                             autoCorrect={false}
@@ -206,6 +226,82 @@ export default class LaunchScreen extends React.Component {
                         />
                         <ContinueButton ref={'continueBtn'} disabled={true} onPress={() => this.storeValue('address', 'phone')} />
                         <LaunchFooter/>
+                    </View>
+                );
+
+            case 'phone':
+                // TODO: Add phone number to launch process
+                return (
+                    <View style={styles.container}>
+                        <Image style={styles.logo} source={require('../assets/images/logo-small.png')}/>
+                        <Text style={styles.baseline}>And a phone number?</Text>
+                        <TextInput
+                            style={styles.textInput}
+                            placeholder={"e.g. +14213371994"}
+                            placeholderTextColor={"rgba(255,255,255,.5)"}
+                            returnKeyType={"done"}
+                            autoCorrect={false}
+                            spellCheck={false}
+                            textContentType={"telephoneNumber"}
+                            keyboardType={"phone-pad"}
+                            clearButtonMode={"always"}
+                            onChangeText={(text) => this.onInputChange('address', text)}
+                        />
+                        <ContinueButton ref={'continueBtn'} disabled={true} onPress={() => this.storeValue('phone', 'otp')} />
+                        <LaunchFooter/>
+                    </View>
+                );
+
+            case 'otp':
+                // TODO: Implement OTP-Code based phone number verification
+                return (
+                    <View style={styles.container}>
+                        <Image style={styles.logo} source={require('../assets/images/logo-small.png')}/>
+                        <Text style={styles.baseline}>Enter the code you received by SMS</Text>
+                        <TextInput
+                            style={styles.textInput}
+                            placeholder={"Your verification code"}
+                            placeholderTextColor={"rgba(255,255,255,.5)"}
+                            returnKeyType={"done"}
+                            autoCorrect={false}
+                            spellCheck={false}
+                            textContentType={"oneTimeCode"}
+                            keyboardType={"phone-pad"}
+                            clearButtonMode={"always"}
+                            onChangeText={(text) => this.onInputChange('address', text)}
+                        />
+                        <ContinueButton ref={'continueBtn'} disabled={true} onPress={() => this.storeValue('otp', 'keygen')} />
+                        <LaunchFooter/>
+                    </View>
+                );
+
+            case 'keygen':
+                return (
+                    <View style={styles.container}>
+                        <Image style={styles.logo} source={require('../assets/images/logo-small.png')}/>
+                        <Text style={styles.baseline}>Almost there!</Text>
+                        <Text style={styles.warningText}>
+                            Your phone will now make complex calculations to secure your entire JustAuth.Me experience.
+                            This can take up to 5 minutes, do not worry and just let your phone do all the work for you!
+                            The Continue button will highlight itself once the process is complete.
+                        </Text>
+                        <Text style={styles.warningText}>{this.state.generationStatus}</Text>
+                        <ContinueButton ref={'continueBtn'} disabled={true} onPress={this.lastStep} />
+                    </View>
+                );
+
+            case 'done':
+                return (
+                    <View style={styles.container}>
+                        <Image style={styles.logo} source={require('../assets/images/logo-small.png')}/>
+                        <Text style={styles.baseline}>Congratulations!</Text>
+                        <Text style={styles.warningText}>
+                            You successfully registered into JustAuth.Me! All the personnal informations you just provided
+                            are only stored on your phone, not on our servers, not anywhere else, just on your device.
+                            You can now login on any website which provide the "Login with JustAuth.Me" button, without
+                            getting through any registration process, without any password, without even thinking about it!
+                        </Text>
+                        <ContinueButton text={'Finish'} ref={'continueBtn'} disabled={false} onPress={this.finish} />
                     </View>
                 );
 
@@ -286,5 +382,13 @@ const styles = StyleSheet.create({
     inputTouchable: {
         width: '100%',
         alignItems: 'center'
+    },
+    warningText: {
+        marginTop: 30,
+        fontSize: 18,
+        color: 'white',
+        textAlign: 'center',
+        paddingLeft: 15,
+        paddingRight: 15
     }
 });

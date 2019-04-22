@@ -18,7 +18,8 @@ export default class ContinueButton extends React.Component {
     };
 
     state = {
-        disabled: this.props.disabled
+        disabled: this.props.disabled,
+        text: this.props.text ? this.props.text : 'Continue'
     };
 
     render() {
@@ -45,7 +46,7 @@ export default class ContinueButton extends React.Component {
                     color: this.state.disabled ?
                         ContinueButton.styles.color.disabled :
                         ContinueButton.styles.color.enabled
-                }}>Continue</Text>
+                }}>{this.state.text}</Text>
             </TouchableOpacity>
         );
     }
