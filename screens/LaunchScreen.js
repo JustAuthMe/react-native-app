@@ -86,14 +86,55 @@ export default class LaunchScreen extends React.Component {
     }
 
     keygen() {
+        /*
+         TODO: Make sure that actual keygen and THEN registration is workign as expected
+         (I think that maybe the keypair do not have the time to save itself onto the SecureStore before the
+         registration process begins)
+          */
         console.log('Generating...');
         // Giving time to UI to update
         window.setTimeout(() => {
             const enc = new Encryption();
             enc.generateKeypair();
-            this.setState({generationStatus: 'Done!'});
-            this.refs.continueBtn.setState({disabled: false});
+            this.register().then(() => {
+                this.setState({generationStatus: 'Done!'});
+                this.refs.continueBtn.setState({disabled: false});
+            });
         }, 500);
+    }
+
+    async register() {
+        const pubkey = await SecureStore.getItemAsync(Config.storageKeys.publicKey);
+        const endpointUrl = Config.apiUrl + 'register';
+        console.log('sent pubkey: ', pubkey);
+        try {
+            let response = await fetch(
+                endpointUrl,
+                {
+                    method: 'POST',
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        pubkey: pubkey
+                    })
+                }
+            );
+            let responseJson = await response.json();
+            console.log(responseJson);
+            if (responseJson.user.username) {
+                await SecureStore.setItemAsync(Config.storageKeys.jamID, responseJson.user.username, {
+                    keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY
+                });
+                const jamID = await SecureStore.getItemAsync(Config.storageKeys.jamID);
+                console.log(jamID);
+            } else {
+                console.log('error retreiving username');
+            }
+        } catch (error) {
+            console.error(error);
+        }
     }
 
     lastStep = () => {

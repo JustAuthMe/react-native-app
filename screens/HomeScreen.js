@@ -13,7 +13,8 @@ import {
 } from 'react-native';
 import {
     WebBrowser,
-    SecureStore
+    SecureStore,
+    BarCodeScanner
 } from 'expo';
 
 import {MonoText} from '../components/StyledText';
@@ -30,6 +31,7 @@ export default class HomeScreen extends React.Component {
 
     constructor(props) {
         super(props);
+        this.isBarCodeScannerEnabled = true;
         this._bootstrapAsync().then();
     }
 
@@ -46,10 +48,10 @@ export default class HomeScreen extends React.Component {
     };
 
     run() {
-        SecureStore.getItemAsync('pubkey').then(value => {
+        SecureStore.getItemAsync(Config.storageKeys.publicKey).then(value => {
             if (value !== null) {
                 console.log(value);
-                SecureStore.getItemAsync('privkey').then(value => {
+                SecureStore.getItemAsync(Config.storageKeys.privateKey).then(value => {
                     console.log(value);
                 }).catch(err => console.log(err));
             }
@@ -77,6 +79,14 @@ export default class HomeScreen extends React.Component {
         ]);
     };
 
+    handleBarCodeScanned = ({ type, data }) => {
+        if (this.isBarCodeScannerEnabled) {
+            this.isBarCodeScannerEnabled = false;
+            console.log(data);
+            // Autre écran: "chargement..." (appel API de /auth/:token)
+        }
+    };
+
     render() {
         return (
             <View style={styles.container}>
@@ -91,7 +101,10 @@ export default class HomeScreen extends React.Component {
                             style={styles.welcomeImage}
                         />
                     </View>
-
+                    <BarCodeScanner
+                        onBarCodeScanned={this.handleBarCodeScanned}
+                        style={styles.scanner}
+                    />
                     <View style={styles.getStartedContainer}>
                         {this._maybeRenderDevelopmentModeWarning()}
                         <Button title="Display keypair" onPress={this.run}/>
@@ -101,21 +114,7 @@ export default class HomeScreen extends React.Component {
                         <Text>{this.state.user.email}</Text>
                         <Button title="Log out" onPress={this.logout}/>
                     </View>
-
-                    <View style={styles.helpContainer}>
-                        <TouchableOpacity onPress={this._handleHelpPress} style={styles.helpLink}>
-                            <Text style={styles.helpLinkText}>Help, it didn’t automatically reload!</Text>
-                        </TouchableOpacity>
-                    </View>
                 </ScrollView>
-
-                <View style={styles.tabBarInfoContainer}>
-                    <Text style={styles.tabBarInfoText}>This is a tab bar. You can edit it in:</Text>
-
-                    <View style={[styles.codeHighlightContainer, styles.navigationFilename]}>
-                        <MonoText style={styles.codeHighlightText}>navigation/MainTabNavigator.js</MonoText>
-                    </View>
-                </View>
             </View>
         );
     }
@@ -168,6 +167,7 @@ const styles = StyleSheet.create({
     },
     contentContainer: {
         paddingTop: 30,
+        alignItems: 'center'
     },
     welcomeContainer: {
         alignItems: 'center',
@@ -185,60 +185,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginHorizontal: 50,
     },
-    homeScreenFilename: {
-        marginVertical: 7,
-    },
-    codeHighlightText: {
-        color: 'rgba(96,100,109, 0.8)',
-    },
-    codeHighlightContainer: {
-        backgroundColor: 'rgba(0,0,0,0.05)',
-        borderRadius: 3,
-        paddingHorizontal: 4,
-    },
-    getStartedText: {
-        fontSize: 17,
-        color: 'rgba(96,100,109, 1)',
-        lineHeight: 24,
-        textAlign: 'center',
-    },
-    tabBarInfoContainer: {
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        ...Platform.select({
-            ios: {
-                shadowColor: 'black',
-                shadowOffset: {height: -3},
-                shadowOpacity: 0.1,
-                shadowRadius: 3,
-            },
-            android: {
-                elevation: 20,
-            },
-        }),
-        alignItems: 'center',
-        backgroundColor: '#fbfbfb',
-        paddingVertical: 20,
-    },
-    tabBarInfoText: {
-        fontSize: 17,
-        color: 'rgba(96,100,109, 1)',
-        textAlign: 'center',
-    },
-    navigationFilename: {
-        marginTop: 5,
-    },
-    helpContainer: {
-        marginTop: 15,
-        alignItems: 'center',
-    },
-    helpLink: {
-        paddingVertical: 15,
-    },
-    helpLinkText: {
-        fontSize: 14,
-        color: '#2e78b7',
-    },
+    scanner: {
+        width: 300,
+        height: 300
+    }
 });

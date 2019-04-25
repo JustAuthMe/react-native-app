@@ -1,5 +1,6 @@
 import forge from 'node-forge';
 import { SecureStore } from 'expo';
+import Config from "../constants/Config";
 
 export class Encryption {
     generateKeypair() {
@@ -17,10 +18,10 @@ export class Encryption {
                 const privPem  = forge.pki.privateKeyToPem(priv);
 
                 // Storing keypair
-                SecureStore.setItemAsync('pubkey', pubPem, {
+                SecureStore.setItemAsync(Config.storageKeys.publicKey, pubPem, {
                     keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY
                 }).then(() => {}).catch(err => console.log(err));
-                SecureStore.setItemAsync('privkey', privPem, {
+                SecureStore.setItemAsync(Config.storageKeys.privateKey, privPem, {
                     keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY
                 }).then(() => {}).catch(err => console.log(err));
 
