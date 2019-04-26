@@ -19,6 +19,7 @@ import ContinueButton from "../components/ContinueButton";
 import DatePickerKeyboardIOS from "../components/DatePickerKeyboardIOS";
 import Config from "../constants/Config";
 import {Encryption} from "../models/Encryption";
+import LightStatusBar from "../components/LightStatusBar";
 
 export default class LaunchScreen extends React.Component {
 
@@ -95,11 +96,11 @@ export default class LaunchScreen extends React.Component {
         // Giving time to UI to update
         window.setTimeout(() => {
             const enc = new Encryption();
-            enc.generateKeypair();
-            this.register().then(() => {
+            //enc.generateKeypair();
+            //this.register().then(() => {
                 this.setState({generationStatus: 'Done!'});
                 this.refs.continueBtn.setState({disabled: false});
-            });
+            //});
         }, 500);
     }
 
@@ -130,6 +131,7 @@ export default class LaunchScreen extends React.Component {
                 const jamID = await SecureStore.getItemAsync(Config.storageKeys.jamID);
                 console.log(jamID);
             } else {
+                // TODO: make a real error handling
                 console.log('error retreiving username');
             }
         } catch (error) {
@@ -156,6 +158,7 @@ export default class LaunchScreen extends React.Component {
             case 'firstname':
                 return (
                     <View style={styles.container}>
+                        <LightStatusBar/>
                         <Image style={styles.logo} source={require('../assets/images/logo-small.png')}/>
                         <Text style={styles.baseline}>What's your firstname?</Text>
                         <TextInput
@@ -177,6 +180,7 @@ export default class LaunchScreen extends React.Component {
             case 'lastname':
                 return (
                     <View style={styles.container}>
+                        <LightStatusBar/>
                         <Image style={styles.logo} source={require('../assets/images/logo-small.png')}/>
                         <Text style={styles.baseline}>And your lastname?</Text>
                         <TextInput
@@ -198,6 +202,7 @@ export default class LaunchScreen extends React.Component {
             case 'birthdate':
                 return (
                     <View style={styles.container}>
+                        <LightStatusBar/>
                         <DatePickerKeyboardIOS
                             ref={'datePicker'}
                             date={this.state.currentBirthdate}
@@ -229,6 +234,7 @@ export default class LaunchScreen extends React.Component {
             case 'email':
                 return (
                     <View style={styles.container}>
+                        <LightStatusBar/>
                         <Image style={styles.logo} source={require('../assets/images/logo-small.png')}/>
                         <Text style={styles.baseline}>And your E-Mail?</Text>
                         <TextInput
@@ -252,6 +258,7 @@ export default class LaunchScreen extends React.Component {
                 // TODO: Add address screen to launch process
                 return (
                     <View style={styles.container}>
+                        <LightStatusBar/>
                         <Image style={styles.logo} source={require('../assets/images/logo-small.png')}/>
                         <Text style={styles.baseline}>Do you have an address?</Text>
                         <TextInput
@@ -274,6 +281,7 @@ export default class LaunchScreen extends React.Component {
                 // TODO: Add phone number to launch process
                 return (
                     <View style={styles.container}>
+                        <LightStatusBar/>
                         <Image style={styles.logo} source={require('../assets/images/logo-small.png')}/>
                         <Text style={styles.baseline}>And a phone number?</Text>
                         <TextInput
@@ -297,6 +305,7 @@ export default class LaunchScreen extends React.Component {
                 // TODO: Implement OTP-Code based phone number verification
                 return (
                     <View style={styles.container}>
+                        <LightStatusBar/>
                         <Image style={styles.logo} source={require('../assets/images/logo-small.png')}/>
                         <Text style={styles.baseline}>Enter the code you received by SMS</Text>
                         <TextInput
@@ -319,6 +328,7 @@ export default class LaunchScreen extends React.Component {
             case 'keygen':
                 return (
                     <View style={styles.container}>
+                        <LightStatusBar/>
                         <Image style={styles.logo} source={require('../assets/images/logo-small.png')}/>
                         <Text style={styles.baseline}>Almost there!</Text>
                         <Text style={styles.warningText}>
@@ -334,6 +344,7 @@ export default class LaunchScreen extends React.Component {
             case 'done':
                 return (
                     <View style={styles.container}>
+                        <LightStatusBar/>
                         <Image style={styles.logo} source={require('../assets/images/logo-small.png')}/>
                         <Text style={styles.baseline}>Congratulations!</Text>
                         <Text style={styles.warningText}>
@@ -349,6 +360,7 @@ export default class LaunchScreen extends React.Component {
             default:
                 return (
                     <View style={styles.container}>
+                        <LightStatusBar/>
                         <Image style={styles.logo} source={require('../assets/images/logo-small.png')}/>
                         <Text style={styles.baseline}>Join the revolution</Text>
                         <TouchableOpacity style={styles.startBtn} onPress={() => this.props.navigation.push('LaunchScreen', {step: 'firstname'})}>

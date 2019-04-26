@@ -24,7 +24,10 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSFaceIDUsageDescription": "We use FaceID in order to authenticate the user before loging them into the selected website or service"
+      }
     }
   }
 }

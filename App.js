@@ -1,6 +1,6 @@
 import React from 'react';
-import {Platform, StatusBar, StyleSheet, Text, View, AsyncStorage} from 'react-native';
-import {AppLoading, Asset, Font, Icon, SplashScreen} from 'expo';
+import {StyleSheet, View, AsyncStorage} from 'react-native';
+import {AppLoading, Asset, Font, Icon} from 'expo';
 import AppNavigator from './navigation/AppNavigator';
 import Config from "./constants/Config";
 
@@ -28,7 +28,6 @@ export default class App extends React.Component {
 
         return (
             <View style={styles.container}>
-                {Platform.OS === 'ios' && <StatusBar barStyle="light-content"/>}
                 <AppNavigator/>
             </View>
         );

@@ -31,4 +31,13 @@ export class Encryption {
                 console.log('Took ' + took + ' seconds');
             }).catch(err => console.log(err));
     }
+
+    async sign(dataString) {
+        const privKeyPem = await SecureStore.getItemAsync(Config.storageKeys.privateKey)
+        const privKey = forge.pki.privateKeyFromPem(privKeyPem);
+        const hash = forge.md.sha512.create();
+        hash.update(dataString);
+
+        return privKey.sign(hash);
+    }
 }

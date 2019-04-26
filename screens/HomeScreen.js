@@ -1,11 +1,9 @@
 import React from 'react';
 import {
     Image,
-    Platform,
     ScrollView,
     StyleSheet,
     Text,
-    TouchableOpacity,
     View,
     Button,
     AsyncStorage,
@@ -17,7 +15,6 @@ import {
     BarCodeScanner
 } from 'expo';
 
-import {MonoText} from '../components/StyledText';
 import Config from "../constants/Config";
 
 export default class HomeScreen extends React.Component {
@@ -52,7 +49,12 @@ export default class HomeScreen extends React.Component {
             if (value !== null) {
                 console.log(value);
                 SecureStore.getItemAsync(Config.storageKeys.privateKey).then(value => {
-                    console.log(value);
+                    if (value !== null) {
+                        console.log(value);
+                        SecureStore.getItemAsync(Config.storageKeys.jamID).then(value => {
+                            console.log(value);
+                        }).catch(err => console.log(err));
+                    }
                 }).catch(err => console.log(err));
             }
         }).catch(err => console.log(err));
@@ -107,7 +109,7 @@ export default class HomeScreen extends React.Component {
                     />
                     <View style={styles.getStartedContainer}>
                         {this._maybeRenderDevelopmentModeWarning()}
-                        <Button title="Display keypair" onPress={this.run}/>
+                        <Button title="Display secured infos" onPress={this.run}/>
                         <Text>{this.state.user.firstname}</Text>
                         <Text>{this.state.user.lastname}</Text>
                         <Text>{this.state.user.birthdate}</Text>
@@ -145,25 +147,19 @@ export default class HomeScreen extends React.Component {
     _handleLearnMorePress = () => {
         WebBrowser.openBrowserAsync('https://docs.expo.io/versions/latest/guides/development-mode');
     };
-
-    _handleHelpPress = () => {
-        WebBrowser.openBrowserAsync(
-            'https://docs.expo.io/versions/latest/guides/up-and-running.html#can-t-see-your-changes'
-        );
-    };
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#fff'
     },
     developmentModeText: {
         marginBottom: 20,
         color: 'rgba(0,0,0,0.4)',
         fontSize: 14,
         lineHeight: 19,
-        textAlign: 'center',
+        textAlign: 'center'
     },
     contentContainer: {
         paddingTop: 30,
@@ -172,18 +168,18 @@ const styles = StyleSheet.create({
     welcomeContainer: {
         alignItems: 'center',
         marginTop: 10,
-        marginBottom: 20,
+        marginBottom: 20
     },
     welcomeImage: {
         width: 100,
         height: 80,
         resizeMode: 'contain',
         marginTop: 3,
-        marginLeft: -10,
+        marginLeft: -10
     },
     getStartedContainer: {
         alignItems: 'center',
-        marginHorizontal: 50,
+        marginHorizontal: 50
     },
     scanner: {
         width: 300,
