@@ -84,8 +84,16 @@ export default class HomeScreen extends React.Component {
     handleBarCodeScanned = ({ type, data }) => {
         if (this.isBarCodeScannerEnabled) {
             this.isBarCodeScannerEnabled = false;
-            console.log(data);
-            // Autre écran: "chargement..." (appel API de /auth/:token)
+
+            console.log(type + ': ', data);
+            const token = data.replace('jam://', '');
+            this.props.navigation.navigate('Auth', {
+                token: token
+            });
+
+            window.setTimeout(() => {
+                this.isBarCodeScannerEnabled = true;
+            }, 2000);
         }
     };
 

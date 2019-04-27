@@ -38,6 +38,6 @@ export class Encryption {
         const hash = forge.md.sha512.create();
         hash.update(dataString);
 
-        return privKey.sign(hash);
+        return forge.util.encode64(privKey.sign(hash));
     }
 }

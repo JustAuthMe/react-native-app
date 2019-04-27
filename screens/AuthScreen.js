@@ -2,10 +2,12 @@ import React from 'react';
 import {
     View,
     Text,
-    StyleSheet
+    StyleSheet,
+    AsyncStorage
 } from 'react-native';
 import {
-    LocalAuthentication
+    LocalAuthentication,
+    SecureStore
 } from 'expo';
 import AuthDataList from "../components/AuthDataList";
 import Config from "../constants/Config";
@@ -18,7 +20,7 @@ export default class AuthScreen extends React.Component {
 
     state = {
         token: this.props.navigation.getParam('token'),
-        data: []
+        auth: null
     };
 
     constructor(props) {
@@ -32,12 +34,12 @@ export default class AuthScreen extends React.Component {
         const endpointUrl = Config.apiUrl + 'auth/' + this.state.token;
         console.log(endpointUrl);
         try {
-            const response = await fetch(endpoint);
+            const response = await fetch(endpointUrl);
             const responseJson = await response.json();
             console.log(responseJson);
-            if (responseJson.auth.data) {
+            if (responseJson.auth) {
                 this.setState({
-                    data: responseJson.auth.data
+                    auth: responseJson.auth
                 });
             } else {
                 // TODO: make a real error handling
@@ -49,7 +51,23 @@ export default class AuthScreen extends React.Component {
     }
 
     async getUserDataFromDataset() {
-        // TODO: Write function
+        const jamID = await SecureStore.getItemAsync(Config.storageKeys.jamID);
+        let data = {
+            jam_id: jamID,
+            token: this.state.token
+        };
+
+        const authData = this.state.auth.data;
+        for (let i = 0; i < authData.length; i++) {
+            let dataName = authData[i];
+            if (authData[i].indexOf('!') !== -1) {
+                dataName = authData[i].slice(0, -1);
+            }
+
+            data[dataName] = await AsyncStorage.getItem(dataName);
+        }
+
+        return data;
     }
 
     onAcceptLogin = async () => {
@@ -63,9 +81,11 @@ export default class AuthScreen extends React.Component {
 
         if (canLogin) {
             const endpointUrl = Config.apiUrl + 'login';
-            const data = this.getUserDataFromDataset();
+            const data = await this.getUserDataFromDataset();
             const enc = new Encryption();
-            const sign = await enc.sign(data);
+            const sign = await enc.sign(JSON.stringify(data));
+            console.log(data);
+            console.log(sign);
             try {
                 const response = await fetch(
                     endpointUrl,
@@ -80,7 +100,16 @@ export default class AuthScreen extends React.Component {
                             sign: sign
                         })
                     }
-                )
+                );
+
+                const responseJson = await response.json();
+                console.log(responseJson);
+
+                if (responseJson.status === 'success') {
+                    this.props.navigation.goBack();
+                }
+            } catch (error) {
+                console.error(error);
             }
         } else {
             console.log('Forbidden');
@@ -89,12 +118,12 @@ export default class AuthScreen extends React.Component {
 
     render() {
         let content;
-        if (this.state.data.length === 0) {
+        if (this.state.auth === null) {
             content = <Text style={styles.loadingText}>Loading authentication details...</Text>;
         } else {
             content = <AuthDataList
                 style={styles.data}
-                data={this.state.data}
+                auth={this.state.auth}
                 onAccept={this.onAcceptLogin}
             />;
         }
@@ -114,9 +143,9 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     loadingText: {
-
+        textAlign: 'center'
     },
     data: {
-
+        textAlign: 'center'
     }
 });
