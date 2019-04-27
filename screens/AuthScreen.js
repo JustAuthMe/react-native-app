@@ -106,6 +106,7 @@ export default class AuthScreen extends React.Component {
                 console.log(responseJson);
 
                 if (responseJson.status === 'success') {
+                    alert('Login succeed!');
                     this.props.navigation.goBack();
                 }
             } catch (error) {
@@ -121,9 +122,14 @@ export default class AuthScreen extends React.Component {
         if (this.state.auth === null) {
             content = <Text style={styles.loadingText}>Loading authentication details...</Text>;
         } else {
+            let data = [];
+            for (let i = 0; i < this.state.auth.data.length; i++) {
+                data.push({key: this.state.auth.data[i]});
+            }
             content = <AuthDataList
                 style={styles.data}
-                auth={this.state.auth}
+                domain={this.state.auth.client_app.domain}
+                data={data}
                 onAccept={this.onAcceptLogin}
             />;
         }

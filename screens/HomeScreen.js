@@ -70,10 +70,14 @@ export default class HomeScreen extends React.Component {
                         'lastname',
                         'birthdate',
                         'email'
-                    ], () => {
+                    ], async () => {
                         AsyncStorage.getItem(Config.initDone.key).then(value => {
                             console.log('init done at logout:', value);
                         });
+
+                        await SecureStore.deleteItemAsync(Config.storageKeys.publicKey);
+                        await SecureStore.deleteItemAsync(Config.storageKeys.privateKey);
+                        await SecureStore.deleteItemAsync(Config.storageKeys.jamID);
 
                         this.props.navigation.navigate('Launch');
                     });

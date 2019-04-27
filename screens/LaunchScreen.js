@@ -86,7 +86,7 @@ export default class LaunchScreen extends React.Component {
         this.refs.datePicker.setState({opened: false});
     }
 
-    keygen() {
+    async keygen() {
         /*
          TODO: Make sure that actual keygen and THEN registration is workign as expected
          (I think that maybe the keypair do not have the time to save itself onto the SecureStore before the
@@ -94,13 +94,16 @@ export default class LaunchScreen extends React.Component {
           */
         console.log('Generating...');
         // Giving time to UI to update
-        window.setTimeout(() => {
+        window.setTimeout(async () => {
             const enc = new Encryption();
-            //enc.generateKeypair();
-            //this.register().then(() => {
-                this.setState({generationStatus: 'Done!'});
-                this.refs.continueBtn.setState({disabled: false});
-            //});
+            await enc.generateKeypair();
+
+            window.setTimeout(() => {
+                this.register().then(() => {
+                    this.setState({generationStatus: 'Done!'});
+                    this.refs.continueBtn.setState({disabled: false});
+                });
+            }, 500);
         }, 500);
     }
 
