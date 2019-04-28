@@ -12,7 +12,8 @@ import {
 import {
     WebBrowser,
     SecureStore,
-    BarCodeScanner
+    BarCodeScanner,
+    Linking
 } from 'expo';
 
 import Config from "../constants/Config";
@@ -32,6 +33,15 @@ export default class HomeScreen extends React.Component {
         this._bootstrapAsync().then();
     }
 
+    componentDidMount() {
+        Linking.addEventListener('url', this._handleDeepLinkEvent);
+        Linking.getInitialURL().then(url => {
+            if (url && url.indexOf('jam://') === 0) {
+                this._authByDeepLink(url);
+            }
+        });
+    }
+
     async _bootstrapAsync() {
         const user = {
             firstname: await AsyncStorage.getItem('firstname'),
@@ -43,6 +53,18 @@ export default class HomeScreen extends React.Component {
             user: user
         });
     };
+
+    _handleDeepLinkEvent = event => {
+        this._authByDeepLink(event.url);
+    };
+
+    _authByDeepLink(url) {
+        console.log('authentication url: ', url);
+        const token = url.replace('jam://', '');
+        this.props.navigation.navigate('Auth', {
+            token: token
+        });
+    }
 
     run() {
         SecureStore.getItemAsync(Config.storageKeys.publicKey).then(value => {
@@ -85,15 +107,10 @@ export default class HomeScreen extends React.Component {
         ]);
     };
 
-    handleBarCodeScanned = ({ type, data }) => {
-        if (this.isBarCodeScannerEnabled) {
+    _handleBarCodeScanned = ({ type, data }) => {
+        if (this.isBarCodeScannerEnabled && type === 'org.iso.QRCode') {
             this.isBarCodeScannerEnabled = false;
-
-            console.log(type + ': ', data);
-            const token = data.replace('jam://', '');
-            this.props.navigation.navigate('Auth', {
-                token: token
-            });
+            this._authByDeepLink(data);
 
             window.setTimeout(() => {
                 this.isBarCodeScannerEnabled = true;
@@ -116,7 +133,7 @@ export default class HomeScreen extends React.Component {
                         />
                     </View>
                     <BarCodeScanner
-                        onBarCodeScanned={this.handleBarCodeScanned}
+                        onBarCodeScanned={this._handleBarCodeScanned}
                         style={styles.scanner}
                     />
                     <View style={styles.getStartedContainer}>
