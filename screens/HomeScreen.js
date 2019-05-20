@@ -33,15 +33,6 @@ export default class HomeScreen extends React.Component {
         this._bootstrapAsync().then();
     }
 
-    componentDidMount() {
-        Linking.addEventListener('url', this._handleDeepLinkEvent);
-        Linking.getInitialURL().then(url => {
-            if (url && url.indexOf('jam://') === 0) {
-                this._authByDeepLink(url);
-            }
-        });
-    }
-
     async _bootstrapAsync() {
         const user = {
             firstname: await AsyncStorage.getItem('firstname'),
@@ -54,16 +45,25 @@ export default class HomeScreen extends React.Component {
         });
     };
 
+    componentDidMount() {
+        Linking.addEventListener('url', this._handleDeepLinkEvent);
+        Linking.getInitialURL().then(url => {
+            this._authByDeepLink(url);
+        });
+    }
+
     _handleDeepLinkEvent = event => {
         this._authByDeepLink(event.url);
     };
 
     _authByDeepLink(url) {
-        console.log('authentication url: ', url);
-        const token = url.replace('jam://', '');
-        this.props.navigation.navigate('Auth', {
-            token: token
-        });
+        if (url && url.indexOf('jam://') === 0) {
+            console.log('authentication url: ', url);
+            const token = url.replace('jam://', '');
+            this.props.navigation.navigate('Auth', {
+                token: token
+            });
+        }
     }
 
     run() {
