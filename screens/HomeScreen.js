@@ -58,7 +58,7 @@ export default class HomeScreen extends React.Component {
 
     _authByDeepLink(url) {
         if (url && url.indexOf('jam://') === 0) {
-            console.log('authentication url: ', url);
+            alert('authentication url: ' + url);
             const token = url.replace('jam://', '');
             this.props.navigation.navigate('Auth', {
                 token: token
