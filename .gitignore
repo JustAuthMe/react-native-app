@@ -8,3 +8,4 @@ npm-debug.*
 *.mobileprovision
 false/
 dist/
+*.sh

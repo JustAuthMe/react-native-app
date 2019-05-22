@@ -1,4 +1,5 @@
 export default {
+    urlScheme: 'jam://',
     initDone: {
         key: 'init_done',
         value: 'done'
