@@ -82,10 +82,11 @@ export default class AuthScreen extends React.Component {
         if (canLogin) {
             const endpointUrl = Config.apiUrl + 'login';
             const data = await this.getUserDataFromDataset();
+            const plain = encodeURIComponent(JSON.stringify(data));
             const enc = new Encryption();
-            const sign = await enc.sign(encodeURIComponent(JSON.stringify(data)));
+            const sign = await enc.sign(plain);
             console.log(data);
-            console.log(encodeURIComponent(JSON.stringify(data)));
+            console.log(plain);
             console.log(sign);
             try {
                 const response = await fetch(
@@ -97,6 +98,7 @@ export default class AuthScreen extends React.Component {
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
+                            plain: plain,
                             data: data,
                             sign: sign
                         })
