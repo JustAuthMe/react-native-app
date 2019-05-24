@@ -30,18 +30,18 @@ export default class HomeScreen extends React.Component {
     constructor(props) {
         super(props);
         this.isBarCodeScannerEnabled = true;
-        this._bootstrapAsync().then();
+        this.user = {};
     }
 
     async _bootstrapAsync() {
-        const user = {
+        this.user = {
             firstname: await AsyncStorage.getItem('firstname'),
             lastname: await AsyncStorage.getItem('lastname'),
             birthdate: await AsyncStorage.getItem('birthdate'),
             email: await AsyncStorage.getItem('email')
         };
         this.setState({
-            user: user
+            user: this.user
         });
     };
 
@@ -49,6 +49,9 @@ export default class HomeScreen extends React.Component {
         Linking.addEventListener('url', this._handleDeepLinkEvent);
         Linking.getInitialURL().then(url => {
             this._authByDeepLink(url);
+        });
+        this.props.navigation.addListener("didFocus", () => {
+            this._bootstrapAsync().then();
         });
     }
 

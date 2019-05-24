@@ -83,8 +83,9 @@ export default class AuthScreen extends React.Component {
             const endpointUrl = Config.apiUrl + 'login';
             const data = await this.getUserDataFromDataset();
             const enc = new Encryption();
-            const sign = await enc.sign(JSON.stringify(data));
+            const sign = await enc.sign(encodeURIComponent(JSON.stringify(data)));
             console.log(data);
+            console.log(encodeURIComponent(JSON.stringify(data)));
             console.log(sign);
             try {
                 const response = await fetch(
