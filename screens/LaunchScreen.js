@@ -247,6 +247,7 @@ export default class LaunchScreen extends React.Component {
                             returnKeyType={"done"}
                             autoCorrect={false}
                             spellCheck={false}
+                            autoCapitalize={"none"}
                             textContentType={"emailAddress"}
                             keyboardType={"email-address"}
                             clearButtonMode={"always"}

@@ -36,6 +36,12 @@ export default class UserScreen extends React.Component {
         });
     };
 
+    componentDidMount() {
+        this.props.navigation.addListener("didFocus", () => {
+            this._bootstrapAsync().then();
+        });
+    }
+
     async updateInfos() {
         await AsyncStorage.setItem('firstname', this.state.user.firstname);
         await AsyncStorage.setItem('lastname', this.state.user.lastname);
@@ -91,6 +97,7 @@ export default class UserScreen extends React.Component {
                         returnKeyType={"done"}
                         autoCorrect={false}
                         spellCheck={false}
+                        autoCapitalize={"none"}
                         textContentType={"emailAddress"}
                         keyboardType={"email-address"}
                         clearButtonMode={"always"}
