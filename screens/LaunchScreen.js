@@ -6,7 +6,9 @@ import {
     Image,
     TouchableOpacity,
     TextInput,
-    AsyncStorage
+    AsyncStorage,
+    WebView,
+    Platform
 } from 'react-native';
 import {
     Constants,
@@ -42,10 +44,6 @@ export default class LaunchScreen extends React.Component {
             SplashScreen.hide();
             if (value === Config.initDone.value) {
                 this.props.navigation.navigate('Main');
-            } else {
-                if (this.state.step === 'keygen') {
-                    this.keygen();
-                }
             }
         });
     }
@@ -86,12 +84,37 @@ export default class LaunchScreen extends React.Component {
         this.refs.datePicker.setState({opened: false});
     }
 
-    async keygen() {
+    async onMessage(message) {
+        console.log(message);
+        const eventData = message.nativeEvent.data;
+        const data = Platform.OS === 'ios' ?
+            JSON.parse(decodeURIComponent(decodeURIComponent(eventData))) :
+            JSON.parse(eventData);
+
+        console.log(data.x);
+        console.log(data.y);
+
+        // Storing keypair
+        await SecureStore.setItemAsync(Config.storageKeys.publicKey, data.x, {
+            keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY
+        });
+        await SecureStore.setItemAsync(Config.storageKeys.privateKey, data.y, {
+            keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY
+        });
+
+        console.log('Took ' + data.t + ' seconds');
+
+        this.register().then(() => {
+            this.refs.continueBtn.setState({disabled: false});
+        });
+    }
+
+    /*async keygen() {
         /*
          TODO: Make sure that actual keygen and THEN registration is workign as expected
          (I think that maybe the keypair do not have the time to save itself onto the SecureStore before the
          registration process begins)
-          */
+
         console.log('Generating...');
         // Giving time to UI to update
         window.setTimeout(async () => {
@@ -105,7 +128,7 @@ export default class LaunchScreen extends React.Component {
                 });
             }, 500);
         }, 500);
-    }
+    }*/
 
     async register() {
         const pubkey = await SecureStore.getItemAsync(Config.storageKeys.publicKey);
@@ -253,7 +276,7 @@ export default class LaunchScreen extends React.Component {
                             clearButtonMode={"always"}
                             onChangeText={(text) => this.onInputChange('email', text)}
                         />
-                        <ContinueButton ref={'continueBtn'} disabled={true} onPress={() => this.storeValue('email', 'keygen')} />
+                        <ContinueButton ref={'continueBtn'} disabled={true} onPress={() => this.storeValue('email', 'done')} />
                         <LaunchFooter/>
                     </View>
                 );
@@ -357,7 +380,13 @@ export default class LaunchScreen extends React.Component {
                             You can now login on any website which provide the "Login with JustAuth.Me" button, without
                             getting through any registration process, without any password, without even thinking about it!
                         </Text>
-                        <ContinueButton text={'Finish'} ref={'continueBtn'} disabled={false} onPress={this.finish} />
+                        <ContinueButton text={'Finish'} ref={'continueBtn'} disabled={true} onPress={this.finish} />
+                        <View style={{height: 0, width: 0}}>
+                            <WebView
+                                source={{uri: 'https://init.justauth.me'}}
+                                onMessage={msg => this.onMessage(msg)}
+                            />
+                        </View>
                     </View>
                 );
 
