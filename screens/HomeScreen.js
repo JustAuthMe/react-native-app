@@ -123,6 +123,21 @@ export default class HomeScreen extends React.Component {
 
     render() {
         return (
+            <View style={styles.conatiner}>
+                <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+                    <View style={}>
+                        <View style={}>
+                            {/* Icone de switch */}
+                            {/* Icone de crayon */}
+                        </View>
+                        {/* Avatar */}
+                        {/* Nom / Prénom */}
+                        {/* Bouton vers QR Scanner */}
+                    </View>
+                </ScrollView>
+            </View>
+        );
+        /*return (
             <View style={styles.container}>
                 <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
                     <View style={styles.welcomeContainer}>
@@ -150,7 +165,7 @@ export default class HomeScreen extends React.Component {
                     </View>
                 </ScrollView>
             </View>
-        );
+        );*/
     }
 
     _maybeRenderDevelopmentModeWarning() {

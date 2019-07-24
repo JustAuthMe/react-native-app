@@ -281,6 +281,18 @@ export default class LaunchScreen extends React.Component {
                     </View>
                 );
 
+            case 'avatar':
+                // TODO: To finish and to fit into the launch process
+                return (
+                    <View style={styles.container}>
+                        <LightStatusBar/>
+                        <Image style={styles.logo} source={require('../assets/images/logo-small.png')}/>
+                        <Text style={styles.baseline}>And your E-Mail?</Text>
+                        <ContinueButton ref={'continueBtn'} disabled={true} onPress={() => this.storeValue('email', 'done')} />
+                        <LaunchFooter/>
+                    </View>
+                );
+
             case 'address':
                 // TODO: Add address screen to launch process
                 return (
@@ -353,6 +365,7 @@ export default class LaunchScreen extends React.Component {
                 );
 
             case 'keygen':
+                // TODO: To remove, not used anymore (background webview used instead)
                 return (
                     <View style={styles.container}>
                         <LightStatusBar/>
