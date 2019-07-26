@@ -7,16 +7,20 @@ import {
     View,
     Button,
     AsyncStorage,
-    Alert
+    Alert,
+    TouchableOpacity
 } from 'react-native';
 import {
     WebBrowser,
     SecureStore,
     BarCodeScanner,
-    Linking
+    Linking,
+    Icon,
+    Constants
 } from 'expo';
 
 import Config from "../constants/Config";
+import LightStatusBar from "../components/LightStatusBar";
 
 export default class HomeScreen extends React.Component {
     static navigationOptions = {
@@ -123,16 +127,78 @@ export default class HomeScreen extends React.Component {
 
     render() {
         return (
-            <View style={styles.conatiner}>
-                <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-                    <View style={}>
-                        <View style={}>
-                            {/* Icone de switch */}
-                            {/* Icone de crayon */}
-                        </View>
-                        {/* Avatar */}
-                        {/* Nom / Prénom */}
-                        {/* Bouton vers QR Scanner */}
+            <View style={styles.container}>
+                <LightStatusBar/>
+                <ScrollView style={styles.container}>
+                    <View style={{
+                        backgroundColor: '#3498DB',
+                        width: '100%',
+                        height: 300,
+                        alignItems: 'center',
+                        paddingTop: Constants.statusBarHeight > 20 ? 50 : 20
+                        }}>
+                        <TouchableOpacity onPress={() => Alert.alert('We\'re sorry...', 'This feature isn\'t implemented yet.')}
+                          style={{
+                            position: 'absolute',
+                            top: Constants.statusBarHeight > 20 ? 50 : 20,
+                            left: 20
+                        }}>
+                            <Icon.Ionicons
+                                name={'md-switch'}
+                                size={26}
+                                color={'#FFFFFF'}
+                            />
+                        </TouchableOpacity>
+                        <TouchableOpacity style={{
+                            position: 'absolute',
+                            top: Constants.statusBarHeight > 20 ? 50 : 20,
+                            right: 20
+                        }}>
+                            <Icon.Ionicons
+                                name={'md-create'}
+                                size={26}
+                                color={'#FFFFFF'}
+                            />
+                        </TouchableOpacity>
+                        <Image source={require('../assets/images/user.png')} style={{
+                            height: 100,
+                            width: 100,
+                            borderRadius: 50
+                        }} />
+                        <Text style={{
+                            paddingTop: 20,
+                            fontSize: 26,
+                            color: '#FFFFFF'
+                        }}>{this.state.user.firstname + ' ' + this.state.user.lastname}</Text>
+                        <TouchableOpacity style={{
+                            flexDirection: 'row',
+                            marginTop: 30,
+                            width: 170,
+                            height: 50,
+                            backgroundColor: '#1459E3',
+                            borderRadius: 5,
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            shadowColor: "#000",
+                            shadowOffset: {
+                                width: 0,
+                                height: 2,
+                            },
+                            shadowOpacity: 0.25,
+                            shadowRadius: 2,
+                            elevation: 5,
+                        }}>
+                            <Icon.Ionicons
+                                name={'ios-qr-scanner'}
+                                size={22}
+                                color={'#FFFFFF'}
+                            />
+                            <Text style={{
+                                color: '#FFFFFF',
+                                paddingLeft: 10,
+                                fontSize: 18
+                            }}>Authenticate</Text>
+                        </TouchableOpacity>
                     </View>
                 </ScrollView>
             </View>
@@ -196,6 +262,7 @@ export default class HomeScreen extends React.Component {
     };
 }
 
+const isBorderless = Constants.statusBarHeight > 20;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -209,7 +276,6 @@ const styles = StyleSheet.create({
         textAlign: 'center'
     },
     contentContainer: {
-        paddingTop: 30,
         alignItems: 'center'
     },
     welcomeContainer: {
