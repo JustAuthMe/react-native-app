@@ -5,15 +5,13 @@ import {
     StyleSheet,
     Text,
     View,
-    Button,
     AsyncStorage,
     Alert,
-    TouchableOpacity
+    TouchableOpacity,
+    StatusBar
 } from 'react-native';
 import {
-    WebBrowser,
     SecureStore,
-    BarCodeScanner,
     Linking,
     Icon,
     Constants
@@ -21,6 +19,7 @@ import {
 
 import Config from "../constants/Config";
 import LightStatusBar from "../components/LightStatusBar";
+import {AuthModel} from "../models/AuthModel";
 
 export default class HomeScreen extends React.Component {
     static navigationOptions = {
@@ -35,6 +34,7 @@ export default class HomeScreen extends React.Component {
         super(props);
         this.isBarCodeScannerEnabled = true;
         this.user = {};
+        this.authModel = new AuthModel();
     }
 
     async _bootstrapAsync() {
@@ -47,12 +47,13 @@ export default class HomeScreen extends React.Component {
         this.setState({
             user: this.user
         });
+        StatusBar.setBarStyle('light-content');
     };
 
     componentDidMount() {
         Linking.addEventListener('url', this._handleDeepLinkEvent);
         Linking.getInitialURL().then(url => {
-            this._authByDeepLink(url);
+            this.authModel.authByDeepLink(url, this.props.navigation);
         });
         this.props.navigation.addListener("didFocus", () => {
             this._bootstrapAsync().then();
@@ -60,18 +61,8 @@ export default class HomeScreen extends React.Component {
     }
 
     _handleDeepLinkEvent = event => {
-        this._authByDeepLink(event.url);
+        this.authModel.authByDeepLink(event.url, this.props.navigation);
     };
-
-    _authByDeepLink(url) {
-        if (url && url.indexOf(Config.urlScheme) === 0 && url !== Config.urlScheme) {
-            console.log('authentication url: ', url);
-            const token = url.replace(Config.urlScheme, '');
-            this.props.navigation.navigate('Auth', {
-                token: token
-            });
-        }
-    }
 
     run() {
         SecureStore.getItemAsync(Config.storageKeys.publicKey).then(value => {
@@ -114,152 +105,41 @@ export default class HomeScreen extends React.Component {
         ]);
     };
 
-    _handleBarCodeScanned = ({ type, data }) => {
-        if (this.isBarCodeScannerEnabled && type === 'org.iso.QRCode') {
-            this.isBarCodeScannerEnabled = false;
-            this._authByDeepLink(data);
-
-            window.setTimeout(() => {
-                this.isBarCodeScannerEnabled = true;
-            }, 2000);
-        }
-    };
-
     render() {
         return (
             <View style={styles.container}>
                 <LightStatusBar/>
                 <ScrollView style={styles.container}>
-                    <View style={{
-                        backgroundColor: '#3498DB',
-                        width: '100%',
-                        height: 300,
-                        alignItems: 'center',
-                        paddingTop: Constants.statusBarHeight > 20 ? 50 : 20
-                        }}>
-                        <TouchableOpacity onPress={() => Alert.alert('We\'re sorry...', 'This feature isn\'t implemented yet.')}
-                          style={{
-                            position: 'absolute',
-                            top: Constants.statusBarHeight > 20 ? 50 : 20,
-                            left: 20
-                        }}>
+                    <View style={styles.userHeader}>
+                        <TouchableOpacity style={styles.switchIcon} onPress={() => Alert.alert('We\'re sorry...', 'This feature isn\'t implemented yet.')}>
                             <Icon.Ionicons
                                 name={'md-switch'}
                                 size={26}
                                 color={'#FFFFFF'}
                             />
                         </TouchableOpacity>
-                        <TouchableOpacity style={{
-                            position: 'absolute',
-                            top: Constants.statusBarHeight > 20 ? 50 : 20,
-                            right: 20
-                        }}>
+                        <TouchableOpacity style={styles.editIcon}>
                             <Icon.Ionicons
                                 name={'md-create'}
                                 size={26}
                                 color={'#FFFFFF'}
                             />
                         </TouchableOpacity>
-                        <Image source={require('../assets/images/user.png')} style={{
-                            height: 100,
-                            width: 100,
-                            borderRadius: 50
-                        }} />
-                        <Text style={{
-                            paddingTop: 20,
-                            fontSize: 26,
-                            color: '#FFFFFF'
-                        }}>{this.state.user.firstname + ' ' + this.state.user.lastname}</Text>
-                        <TouchableOpacity style={{
-                            flexDirection: 'row',
-                            marginTop: 30,
-                            width: 170,
-                            height: 50,
-                            backgroundColor: '#1459E3',
-                            borderRadius: 5,
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            shadowColor: "#000",
-                            shadowOffset: {
-                                width: 0,
-                                height: 2,
-                            },
-                            shadowOpacity: 0.25,
-                            shadowRadius: 2,
-                            elevation: 5,
-                        }}>
+                        <Image source={require('../assets/images/user.png')} style={styles.userAvatar} />
+                        <Text style={styles.userIdentity}>{this.state.user.firstname + ' ' + this.state.user.lastname}</Text>
+                        <TouchableOpacity style={styles.authBtn} onPress={() => this.props.navigation.navigate('Scanner')}>
                             <Icon.Ionicons
                                 name={'ios-qr-scanner'}
                                 size={22}
                                 color={'#FFFFFF'}
                             />
-                            <Text style={{
-                                color: '#FFFFFF',
-                                paddingLeft: 10,
-                                fontSize: 18
-                            }}>Authenticate</Text>
+                            <Text style={styles.authText}>Authenticate</Text>
                         </TouchableOpacity>
                     </View>
                 </ScrollView>
             </View>
         );
-        /*return (
-            <View style={styles.container}>
-                <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-                    <View style={styles.welcomeContainer}>
-                        <Image
-                            source={
-                                __DEV__
-                                    ? require('../assets/images/robot-dev.png')
-                                    : require('../assets/images/robot-prod.png')
-                            }
-                            style={styles.welcomeImage}
-                        />
-                    </View>
-                    <BarCodeScanner
-                        onBarCodeScanned={this._handleBarCodeScanned}
-                        style={styles.scanner}
-                    />
-                    <View style={styles.getStartedContainer}>
-                        {this._maybeRenderDevelopmentModeWarning()}
-                        <Button title="Display secured infos" onPress={this.run}/>
-                        <Text>{this.state.user.firstname}</Text>
-                        <Text>{this.state.user.lastname}</Text>
-                        <Text>{this.state.user.birthdate}</Text>
-                        <Text>{this.state.user.email}</Text>
-                        <Button title="Log out" onPress={this.logout}/>
-                    </View>
-                </ScrollView>
-            </View>
-        );*/
     }
-
-    _maybeRenderDevelopmentModeWarning() {
-        if (__DEV__) {
-            const learnMoreButton = (
-                <Text onPress={this._handleLearnMorePress} style={styles.helpLinkText}>
-                    Learn more
-                </Text>
-            );
-
-            return (
-                <Text style={styles.developmentModeText}>
-                    Development mode is enabled, your app will be slower but you can use useful development
-                    tools. {learnMoreButton}
-                </Text>
-            );
-        } else {
-            return (
-                <Text style={styles.developmentModeText}>
-                    You are not in development mode, your app will run at full speed.
-                </Text>
-            );
-        }
-    }
-
-    _handleLearnMorePress = () => {
-        WebBrowser.openBrowserAsync('https://docs.expo.io/versions/latest/guides/development-mode');
-    };
 }
 
 const isBorderless = Constants.statusBarHeight > 20;
@@ -268,34 +148,66 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#fff'
     },
-    developmentModeText: {
-        marginBottom: 20,
-        color: 'rgba(0,0,0,0.4)',
-        fontSize: 14,
-        lineHeight: 19,
-        textAlign: 'center'
-    },
     contentContainer: {
         alignItems: 'center'
     },
-    welcomeContainer: {
+    userHeader: {
+        backgroundColor: '#3498DB',
+        width: '100%',
+        height: 300,
         alignItems: 'center',
-        marginTop: 10,
-        marginBottom: 20
+        paddingTop: isBorderless ? 50 : 20
     },
-    welcomeImage: {
+    switchIcon: {
+        position: 'absolute',
+        top: isBorderless ? 40 : 10,
+        left: 5,
+        width: 50,
+        height: 50,
+        paddingTop: 10,
+        paddingLeft: 15
+    },
+    editIcon: {
+        position: 'absolute',
+        top: isBorderless ? 40 : 10,
+        right: 5,
+        width: 50,
+        height: 50,
+        paddingTop: 10,
+        paddingLeft: 15
+    },
+    userAvatar: {
+        height: 100,
         width: 100,
-        height: 80,
-        resizeMode: 'contain',
-        marginTop: 3,
-        marginLeft: -10
+        borderRadius: 50
     },
-    getStartedContainer: {
+    userIdentity: {
+        paddingTop: 20,
+        fontSize: 26,
+        color: '#FFFFFF',
+        fontWeight: '200'
+    },
+    authBtn: {
+        flexDirection: 'row',
+        marginTop: 30,
+        width: 170,
+        height: 50,
+        backgroundColor: '#1459E3',
+        borderRadius: 5,
         alignItems: 'center',
-        marginHorizontal: 50
+        justifyContent: 'center',
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 2,
+        elevation: 5,
     },
-    scanner: {
-        width: 300,
-        height: 300
+    authText: {
+        color: '#FFFFFF',
+        paddingLeft: 10,
+        fontSize: 18
     }
 });

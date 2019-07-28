@@ -7,10 +7,12 @@ import HomeScreen from '../screens/HomeScreen';
 import UserScreen from '../screens/UserScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import AuthScreen from "../screens/AuthScreen";
+import ScannerScreen from "../screens/ScannerScreen";
 
 const HomeStack = createStackNavigator({
-    Home: HomeScreen,
-    Auth: AuthScreen
+    Home   : HomeScreen,
+    Scanner: ScannerScreen,
+    Auth   : AuthScreen
 });
 
 HomeStack.navigationOptions = {
@@ -18,11 +20,7 @@ HomeStack.navigationOptions = {
     tabBarIcon: ({focused}) => (
         <TabBarIcon
             focused={focused}
-            name={
-                Platform.OS === 'ios'
-                    ? `ios-information-circle${focused ? '' : '-outline'}`
-                    : 'md-information-circle'
-            }
+            name={`md-home`}
         />
     ),
 };

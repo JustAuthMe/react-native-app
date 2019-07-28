@@ -3,10 +3,10 @@ import {
     StatusBar
 } from 'react-native';
 
-export default class LightStatusBar extends React.Component {
+export default class DarkStatusBar extends React.Component {
     render() {
         return (
-            <StatusBar barStyle="light-content" animated={true} />
+            <StatusBar barStyle="dark-content" animated={true} />
         );
     }
 }

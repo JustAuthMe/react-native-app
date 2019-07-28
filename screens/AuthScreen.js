@@ -3,15 +3,21 @@ import {
     View,
     Text,
     StyleSheet,
+    Image,
     AsyncStorage
 } from 'react-native';
 import {
     LocalAuthentication,
     SecureStore
 } from 'expo';
+import {
+    StackActions,
+    NavigationActions
+} from 'react-navigation';
 import AuthDataList from "../components/AuthDataList";
 import Config from "../constants/Config";
 import {Encryption} from "../models/Encryption";
+import DarkStatusBar from "../components/DarkStatusBar";
 
 export default class AuthScreen extends React.Component {
     static navigationOptions = {
@@ -110,7 +116,11 @@ export default class AuthScreen extends React.Component {
 
                 if (responseJson.status === 'success') {
                     alert('Login succeed!');
-                    this.props.navigation.goBack();
+                    const resetAction = StackActions.reset({
+                        index: 0,
+                        actions: [NavigationActions.navigate({ routeName: 'Home' })],
+                    });
+                    this.props.navigation.dispatch(resetAction);
                 }
             } catch (error) {
                 console.error(error);
@@ -129,16 +139,35 @@ export default class AuthScreen extends React.Component {
             for (let i = 0; i < this.state.auth.data.length; i++) {
                 data.push({key: this.state.auth.data[i]});
             }
-            content = <AuthDataList
-                style={styles.data}
-                domain={this.state.auth.client_app.domain}
-                data={data}
-                onAccept={this.onAcceptLogin}
-            />;
+            content =
+                <View style={styles.container}>
+                    <View style={{
+                        backgroundColor: '#3498DB',
+                        height: 250,
+                        width: '100%',
+                        alignItems: 'center'
+                    }}>
+                        <Image source={require('../assets/images/client.png')} style={{
+                            height: 100,
+                            width: 100,
+                            borderRadius: 50,
+                            marginTop: 20
+                        }} />
+                        <Text>{this.state.auth.client_app.name}</Text>
+                    </View>
+                    <AuthDataList
+                        style={styles.data}
+                        domain={this.state.auth.client_app.domain}
+                        data={data}
+                        onAccept={this.onAcceptLogin}
+                    />
+                </View>
+            ;
         }
 
         return (
             <View style={styles.container}>
+                <DarkStatusBar/>
                 {content}
             </View>
         );
@@ -148,8 +177,7 @@ export default class AuthScreen extends React.Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
-        justifyContent: 'center',
+        backgroundColor: '#fff'
     },
     loadingText: {
         textAlign: 'center'

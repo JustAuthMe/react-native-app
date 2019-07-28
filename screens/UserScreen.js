@@ -5,7 +5,8 @@ import {
     StyleSheet,
     TextInput,
     AsyncStorage,
-    Button
+    Button,
+    StatusBar
 } from 'react-native';
 import Colors from '../constants/Colors';
 
@@ -34,6 +35,7 @@ export default class UserScreen extends React.Component {
         this.setState({
             user: user
         });
+        StatusBar.setBarStyle('dark-content');
     };
 
     componentDidMount() {
