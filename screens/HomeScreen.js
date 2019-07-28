@@ -51,10 +51,10 @@ export default class HomeScreen extends React.Component {
     };
 
     componentDidMount() {
-        Linking.addEventListener('url', this._handleDeepLinkEvent);
+        /*Linking.addEventListener('url', this._handleDeepLinkEvent);
         Linking.getInitialURL().then(url => {
             this.authModel.authByDeepLink(url, this.props.navigation);
-        });
+        });*/
         this._navListener = this.props.navigation.addListener("didFocus", () => {
             this._bootstrapAsync().then();
         });
@@ -64,9 +64,9 @@ export default class HomeScreen extends React.Component {
         this._navListener.remove();
     }
 
-    _handleDeepLinkEvent = event => {
+    /*_handleDeepLinkEvent = event => {
         this.authModel.authByDeepLink(event.url, this.props.navigation);
-    };
+    };*/
 
     run() {
         SecureStore.getItemAsync(Config.storageKeys.publicKey).then(value => {
