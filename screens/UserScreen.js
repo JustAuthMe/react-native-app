@@ -39,9 +39,13 @@ export default class UserScreen extends React.Component {
     };
 
     componentDidMount() {
-        this.props.navigation.addListener("didFocus", () => {
+        this._navListener = this.props.navigation.addListener("didFocus", () => {
             this._bootstrapAsync().then();
         });
+    }
+
+    componentWillUnmount() {
+        this._navListener.remove();
     }
 
     async updateInfos() {

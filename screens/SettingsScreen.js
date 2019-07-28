@@ -14,10 +14,14 @@ export default class SettingsScreen extends React.Component {
   }
 
   componentDidMount() {
-      this.props.navigation.addListener("didFocus", () => {
+      this._navListener = this.props.navigation.addListener("didFocus", () => {
           this._bootstrapAsync().then();
       });
   }
+
+    componentWillUnmount() {
+        this._navListener.remove();
+    }
 
   render() {
     /* Go ahead and delete ExpoConfigView and replace it with your

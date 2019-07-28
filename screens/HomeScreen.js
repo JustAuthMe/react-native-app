@@ -55,9 +55,13 @@ export default class HomeScreen extends React.Component {
         Linking.getInitialURL().then(url => {
             this.authModel.authByDeepLink(url, this.props.navigation);
         });
-        this.props.navigation.addListener("didFocus", () => {
+        this._navListener = this.props.navigation.addListener("didFocus", () => {
             this._bootstrapAsync().then();
         });
+    }
+
+    componentWillUnmount() {
+        this._navListener.remove();
     }
 
     _handleDeepLinkEvent = event => {
