@@ -20,6 +20,7 @@ import {
 import Config from "../constants/Config";
 import LightStatusBar from "../components/LightStatusBar";
 import {AuthModel} from "../models/AuthModel";
+import ActionBtn from "../components/ActionBtn";
 
 export default class HomeScreen extends React.Component {
     static navigationOptions = {
@@ -131,14 +132,11 @@ export default class HomeScreen extends React.Component {
                         </TouchableOpacity>
                         <Image source={require('../assets/images/user.png')} style={styles.userAvatar} />
                         <Text style={styles.userIdentity}>{this.state.user.firstname + ' ' + this.state.user.lastname}</Text>
-                        <TouchableOpacity style={styles.authBtn} onPress={() => this.props.navigation.navigate('Scanner')}>
-                            <Icon.Ionicons
-                                name={'ios-qr-scanner'}
-                                size={22}
-                                color={'#FFFFFF'}
-                            />
-                            <Text style={styles.authText}>Authenticate</Text>
-                        </TouchableOpacity>
+                        <ActionBtn
+                            onPress={() => this.props.navigation.navigate('Scanner')}
+                            btnIcon={'ios-qr-scanner'}
+                            btnText={'Authenticate'}
+                        />
                     </View>
                 </ScrollView>
             </View>
@@ -190,28 +188,5 @@ const styles = StyleSheet.create({
         fontSize: 26,
         color: '#FFFFFF',
         fontWeight: '200'
-    },
-    authBtn: {
-        flexDirection: 'row',
-        marginTop: 30,
-        width: 170,
-        height: 50,
-        backgroundColor: '#1459E3',
-        borderRadius: 5,
-        alignItems: 'center',
-        justifyContent: 'center',
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 2,
-        elevation: 5,
-    },
-    authText: {
-        color: '#FFFFFF',
-        paddingLeft: 10,
-        fontSize: 18
     }
 });

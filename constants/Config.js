@@ -9,5 +9,12 @@ export default {
         publicKey: 'pubkey',
         privateKey: 'privkey',
         jamID: 'jam_id'
+    },
+    dataList: {
+        firstname: 'Firstname',
+        lastname: 'Lastname',
+        email: 'E-Mail address',
+        tel: 'Phone number',
+        birthdate: 'Birthdate'
     }
 };

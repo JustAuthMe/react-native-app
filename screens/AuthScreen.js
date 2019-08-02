@@ -4,7 +4,8 @@ import {
     Text,
     StyleSheet,
     Image,
-    AsyncStorage
+    AsyncStorage,
+    ScrollView
 } from 'react-native';
 import {
     LocalAuthentication,
@@ -140,20 +141,11 @@ export default class AuthScreen extends React.Component {
                 data.push({key: this.state.auth.data[i]});
             }
             content =
-                <View style={styles.container}>
-                    <View style={{
-                        backgroundColor: '#3498DB',
-                        height: 250,
-                        width: '100%',
-                        alignItems: 'center'
-                    }}>
-                        <Image source={require('../assets/images/client.png')} style={{
-                            height: 100,
-                            width: 100,
-                            borderRadius: 50,
-                            marginTop: 20
-                        }} />
-                        <Text>{this.state.auth.client_app.name}</Text>
+                <ScrollView style={styles.container}>
+                    <View style={styles.authHeader}>
+                        <Image source={require('../assets/images/client.png')} style={styles.appIcon} />
+                        <Text style={styles.logInto}>You're about to log into</Text>
+                        <Text style={styles.appName}>{this.state.auth.client_app.name}</Text>
                     </View>
                     <AuthDataList
                         style={styles.data}
@@ -161,7 +153,7 @@ export default class AuthScreen extends React.Component {
                         data={data}
                         onAccept={this.onAcceptLogin}
                     />
-                </View>
+                </ScrollView>
             ;
         }
 
@@ -183,6 +175,36 @@ const styles = StyleSheet.create({
         textAlign: 'center'
     },
     data: {
+        paddingLeft: 70,
+        paddingRight: 70,
+        marginTop: 20,
+        alignItems: 'center'
+    },
+    authHeader: {
+        backgroundColor: '#3498DB',
+        width: '100%',
+        alignItems: 'center'
+    },
+    appIcon: {
+        height: 100,
+        width: 100,
+        borderRadius: 50,
+        marginTop: 20
+    },
+    logInto: {
+        marginTop: 20,
+        paddingLeft: 70,
+        paddingRight: 70,
+        fontWeight: '200',
+        color: '#fff',
+        fontSize: 20,
         textAlign: 'center'
+    },
+    appName: {
+        marginTop: 20,
+        fontWeight: '600',
+        color: '#fff',
+        fontSize: 20,
+        paddingBottom: 30
     }
 });
