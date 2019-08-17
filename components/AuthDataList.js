@@ -3,23 +3,30 @@ import {
     View,
     Text,
     FlatList,
-    TouchableOpacity
+    TouchableOpacity,
+    StyleSheet
 } from 'react-native';
 import {
     Icon
 } from 'expo';
 import ActionBtn from "./ActionBtn";
 import Config from "../constants/Config";
+import CheckMark from "./CheckMark";
 
 export default class AuthDataList extends React.Component {
+    static isDataRequired(data) {
+        return data.indexOf('!') === data.length - 1;
+    }
+
     getDataLabelFromID(data) {
-        if (data.indexOf('!') === data.length - 1) {
+        if (AuthDataList.isDataRequired(data)) {
             data = data.slice(0, -1);
         }
 
         return Config.dataList[data];
     }
 
+    // TODO: onPress() sur le TouchableOpacity
     render() {
         console.log(this.props.data);
         return (
@@ -30,50 +37,56 @@ export default class AuthDataList extends React.Component {
                     textAlign: 'center'
                 }}>{this.props.domain} will have access to the following:</Text>
                 <FlatList
-                    style={{
-                        marginTop: 20
-                    }}
+                    style={styles.listContainer}
                     data={this.props.data}
                     renderItem={({item}) =>
-                        <View style={{
-                            flexDirection: 'row',
-                            marginBottom: 10
-                        }}>
-                            <TouchableOpacity style={{
-                                width: 30,
-                                height: 30,
-                                borderRadius: 15,
-                                borderWidth: 1,
-                                borderColor: '#6f6f6f'
-                            }}>
-                                <View style={{
-                                    width: 24,
-                                    height: 24,
-                                    marginTop: 2,
-                                    marginLeft: 2,
-                                    backgroundColor: '#00b100',
-                                    borderRadius: 12,
-                                    alignItems: 'center',
-                                    justifyContent: 'center'
-                                }}>
-                                    <Icon.Ionicons
-                                        name={'md-checkmark'}
-                                        size={22}
-                                        color={'#fff'}
-                                    />
-                                </View>
+                        <View style={styles.listItem}>
+                            <TouchableOpacity style={styles.itemCheckbox} activeOpacity={AuthDataList.isDataRequired(item.key) ? 1 : .2}>
+                                <CheckMark ref={'checked_' + item.key} itemKey={item.key} />
                             </TouchableOpacity>
-                            <Text style={{
-                                marginLeft: 15,
-                                lineHeight: 30,
-                                fontSize: 20,
-                                fontWeight: '600'
-                            }}>{this.getDataLabelFromID(item.key)}</Text>
+                            <Text style={styles.itemText}>{this.getDataLabelFromID(item.key)}</Text>
                         </View>
                     }
                 />
-                <ActionBtn style={{alignSelf: 'center'}} btnText="Confirm login" btnIcon={'md-checkmark'} onPress={this.props.onAccept} />
+                <ActionBtn style={styles.loginBtn} btnText="Confirm login" btnIcon={'md-checkmark'} onPress={this.props.onAccept} />
             </View>
         );
     }
 }
+
+const styles = StyleSheet.create({
+    listContainer: {
+        marginTop: 20
+    },
+    listItem: {
+        flexDirection: 'row',
+        marginBottom: 10
+    },
+    itemCheckbox: {
+        flexDirection: 'row',
+        marginBottom: 10,
+        height: 30,
+        width: 30,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 15
+    },
+    roundedBox: {
+        width: 24,
+        height: 24,
+        marginTop: 2,
+        marginLeft: 2,
+        borderRadius: 12,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    itemText: {
+        marginLeft: 15,
+        lineHeight: 30,
+        fontSize: 20,
+        fontWeight: '600'
+    },
+    loginBtn: {
+        alignSelf: 'center'
+    }
+});
