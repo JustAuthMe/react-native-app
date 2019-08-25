@@ -32,9 +32,7 @@ export default class AuthScreen extends React.Component {
 
     constructor(props) {
         super(props);
-        this.getAuthDetails().then(data => {
-            this.setState({data: data});
-        });
+        this.getAuthDetails().then();
     }
 
     async getAuthDetails() {
@@ -48,6 +46,10 @@ export default class AuthScreen extends React.Component {
                 this.setState({
                     auth: responseJson.auth
                 });
+                this.actualData = {};
+                for (let i = 0; i < responseJson.auth.data.length; i++) {
+                    this.actualData[responseJson.auth.data[i]] = true;
+                }
             } else {
                 // TODO: make a real error handling
                 console.log('error retreiving auth details');
@@ -71,7 +73,10 @@ export default class AuthScreen extends React.Component {
                 dataName = authData[i].slice(0, -1);
             }
 
-            data[dataName] = await AsyncStorage.getItem(dataName);
+            if (this.actualData[authData[i]]) {
+                console.log('date sent: ' + dataName);
+                data[dataName] = await AsyncStorage.getItem(dataName);
+            }
         }
 
         return data;
@@ -105,7 +110,8 @@ export default class AuthScreen extends React.Component {
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
-                            plain: plain,
+                            // TODO: Check all possibilities for accents and REMOVE plain (possible security flaw)
+                            /*plain: plain,*/
                             data: data,
                             sign: sign
                         })
@@ -131,6 +137,10 @@ export default class AuthScreen extends React.Component {
         }
     };
 
+    onUpdateData = (data) => {
+        this.actualData[data] = !this.actualData[data];
+    };
+
     render() {
         let content;
         if (this.state.auth === null) {
@@ -152,6 +162,7 @@ export default class AuthScreen extends React.Component {
                         domain={this.state.auth.client_app.domain}
                         data={data}
                         onAccept={this.onAcceptLogin}
+                        onUpdate={this.onUpdateData}
                     />
                 </ScrollView>
             ;

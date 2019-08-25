@@ -12,7 +12,7 @@ export default class CheckMark extends React.Component {
         visible: true
     };
 
-    static getCheckMarkStyle(data) {
+    getCheckMarkStyle = (data) => {
         const bgColor = AuthDataList.isDataRequired(data) ? '#ccc' : '#00b100';
         const visible = this.state.visible ? 'flex' : 'none';
         return {
@@ -26,11 +26,11 @@ export default class CheckMark extends React.Component {
             display: visible,
             backgroundColor: bgColor
         };
-    }
+    };
 
     render() {
         return (
-            <View style={CheckMark.getCheckMarkStyle(this.props.itemKey)}>
+            <View style={this.getCheckMarkStyle(this.props.itemKey)}>
                 <Icon.Ionicons
                     name={'md-checkmark'}
                     size={22}

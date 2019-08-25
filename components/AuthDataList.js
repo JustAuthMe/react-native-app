@@ -6,14 +6,16 @@ import {
     TouchableOpacity,
     StyleSheet
 } from 'react-native';
-import {
-    Icon
-} from 'expo';
 import ActionBtn from "./ActionBtn";
 import Config from "../constants/Config";
 import CheckMark from "./CheckMark";
 
 export default class AuthDataList extends React.Component {
+    constructor(props) {
+        super(props);
+        this.checkmarks = {};
+    }
+
     static isDataRequired(data) {
         return data.indexOf('!') === data.length - 1;
     }
@@ -26,7 +28,11 @@ export default class AuthDataList extends React.Component {
         return Config.dataList[data];
     }
 
-    // TODO: onPress() sur le TouchableOpacity
+    onCheckMarkPressed = data => {
+        this.checkmarks[data].setState({visible: !this.checkmarks[data].state.visible});
+        this.props.onUpdate(data);
+    };
+
     render() {
         console.log(this.props.data);
         return (
@@ -41,8 +47,8 @@ export default class AuthDataList extends React.Component {
                     data={this.props.data}
                     renderItem={({item}) =>
                         <View style={styles.listItem}>
-                            <TouchableOpacity style={styles.itemCheckbox} activeOpacity={AuthDataList.isDataRequired(item.key) ? 1 : .2}>
-                                <CheckMark ref={'checked_' + item.key} itemKey={item.key} />
+                            <TouchableOpacity style={styles.itemCheckbox} activeOpacity={1} onPress={() => this.onCheckMarkPressed(item.key)}>
+                                <CheckMark ref={ref =>(this.checkmarks[item.key] = ref)} itemKey={item.key} />
                             </TouchableOpacity>
                             <Text style={styles.itemText}>{this.getDataLabelFromID(item.key)}</Text>
                         </View>
