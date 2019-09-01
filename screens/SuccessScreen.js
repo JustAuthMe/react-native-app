@@ -4,16 +4,9 @@ import {
     StyleSheet,
     Text
 } from 'react-native';
-import {
-    Audio
-} from 'expo';
-import {
-    NavigationActions,
-    StackActions
-} from "react-navigation";
 import LottieView from 'lottie-react-native';
-import ContinueButton from "../components/ContinueButton";
 import ActionBtn from "../components/ActionBtn";
+import {AudioModel} from "../models/AudioModel";
 
 export default class SuccessScreen extends React.Component {
     static navigationOptions = {
@@ -24,13 +17,10 @@ export default class SuccessScreen extends React.Component {
 
     componentDidMount() {
         this.animation.play();
-        const soundObject = new Audio.Sound();
         try {
-            soundObject.loadAsync(require('../assets/sounds/success.wav')).then(() => {
-                window.setTimeout(() => {
-                    soundObject.playAsync();
-                }, 800);
-            });
+            window.setTimeout(() => {
+                AudioModel.play('success').then();
+            }, 750);
             // Your sound is playing!
         } catch (error) {
             // An error occurred!
@@ -49,6 +39,7 @@ export default class SuccessScreen extends React.Component {
                         }}
                         source={require('../assets/animations/check-mark-success.json')}
                         loop={false}
+                        speed={1.3}
                     />
                 </View>
                 <ActionBtn
@@ -71,13 +62,14 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
     animationContainer: {
-        width: 200,
-        height: 200
+        width: 150,
+        height: 150,
+        marginTop: 50,
+        marginBottom: 50
     },
     successText: {
         fontSize: 24,
         color: '#fff',
         fontWeight: '600',
-        paddingBottom: 20
     }
 });

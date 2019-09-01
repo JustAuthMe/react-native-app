@@ -11,10 +11,6 @@ import {
     LocalAuthentication,
     SecureStore
 } from 'expo';
-import {
-    StackActions,
-    NavigationActions
-} from 'react-navigation';
 import AuthDataList from "../components/AuthDataList";
 import Config from "../constants/Config";
 import {Encryption} from "../models/Encryption";

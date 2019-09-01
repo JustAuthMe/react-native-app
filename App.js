@@ -3,6 +3,8 @@ import {StyleSheet, View, AsyncStorage} from 'react-native';
 import {AppLoading, Asset, Font, Icon} from 'expo';
 import AppNavigator from './navigation/AppNavigator';
 import Config from "./constants/Config";
+import {AudioModel} from "./models/AudioModel";
+import AudioLibrary from "./constants/AudioLibrary";
 
 export default class App extends React.Component {
     state = {
@@ -34,13 +36,12 @@ export default class App extends React.Component {
     }
 
     _loadResourcesAsync = async () => {
+        const sounds = AudioModel.load(AudioLibrary);
         return Promise.all([
             Font.loadAsync({
                 // This is the font that we are using for our tab bar
                 ...Icon.Ionicons.font,
-                // We include SpaceMono because we use it in HomeScreen.js. Feel free
-                // to remove this if you are not using it in your app
-                'space-mono': require('./assets/fonts/SpaceMono-Regular.ttf'),
+                ...sounds
             }),
         ]);
     };
