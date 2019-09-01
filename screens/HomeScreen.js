@@ -17,6 +17,7 @@ import {
     Constants
 } from 'expo';
 
+
 import Config from "../constants/Config";
 import LightStatusBar from "../components/LightStatusBar";
 import {AuthModel} from "../models/AuthModel";
@@ -123,7 +124,7 @@ export default class HomeScreen extends React.Component {
                                 color={'#FFFFFF'}
                             />
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.editIcon}>
+                        <TouchableOpacity style={styles.editIcon} onPress={() => this.props.navigation.navigate('User')}>
                             <Icon.Ionicons
                                 name={'md-create'}
                                 size={26}
@@ -137,6 +138,12 @@ export default class HomeScreen extends React.Component {
                             btnIcon={'ios-qr-scanner'}
                             btnText={'Authenticate'}
                         />
+                    </View>
+                    <View style={{
+                        alignItems: 'center',
+                        paddingTop: 10
+                    }}>
+                        <Text>Build {Constants.manifest.version}</Text>
                     </View>
                 </ScrollView>
             </View>

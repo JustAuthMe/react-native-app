@@ -20,6 +20,9 @@ export default class ActionBtn extends React.Component {
                         name={this.props.btnIcon}
                         size={22}
                         color={'#FFFFFF'}
+                        style={{
+                            paddingTop: 3
+                        }}
                     />
                     <Text style={styles.JamBtnText}>{this.props.btnText}</Text>
                 </TouchableOpacity>

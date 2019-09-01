@@ -122,12 +122,7 @@ export default class AuthScreen extends React.Component {
                 console.log(responseJson);
 
                 if (responseJson.status === 'success') {
-                    alert('Login succeed!');
-                    const resetAction = StackActions.reset({
-                        index: 0,
-                        actions: [NavigationActions.navigate({ routeName: 'Home' })],
-                    });
-                    this.props.navigation.dispatch(resetAction);
+                    this.props.navigation.navigate('Success');
                 }
             } catch (error) {
                 console.error(error);

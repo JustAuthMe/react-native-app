@@ -32,9 +32,9 @@ export default class ContinueButton extends React.Component {
                 onPress={this.props.onPress}>
                 <Text style={{
                     marginTop: 60,
-                    paddingTop: 5,
+                    paddingTop: 10,
                     paddingRight: 20,
-                    paddingBottom: 5,
+                    paddingBottom: 10,
                     paddingLeft: 20,
                     borderColor: this.state.disabled ?
                         ContinueButton.styles.color.disabled :
