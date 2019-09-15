@@ -47,7 +47,11 @@ export default class AuthDataList extends React.Component {
                     data={this.props.data}
                     renderItem={({item}) =>
                         <View style={styles.listItem}>
-                            <TouchableOpacity style={styles.itemCheckbox} activeOpacity={1} onPress={() => this.onCheckMarkPressed(item.key)}>
+                            <TouchableOpacity style={styles.itemCheckbox} activeOpacity={1} onPress={() => {
+                                if (!AuthDataList.isDataRequired(item.key)) {
+                                    this.onCheckMarkPressed(item.key)
+                                }
+                            }}>
                                 <CheckMark ref={ref =>(this.checkmarks[item.key] = ref)} itemKey={item.key} />
                             </TouchableOpacity>
                             <Text style={styles.itemText}>{this.getDataLabelFromID(item.key)}</Text>

@@ -8,7 +8,8 @@ import {
     AsyncStorage,
     Alert,
     TouchableOpacity,
-    StatusBar
+    StatusBar,
+    Button
 } from 'react-native';
 import {
     SecureStore,
@@ -44,7 +45,8 @@ export default class HomeScreen extends React.Component {
             firstname: await AsyncStorage.getItem('firstname'),
             lastname: await AsyncStorage.getItem('lastname'),
             birthdate: await AsyncStorage.getItem('birthdate'),
-            email: await AsyncStorage.getItem('email')
+            email: await AsyncStorage.getItem('email'),
+            avatar: await AsyncStorage.getItem('avatar')
         };
         this.setState({
             user: this.user
@@ -131,7 +133,7 @@ export default class HomeScreen extends React.Component {
                                 color={'#FFFFFF'}
                             />
                         </TouchableOpacity>
-                        <Image source={require('../assets/images/user.png')} style={styles.userAvatar} />
+                        <Image source={{uri: this.state.user.avatar}} style={styles.userAvatar} />
                         <Text style={styles.userIdentity}>{this.state.user.firstname + ' ' + this.state.user.lastname}</Text>
                         <ActionBtn
                             onPress={() => this.props.navigation.navigate('Scanner')}
@@ -144,6 +146,7 @@ export default class HomeScreen extends React.Component {
                         paddingTop: 10
                     }}>
                         <Text>Build {Constants.manifest.version}</Text>
+                        <Button onPress={() => this.logout()} title={'Logout'} />
                     </View>
                 </ScrollView>
             </View>

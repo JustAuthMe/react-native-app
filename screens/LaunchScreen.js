@@ -13,15 +13,18 @@ import {
 import {
     Constants,
     SecureStore,
-    SplashScreen
+    SplashScreen,
+    ImagePicker,
+    Permissions,
+    Icon
 } from 'expo';
 import { Ionicons } from '@expo/vector-icons';
 import LaunchFooter from "../components/LaunchFooter";
 import ContinueButton from "../components/ContinueButton";
 import DatePickerKeyboardIOS from "../components/DatePickerKeyboardIOS";
 import Config from "../constants/Config";
-import {Encryption} from "../models/Encryption";
 import LightStatusBar from "../components/LightStatusBar";
+import { StackActions, NavigationActions } from 'react-navigation';
 
 export default class LaunchScreen extends React.Component {
 
@@ -33,7 +36,8 @@ export default class LaunchScreen extends React.Component {
         step: this.props.navigation.getParam('step') ? this.props.navigation.state.params.step : 'launch',
         currentBirthdate: new Date(),
         birthdateInputValue: '',
-        generationStatus: 'Generating...'
+        generationStatus: 'Generating...',
+        avatar: null,
     };
 
     constructor(props) {
@@ -68,7 +72,20 @@ export default class LaunchScreen extends React.Component {
             AsyncStorage.getItem(key).then(value => {
                 console.log(key + ':', value);
             });
-            this.props.navigation.push('LaunchScreen', {step: nextStep});
+            if (nextStep !== 'done') {
+                this.props.navigation.push('LaunchScreen', {step: nextStep});
+            } else {
+                const resetAction = StackActions.reset({
+                    index: 0,
+                    actions: [NavigationActions.navigate({
+                        routeName: 'LaunchScreen',
+                        params: {
+                            step: nextStep
+                        }
+                    })],
+                });
+                this.props.navigation.dispatch(resetAction);
+            }
         });
     }
 
@@ -179,6 +196,32 @@ export default class LaunchScreen extends React.Component {
         });
     };
 
+    getLibraryPermissionAsync = async () => {
+        if (Constants.platform.ios) {
+            const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+            if (status !== 'granted') {
+                alert('Sorry, you need to grant Camera roll permission to chose an avatar!');
+            }
+        }
+    };
+
+    _pickImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [1, 1],
+            base64: true
+        });
+
+        console.log(result);
+        if (!result.cancelled) {
+            const avatarUri = 'data:image/jpeg;base64,' + result.base64;
+            this.personnalInfos['avatar'] = avatarUri;
+            this.setState({avatar: avatarUri});
+            this.refs.continueBtn.setState({disabled: false});
+        }
+    };
+
     render() {
         switch (this.state.step) {
             case 'firstname':
@@ -276,19 +319,38 @@ export default class LaunchScreen extends React.Component {
                             clearButtonMode={"always"}
                             onChangeText={(text) => this.onInputChange('email', text)}
                         />
-                        <ContinueButton ref={'continueBtn'} disabled={true} onPress={() => this.storeValue('email', 'done')} />
+                        <ContinueButton ref={'continueBtn'} disabled={true} onPress={() => this.storeValue('email', 'avatar')} />
                         <LaunchFooter/>
                     </View>
                 );
 
             case 'avatar':
                 // TODO: To finish and to fit into the launch process
+                this.getLibraryPermissionAsync().then();
                 return (
                     <View style={styles.container}>
                         <LightStatusBar/>
                         <Image style={styles.logo} source={require('../assets/images/logo-small.png')}/>
-                        <Text style={styles.baseline}>And your E-Mail?</Text>
-                        <ContinueButton ref={'continueBtn'} disabled={true} onPress={() => this.storeValue('email', 'done')} />
+                        <Text style={styles.baseline}>Finally, chose an avatar</Text>
+                        <TouchableOpacity onPress={() => this._pickImage()} style={{
+                            marginTop: 20
+                        }}>
+                            <Image source={{uri: this.state.avatar !== null ? this.state.avatar : '../assets/images/user.png'}} style={{
+                                display: this.state.avatar !== null ? 'flex' : 'none',
+                                height: 120,
+                                width: 120,
+                                borderRadius: 60
+                            }} />
+                            <Icon.Ionicons
+                                name={'ios-cloud-upload'}
+                                size={120}
+                                color={'#FFFFFF'}
+                                 style={{
+                                     display: this.state.avatar === null ? 'flex' : 'none'
+                                 }}
+                            />
+                        </TouchableOpacity>
+                        <ContinueButton ref={'continueBtn'} disabled={true} onPress={() => this.storeValue('avatar', 'done')} />
                         <LaunchFooter/>
                     </View>
                 );
@@ -361,23 +423,6 @@ export default class LaunchScreen extends React.Component {
                         />
                         <ContinueButton ref={'continueBtn'} disabled={true} onPress={() => this.storeValue('otp', 'keygen')} />
                         <LaunchFooter/>
-                    </View>
-                );
-
-            case 'keygen':
-                // TODO: To remove, not used anymore (background webview used instead)
-                return (
-                    <View style={styles.container}>
-                        <LightStatusBar/>
-                        <Image style={styles.logo} source={require('../assets/images/logo-small.png')}/>
-                        <Text style={styles.baseline}>Almost there!</Text>
-                        <Text style={styles.warningText}>
-                            Your phone will now make complex calculations to secure your entire JustAuth.Me experience.
-                            This can take up to 5 minutes, do not worry and just let your phone do all the work for you!
-                            The Continue button will highlight itself once the process is complete.
-                        </Text>
-                        <Text style={styles.warningText}>{this.state.generationStatus}</Text>
-                        <ContinueButton ref={'continueBtn'} disabled={true} onPress={this.lastStep} />
                     </View>
                 );
 

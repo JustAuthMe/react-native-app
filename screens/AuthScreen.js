@@ -144,7 +144,7 @@ export default class AuthScreen extends React.Component {
             content =
                 <ScrollView style={styles.container}>
                     <View style={styles.authHeader}>
-                        <Image source={require('../assets/images/client.png')} style={styles.appIcon} />
+                        <Image source={{uri: this.state.auth.client_app.logo}} style={styles.appIcon} />
                         <Text style={styles.logInto}>You're about to log into</Text>
                         <Text style={styles.appName}>{this.state.auth.client_app.name}</Text>
                     </View>

@@ -29,7 +29,7 @@ export default class ContinueButton extends React.Component {
                     ContinueButton.styles.opacity.disabled :
                     ContinueButton.styles.opacity.enabled
                 }
-                onPress={this.props.onPress}>
+                onPress={!this.state.disabled ? this.props.onPress : null}>
                 <Text style={{
                     marginTop: 60,
                     paddingTop: 10,
