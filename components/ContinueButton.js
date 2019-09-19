@@ -31,7 +31,7 @@ export default class ContinueButton extends React.Component {
                 }
                 onPress={!this.state.disabled ? this.props.onPress : null}>
                 <Text style={{
-                    marginTop: 60,
+                    marginTop: this.props.marginTop || 60,
                     paddingTop: 10,
                     paddingRight: 20,
                     paddingBottom: 10,

@@ -8,7 +8,7 @@ import {
     TextInput,
     AsyncStorage,
     WebView,
-    Platform
+    Platform, Alert
 } from 'react-native';
 import {
     Constants,
@@ -42,7 +42,9 @@ export default class LaunchScreen extends React.Component {
 
     constructor(props) {
         super(props);
-        this.personnalInfos = {};
+        this.personnalInfos = {
+            avatar: Config.defaultAvatar
+        };
 
         AsyncStorage.getItem(Config.initDone.key).then(value => {
             SplashScreen.hide();
@@ -197,15 +199,18 @@ export default class LaunchScreen extends React.Component {
     };
 
     getLibraryPermissionAsync = async () => {
+
+    };
+
+    _pickImage = async () => {
         if (Constants.platform.ios) {
             const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
             if (status !== 'granted') {
                 alert('Sorry, you need to grant Camera roll permission to chose an avatar!');
+                return;
             }
         }
-    };
 
-    _pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
             allowsEditing: true,
@@ -350,7 +355,17 @@ export default class LaunchScreen extends React.Component {
                                  }}
                             />
                         </TouchableOpacity>
-                        <ContinueButton ref={'continueBtn'} disabled={true} onPress={() => this.storeValue('avatar', 'done')} />
+                        <ContinueButton ref={'continueBtn'} disabled={true} onPress={() => this.storeValue('avatar', 'done')} marginTop={20} />
+                        <TouchableOpacity onPress={() => Alert.alert('Are you sure? You still could update your avatar later.', '', [
+                            {text: 'Cancel', onPress: () => {}, style:'cancel'},
+                            {text: 'OK', onPress: () => this.storeValue('avatar', 'done')}
+                        ])}>
+                            <Text style={{
+                                color: '#FFFFFF',
+                                textAlign: 'center',
+                                marginTop: 40
+                            }}>Ignore this step</Text>
+                        </TouchableOpacity>
                         <LaunchFooter/>
                     </View>
                 );
