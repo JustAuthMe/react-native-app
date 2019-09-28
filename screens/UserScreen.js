@@ -9,6 +9,7 @@ import {
     StatusBar
 } from 'react-native';
 import Colors from '../constants/Colors';
+import DatePickerInput from "../components/DatePickerInput";
 
 export default class UserScreen extends React.Component {
     static navigationOptions = {
@@ -84,15 +85,12 @@ export default class UserScreen extends React.Component {
                         value={this.state.user.lastname}
                         onChangeText={(text) => this.setState({user:{...this.state.user, lastname:text}})}
                     />
-                    <TextInput
+                    <DatePickerInput
                         ref={"birthdate"}
                         style={styles.textInput}
                         placeholder={"e.g. 02/05/1974"}
                         returnKeyType={"done"}
-                        autoCorrect={false}
-                        spellCheck={false}
-                        clearButtonMode={"always"}
-                        keyboardType={"numbers-and-punctuation"}
+                        date={new Date()}
                         value={this.state.user.birthdate}
                         onChangeText={(text) => this.setState({user:{...this.state.user, birthdate:text}})}
                     />

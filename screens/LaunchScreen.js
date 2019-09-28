@@ -25,6 +25,7 @@ import DatePickerKeyboardIOS from "../components/DatePickerKeyboardIOS";
 import Config from "../constants/Config";
 import LightStatusBar from "../components/LightStatusBar";
 import { StackActions, NavigationActions } from 'react-navigation';
+import DatePickerInput from "../components/DatePickerInput";
 
 export default class LaunchScreen extends React.Component {
 
@@ -277,7 +278,7 @@ export default class LaunchScreen extends React.Component {
                 return (
                     <View style={styles.container}>
                         <LightStatusBar/>
-                        <DatePickerKeyboardIOS
+                        {/*<DatePickerKeyboardIOS
                             ref={'datePicker'}
                             date={this.state.currentBirthdate}
                             onDateChange={(date) => this.setState({currentBirthdate: date})}
@@ -299,7 +300,11 @@ export default class LaunchScreen extends React.Component {
                                 pointerEvents={"none"}
                                 value={this.state.birthdateInputValue}
                             />
-                        </TouchableOpacity>
+                        </TouchableOpacity>*/}
+                        <DatePickerInput
+                            onChangeText={(text) => this.onInputChange('birthdate', text)}
+                            style={styles.textInput}
+                        />
                         <ContinueButton ref={'continueBtn'} disabled={true} onPress={() => this.storeValue('birthdate', 'email')} />
                         <LaunchFooter/>
                     </View>
