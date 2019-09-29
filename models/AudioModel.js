@@ -1,6 +1,4 @@
-import {
-    Audio
-} from 'expo';
+import { Audio } from 'expo-av';
 
 const soundObjects = {};
 

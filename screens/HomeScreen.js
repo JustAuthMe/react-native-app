@@ -11,12 +11,12 @@ import {
     StatusBar,
     Button
 } from 'react-native';
-import {
-    SecureStore,
-    Linking,
-    Icon,
-    Constants
-} from 'expo';
+import { Linking } from 'expo';
+
+
+import Constants from 'expo-constants';
+import * as Icon from '@expo/vector-icons';
+import * as SecureStore from 'expo-secure-store';
 
 
 import Config from "../constants/Config";

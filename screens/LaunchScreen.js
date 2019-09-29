@@ -10,14 +10,12 @@ import {
     WebView,
     Platform, Alert
 } from 'react-native';
-import {
-    Constants,
-    SecureStore,
-    SplashScreen,
-    ImagePicker,
-    Permissions,
-    Icon
-} from 'expo';
+import { SplashScreen } from 'expo';
+import * as Icon from '@expo/vector-icons';
+import * as Permissions from 'expo-permissions';
+import * as ImagePicker from 'expo-image-picker';
+import * as SecureStore from 'expo-secure-store';
+import Constants from 'expo-constants';
 import { Ionicons } from '@expo/vector-icons';
 import LaunchFooter from "../components/LaunchFooter";
 import ContinueButton from "../components/ContinueButton";

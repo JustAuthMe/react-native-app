@@ -3,9 +3,7 @@ import {
     View,
     StyleSheet
 } from 'react-native';
-import {
-    BarCodeScanner
-} from 'expo';
+import { BarCodeScanner } from 'expo-barcode-scanner';
 import Config from "../constants/Config";
 import {AuthModel} from "../models/AuthModel";
 import DarkStatusBar from "../components/DarkStatusBar";

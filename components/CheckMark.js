@@ -2,9 +2,7 @@ import React from 'react';
 import {
     View
 } from 'react-native';
-import {
-    Icon
-} from 'expo';
+import * as Icon from '@expo/vector-icons';
 import AuthDataList from "./AuthDataList";
 
 export default class CheckMark extends React.Component {

@@ -5,9 +5,7 @@ import {
     TouchableOpacity,
     Text
 } from 'react-native';
-import {
-    Icon
-} from 'expo';
+import * as Icon from '@expo/vector-icons';
 
 export default class ActionBtn extends React.Component {
     state = {};

@@ -6,7 +6,7 @@ import {
     TouchableOpacity,
     Alert,
 } from 'react-native';
-import { Constants } from 'expo';
+import Constants from 'expo-constants';
 
 export default class LaunchFooter extends React.Component {
     render() {

@@ -7,10 +7,8 @@ import {
     AsyncStorage,
     ScrollView
 } from 'react-native';
-import {
-    LocalAuthentication,
-    SecureStore
-} from 'expo';
+import * as SecureStore from 'expo-secure-store';
+import * as LocalAuthentication from 'expo-local-authentication';
 import AuthDataList from "../components/AuthDataList";
 import Config from "../constants/Config";
 import {Encryption} from "../models/Encryption";

@@ -4,7 +4,7 @@
     "slug": "just-auth-me",
     "scheme": "jam",
     "privacy": "unlisted",
-    "sdkVersion": "32.0.0",
+    "sdkVersion": "35.0.0",
     "platforms": [
       "ios",
       "android"

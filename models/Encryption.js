@@ -1,5 +1,5 @@
 import forge from 'node-forge';
-import { SecureStore } from 'expo';
+import * as SecureStore from 'expo-secure-store';
 import Config from "../constants/Config";
 
 export class Encryption {
