@@ -1,7 +1,8 @@
 import React from 'react';
 import {
     View,
-    StyleSheet
+    StyleSheet,
+    Text
 } from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import Config from "../constants/Config";
@@ -13,7 +14,28 @@ export default class ScannerScreen extends React.Component {
         title: 'QR Scanner',
     };
 
-    state = {};
+    state = {
+        hasCameraPermission: null
+    };
+
+    async componentDidMount() {
+        console.log('mounted');
+        this.getPermissionsAsync();
+    }
+
+    getPermissionsAsync = async () => {
+        console.log('async');
+        const { status } = await Permissions.askAsync(Permissions.CAMERA);
+        console.log(status);
+        if (status !== 'granted') {
+            this.props.navigation.goBack();
+            // TODO: prévoir une prompt avec un bouton vers l'app réglages
+            alert('You need camera permission to ba able to scan QR Codes.');
+            return;
+        }
+
+        this.setState({ hasCameraPermission: true});
+    };
 
     constructor(props) {
         super(props);
@@ -33,6 +55,13 @@ export default class ScannerScreen extends React.Component {
     };
 
     render() {
+        if (this.state.hasCameraPermission === null) {
+            return <Text>Requesting for camera permission</Text>;
+        }
+        if (this.state.hasCameraPermission === false) {
+            return <Text>No access to camera</Text>;
+        }
+
         return (
             <View style={styles.container}>
                 <DarkStatusBar/>

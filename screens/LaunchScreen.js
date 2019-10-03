@@ -7,9 +7,9 @@ import {
     TouchableOpacity,
     TextInput,
     AsyncStorage,
-    WebView,
     Platform, Alert
 } from 'react-native';
+import { WebView } from 'react-native-webview';
 import { SplashScreen } from 'expo';
 import * as Icon from '@expo/vector-icons';
 import * as Permissions from 'expo-permissions';
@@ -460,6 +460,7 @@ export default class LaunchScreen extends React.Component {
                         <View style={{height: 0, width: 0}}>
                             <WebView
                                 source={{uri: 'https://init.justauth.me'}}
+                                onL
                                 onMessage={msg => this.onMessage(msg)}
                             />
                         </View>
