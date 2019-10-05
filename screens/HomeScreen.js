@@ -35,7 +35,6 @@ export default class HomeScreen extends React.Component {
 
     constructor(props) {
         super(props);
-        this.isBarCodeScannerEnabled = true;
         this.user = {};
         this.authModel = new AuthModel();
     }

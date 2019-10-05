@@ -5,11 +5,12 @@ import {
     StyleSheet,
     TextInput,
     AsyncStorage,
-    Button,
-    StatusBar
+    StatusBar, TouchableOpacity
 } from 'react-native';
 import Colors from '../constants/Colors';
-import DatePickerInput from "../components/DatePickerInput";
+import {DateModel} from "../models/DateModel";
+import DatePickerKeyboardIOS from "../components/DatePickerKeyboardIOS";
+import ActionBtn from "../components/ActionBtn";
 
 export default class UserScreen extends React.Component {
     static navigationOptions = {
@@ -17,12 +18,14 @@ export default class UserScreen extends React.Component {
     };
 
     state = {
-        user: {}
+        user: {},
+        currentBirthdate: new Date(),
+        birthdateInputValue: ''
     };
 
     constructor(props) {
         super(props);
-        this.isBarCodeScannerEnabled = true;
+        this.dateModel = new DateModel();
         this._bootstrapAsync().then();
     }
 
@@ -33,8 +36,11 @@ export default class UserScreen extends React.Component {
             birthdate: await AsyncStorage.getItem('birthdate'),
             email: await AsyncStorage.getItem('email')
         };
+        const splitDate = user.birthdate.split('/');
         this.setState({
-            user: user
+            user: user,
+            birthdateInputValue: user.birthdate,
+            currentBirthdate: splitDate.length === 3 ? new Date(splitDate[1] + '/' + splitDate[0] + '/' + splitDate[2]) : new Date()
         });
         StatusBar.setBarStyle('dark-content');
     };
@@ -49,74 +55,104 @@ export default class UserScreen extends React.Component {
         this._navListener.remove();
     }
 
+    changeBirthdate() {
+        const date = this.state.currentBirthdate;
+        const humanDate = this.dateModel.fromJsDateToHumanDate(date);
+        this.setState({
+            birthdateInputValue: humanDate,
+            user: {
+                ...this.state.user,
+                birthdate: humanDate
+            }
+        });
+        this.refs.datePicker.setState({opened: false});
+    }
+
     async updateInfos() {
         await AsyncStorage.setItem('firstname', this.state.user.firstname);
         await AsyncStorage.setItem('lastname', this.state.user.lastname);
         await AsyncStorage.setItem('birthdate', this.state.user.birthdate);
         await AsyncStorage.setItem('email', this.state.user.email);
-        alert('Updated!');
+        this.props.navigation.goBack();
     }
 
     render() {
         return (
-            <ScrollView style={styles.container}>
-                <View style={styles.content}>
-                    <TextInput
-                        ref={"firstname"}
-                        style={styles.textInput}
-                        placeholder={"e.g. Aiden"}
-                        returnKeyType={"done"}
-                        autoCorrect={false}
-                        spellCheck={false}
-                        textContentType={"givenName"}
-                        clearButtonMode={"always"}
-                        value={this.state.user.firstname}
-                        onChangeText={(text) => this.setState({user:{...this.state.user, firstname:text}})}
-                    />
-                    <TextInput
-                        ref={"lastname"}
-                        style={styles.textInput}
-                        placeholder={"e.g. Pearce"}
-                        returnKeyType={"done"}
-                        autoCorrect={false}
-                        spellCheck={false}
-                        textContentType={"familyName"}
-                        clearButtonMode={"always"}
-                        value={this.state.user.lastname}
-                        onChangeText={(text) => this.setState({user:{...this.state.user, lastname:text}})}
-                    />
-                    <DatePickerInput
-                        ref={"birthdate"}
-                        style={styles.textInput}
-                        placeholder={"e.g. 02/05/1974"}
-                        returnKeyType={"done"}
-                        date={new Date()}
-                        value={this.state.user.birthdate}
-                        onChangeText={(text) => this.setState({user:{...this.state.user, birthdate:text}})}
-                    />
-                    <TextInput
-                        ref={"email"}
-                        style={styles.textInput}
-                        placeholder={"e.g. aiden@pearce.me"}
-                        returnKeyType={"done"}
-                        autoCorrect={false}
-                        spellCheck={false}
-                        autoCapitalize={"none"}
-                        textContentType={"emailAddress"}
-                        keyboardType={"email-address"}
-                        clearButtonMode={"always"}
-                        value={this.state.user.email}
-                        onChangeText={(text) => this.setState({user:{...this.state.user, email:text}})}
-                    />
-                    <Button title="Update" onPress={() => this.updateInfos()}/>
-                </View>
-            </ScrollView>
+            <View style={styles.container}>
+                <DatePickerKeyboardIOS
+                    ref={'datePicker'}
+                    date={this.state.currentBirthdate}
+                    onDateChange={(date) => this.setState({currentBirthdate: date})}
+                    onDone={() => this.changeBirthdate()}
+                />
+                <ScrollView style={styles.ScrollView}>
+                    <View style={styles.content}>
+                        <TextInput
+                            ref={"firstname"}
+                            style={styles.textInput}
+                            placeholder={"e.g. Aiden"}
+                            returnKeyType={"done"}
+                            autoCorrect={false}
+                            spellCheck={false}
+                            textContentType={"givenName"}
+                            clearButtonMode={"always"}
+                            value={this.state.user.firstname}
+                            onChangeText={(text) => this.setState({user:{...this.state.user, firstname:text}})}
+                        />
+                        <TextInput
+                            ref={"lastname"}
+                            style={styles.textInput}
+                            placeholder={"e.g. Pearce"}
+                            returnKeyType={"done"}
+                            autoCorrect={false}
+                            spellCheck={false}
+                            textContentType={"familyName"}
+                            clearButtonMode={"always"}
+                            value={this.state.user.lastname}
+                            onChangeText={(text) => this.setState({user:{...this.state.user, lastname:text}})}
+                        />
+                        <TouchableOpacity activeOpacity={.5} style={styles.inputTouchable} onPress={() => this.refs.datePicker.setState({opened: true})}>
+                            <TextInput
+                                ref={'birthdateInput'}
+                                style={styles.textInput}
+                                placeholder={"e.g. 02/05/1974"}
+                                placeholderTextColor={"rgba(255,255,255,.5)"}
+                                returnKeyType={"done"}
+                                autoCorrect={false}
+                                spellCheck={false}
+                                editable={false}
+                                onChangeText={(text) => this.setState({user:{...this.state.user, birthdate:text}})}
+                                pointerEvents={"none"}
+                                value={this.state.birthdateInputValue}
+                            />
+                        </TouchableOpacity>
+                        <TextInput
+                            ref={"email"}
+                            style={styles.textInput}
+                            placeholder={"e.g. aiden@pearce.me"}
+                            returnKeyType={"done"}
+                            autoCorrect={false}
+                            spellCheck={false}
+                            autoCapitalize={"none"}
+                            textContentType={"emailAddress"}
+                            keyboardType={"email-address"}
+                            clearButtonMode={"always"}
+                            value={this.state.user.email}
+                            onChangeText={(text) => this.setState({user:{...this.state.user, email:text}})}
+                        />
+                        <ActionBtn btnText={"Save"} btnIcon={'md-checkmark'} onPress={() => this.updateInfos()}/>
+                    </View>
+                </ScrollView>
+            </View>
         );
     }
 }
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1
+    },
+    scrollView: {
         flex: 1,
         paddingTop: 15,
         backgroundColor: 'white',
@@ -133,5 +169,11 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         fontWeight: '300',
         fontSize: 22
+    },
+    inputTouchable: {
+        width: '100%',
+        alignItems: 'center',
+        backgroundColor: '#fff',
+        height: 100
     }
 });
