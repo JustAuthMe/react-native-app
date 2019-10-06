@@ -23,6 +23,7 @@ import DatePickerKeyboardIOS from "../components/DatePickerKeyboardIOS";
 import Config from "../constants/Config";
 import LightStatusBar from "../components/LightStatusBar";
 import { StackActions, NavigationActions } from 'react-navigation';
+import {DropdownSingleton} from "../models/DropdownSingleton";
 
 export default class LaunchScreen extends React.Component {
 
@@ -196,15 +197,11 @@ export default class LaunchScreen extends React.Component {
         });
     };
 
-    getLibraryPermissionAsync = async () => {
-
-    };
-
     _pickImage = async () => {
         if (Constants.platform.ios) {
             const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
             if (status !== 'granted') {
-                alert('Sorry, you need to grant Camera roll permission to chose an avatar!');
+                DropdownSingleton.get().alertWithType('error', 'Permission required', 'Sorry, you need to grant Camera roll permission to chose your avatar!');
                 return;
             }
         }
@@ -328,8 +325,6 @@ export default class LaunchScreen extends React.Component {
                 );
 
             case 'avatar':
-                // TODO: To finish and to fit into the launch process
-                this.getLibraryPermissionAsync().then();
                 return (
                     <View style={styles.container}>
                         <LightStatusBar/>

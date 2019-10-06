@@ -3,11 +3,12 @@ import {StyleSheet, View, AsyncStorage} from 'react-native';
 import { AppLoading } from 'expo';
 import * as Icon from '@expo/vector-icons';
 import * as Font from 'expo-font';
-import { Asset } from 'expo-asset';
 import AppNavigator from './navigation/AppNavigator';
 import Config from "./constants/Config";
 import {AudioModel} from "./models/AudioModel";
 import AudioLibrary from "./constants/AudioLibrary";
+import DropdownAlert from "react-native-dropdownalert";
+import {DropdownSingleton} from "./models/DropdownSingleton";
 
 export default class App extends React.Component {
     state = {
@@ -34,6 +35,7 @@ export default class App extends React.Component {
         return (
             <View style={styles.container}>
                 <AppNavigator/>
+                <DropdownAlert ref={(ref) => DropdownSingleton.set(ref)}/>
             </View>
         );
     }

@@ -9,6 +9,7 @@ import Config from "../constants/Config";
 import {AuthModel} from "../models/AuthModel";
 import DarkStatusBar from "../components/DarkStatusBar";
 import * as Permissions from 'expo-permissions';
+import {DropdownSingleton} from "../models/DropdownSingleton";
 
 export default class ScannerScreen extends React.Component {
     static navigationOptions = {
@@ -28,8 +29,7 @@ export default class ScannerScreen extends React.Component {
         console.log(status);
         if (status !== 'granted') {
             this.props.navigation.goBack();
-            // TODO: prévoir une prompt avec un bouton vers l'app réglages
-            alert('You need camera permission to be able to scan QR Codes.');
+            DropdownSingleton.get().alertWithType('error', 'Permission required', 'You need camera permission to be able to scan QR Codes.');
             return;
         }
 

@@ -23,6 +23,7 @@ import Config from "../constants/Config";
 import LightStatusBar from "../components/LightStatusBar";
 import {AuthModel} from "../models/AuthModel";
 import ActionBtn from "../components/ActionBtn";
+import {DropdownSingleton} from "../models/DropdownSingleton";
 
 export default class HomeScreen extends React.Component {
     static navigationOptions = {
@@ -118,7 +119,7 @@ export default class HomeScreen extends React.Component {
                 <LightStatusBar/>
                 <ScrollView style={styles.container}>
                     <View style={styles.userHeader}>
-                        <TouchableOpacity style={styles.switchIcon} onPress={() => Alert.alert('We\'re sorry...', 'This feature isn\'t implemented yet.')}>
+                        <TouchableOpacity style={styles.switchIcon} onPress={() => DropdownSingleton.get().alertWithType('error', 'This app is still in beta', 'We\'re sorry..., This feature isn\'t implemented yet.')}>
                             <Icon.Ionicons
                                 name={'md-switch'}
                                 size={26}

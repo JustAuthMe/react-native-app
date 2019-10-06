@@ -5,12 +5,19 @@ import {
     StyleSheet,
     TextInput,
     AsyncStorage,
-    StatusBar, TouchableOpacity
+    StatusBar,
+    TouchableOpacity,
+    Image
 } from 'react-native';
 import Colors from '../constants/Colors';
 import {DateModel} from "../models/DateModel";
 import DatePickerKeyboardIOS from "../components/DatePickerKeyboardIOS";
 import ActionBtn from "../components/ActionBtn";
+import {DropdownSingleton} from "../models/DropdownSingleton";
+import Constants from "expo-constants";
+import * as Permissions from "expo-permissions";
+import * as ImagePicker from "expo-image-picker";
+import * as Icon from "@expo/vector-icons";
 
 export default class UserScreen extends React.Component {
     static navigationOptions = {
@@ -27,6 +34,12 @@ export default class UserScreen extends React.Component {
         super(props);
         this.dateModel = new DateModel();
         this._bootstrapAsync().then();
+        this.requiredInfos = [
+            'firstname',
+            'lastname',
+            'birthdate',
+            'email'
+        ];
     }
 
     async _bootstrapAsync() {
@@ -34,7 +47,8 @@ export default class UserScreen extends React.Component {
             firstname: await AsyncStorage.getItem('firstname'),
             lastname: await AsyncStorage.getItem('lastname'),
             birthdate: await AsyncStorage.getItem('birthdate'),
-            email: await AsyncStorage.getItem('email')
+            email: await AsyncStorage.getItem('email'),
+            avatar: await AsyncStorage.getItem('avatar')
         };
         const splitDate = user.birthdate.split('/');
         this.setState({
@@ -68,12 +82,44 @@ export default class UserScreen extends React.Component {
         this.refs.datePicker.setState({opened: false});
     }
 
+    _pickImage = async () => {
+        if (Constants.platform.ios) {
+            const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+            if (status !== 'granted') {
+                DropdownSingleton.get().alertWithType('error', 'Permission required', 'Sorry, you need to grant Camera roll permission to change your avatar!');
+                return;
+            }
+        }
+
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [1, 1],
+            base64: true
+        });
+
+        console.log(result);
+        if (!result.cancelled) {
+            const avatarUri = 'data:image/jpeg;base64,' + result.base64;
+            this.setState({user: {...this.state.user, avatar: avatarUri}});
+        }
+    };
+
     async updateInfos() {
+        for (let i = 0; i < this.requiredInfos.length; i++) {
+            if (this.state.user[this.requiredInfos[i]] === '') {
+                DropdownSingleton.get().alertWithType('error', 'Empty field(s)', 'Please fill all the required informations.');
+                return;
+            }
+        }
+
         await AsyncStorage.setItem('firstname', this.state.user.firstname);
         await AsyncStorage.setItem('lastname', this.state.user.lastname);
         await AsyncStorage.setItem('birthdate', this.state.user.birthdate);
         await AsyncStorage.setItem('email', this.state.user.email);
+        await AsyncStorage.setItem('avatar', this.state.user.avatar);
         this.props.navigation.goBack();
+        DropdownSingleton.get().alertWithType('success', 'My infos', 'Saved successfully');
     }
 
     render() {
@@ -84,9 +130,20 @@ export default class UserScreen extends React.Component {
                     date={this.state.currentBirthdate}
                     onDateChange={(date) => this.setState({currentBirthdate: date})}
                     onDone={() => this.changeBirthdate()}
+                    maximumDate={new Date()}
                 />
                 <ScrollView style={styles.ScrollView}>
                     <View style={styles.content}>
+                        <TouchableOpacity onPress={() => this._pickImage()} style={{marginTop: 20}}>
+                            <View style={styles.avatarUpdateBtn}>
+                                <Icon.Ionicons
+                                    name={'ios-camera'}
+                                    size={20}
+                                    color={'#FFFFFF'}
+                                />
+                            </View>
+                            <Image source={{uri: this.state.user.avatar}} style={styles.avatar} />
+                        </TouchableOpacity>
                         <TextInput
                             ref={"firstname"}
                             style={styles.textInput}
@@ -175,5 +232,22 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#fff',
         height: 100
+    },
+    avatar: {
+        height: 100,
+        width: 100,
+        borderRadius: 50
+    },
+    avatarUpdateBtn: {
+        position: 'absolute',
+        zIndex: 2,
+        right: 0,
+        bottom: 0,
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        backgroundColor: '#bdbdbd',
+        alignItems: 'center',
+        justifyContent: 'center'
     }
 });

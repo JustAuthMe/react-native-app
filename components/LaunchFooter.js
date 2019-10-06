@@ -7,13 +7,14 @@ import {
     Alert,
 } from 'react-native';
 import Constants from 'expo-constants';
+import {DropdownSingleton} from "../models/DropdownSingleton";
 
 export default class LaunchFooter extends React.Component {
     render() {
         return (
             <View style={styles.footer}>
                 <Text style={styles.alreadyMember}>Are you already a JustAuth.Me member?</Text>
-                <TouchableOpacity onPress={() => Alert.alert('We\'re sorry...', 'This feature isn\'t implemented yet.')}>
+                <TouchableOpacity onPress={() => DropdownSingleton.get().alertWithType('error', 'This app is still in beta', 'We\'re sorry..., This feature isn\'t implemented yet.')}>
                     <Text style={styles.recover}>Recover your account</Text>
                 </TouchableOpacity>
             </View>
