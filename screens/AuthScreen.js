@@ -13,6 +13,8 @@ import AuthDataList from "../components/AuthDataList";
 import Config from "../constants/Config";
 import {Encryption} from "../models/Encryption";
 import DarkStatusBar from "../components/DarkStatusBar";
+import {DropdownSingleton} from "../models/DropdownSingleton";
+import {NavigationActions, StackActions} from "react-navigation";
 
 export default class AuthScreen extends React.Component {
     static navigationOptions = {
@@ -45,8 +47,15 @@ export default class AuthScreen extends React.Component {
                     this.actualData[responseJson.auth.data[i]] = true;
                 }
             } else {
-                // TODO: make a real error handling
                 console.log('error retreiving auth details');
+                const resetAction = StackActions.reset({
+                    index: 0,
+                    actions: [NavigationActions.navigate({
+                        routeName: 'Home'
+                    })],
+                });
+                this.props.navigation.dispatch(resetAction);
+                DropdownSingleton.get().alertWithType('error', 'Invalid token', 'An error occurred while attempting to retrieve authentication details. Please try again or contact support.');
             }
         } catch (error) {
             console.error(error);
@@ -116,7 +125,17 @@ export default class AuthScreen extends React.Component {
                 console.log(responseJson);
 
                 if (responseJson.status === 'success') {
+                    // TODO: Save service to AsyncStorage
                     this.props.navigation.navigate('Success');
+                } else {
+                    const resetAction = StackActions.reset({
+                        index: 0,
+                        actions: [NavigationActions.navigate({
+                            routeName: 'Home'
+                        })],
+                    });
+                    this.props.navigation.dispatch(resetAction);
+                    DropdownSingleton.get().alertWithType('error', 'Unknow error', 'An error occurred during login challenge. Please contact support.');
                 }
             } catch (error) {
                 console.error(error);

@@ -22,8 +22,6 @@ export default class DatePickerKeyboardIOS extends React.Component {
         maximumDate: this.props.maximumDate || new Date((new Date().getFullYear()) + '-12-31T00:00:00')
     };
 
-
-
     render() {
         return (
             <View
