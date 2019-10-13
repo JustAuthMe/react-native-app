@@ -188,7 +188,11 @@ export default class HomeScreen extends React.Component {
                             return (
                                 <TouchableOpacity
                                     style={styles.serviceContainer}
-                                    onPress={null}
+                                    onPress={() => {
+                                        this.props.navigation.navigate('Service', {
+                                            service: this.state.services[item.item.key]
+                                        });
+                                    }}
                                 >
                                     <Image source={{uri: this.state.services[item.item.key].logo}} style={styles.serviceIcon}/>
                                     <Text style={styles.serviceName}>{this.state.services[item.item.key].name}</Text>

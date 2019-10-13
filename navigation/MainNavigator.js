@@ -5,11 +5,12 @@ import HomeScreen from '../screens/HomeScreen';
 import ScannerScreen from "../screens/ScannerScreen";
 import AuthScreen from "../screens/AuthScreen";
 import UserScreen from '../screens/UserScreen';
-import SuccessScreen from "../screens/SuccessScreen";
+import ServiceScreen from "../screens/ServiceScreen";
 
 export default createStackNavigator({
     Home   : HomeScreen,
     Scanner: ScannerScreen,
     Auth   : AuthScreen,
-    User   : UserScreen
+    User   : UserScreen,
+    Service: ServiceScreen
 });
