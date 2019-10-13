@@ -44,6 +44,7 @@ export default class LaunchScreen extends React.Component {
         this.personnalInfos = {
             avatar: Config.defaultAvatar
         };
+        this.logo = require('../assets/images/logo-new.png');
 
         AsyncStorage.getItem(Config.initDone.key).then(value => {
             SplashScreen.hide();
@@ -189,8 +190,13 @@ export default class LaunchScreen extends React.Component {
 
     finish = () => {
         AsyncStorage.setItem(Config.initDone.key, Config.initDone.value, () => {
-            AsyncStorage.getItem(Config.initDone.key).then(value => {
+            AsyncStorage.getItem(Config.initDone.key, (value) => {
                 console.log('init done at and of launch:', value);
+            });
+            AsyncStorage.setItem(Config.servicesKey, JSON.stringify({}), () => {
+                AsyncStorage.getItem(Config.servicesKey, (value) => {
+                    console.log('services list:', value);
+                });
             });
 
             this.props.navigation.navigate('Main');
@@ -228,7 +234,7 @@ export default class LaunchScreen extends React.Component {
                 return (
                     <View style={styles.container}>
                         <LightStatusBar/>
-                        <Image style={styles.logo} source={require('../assets/images/logo-small.png')}/>
+                        <Image style={styles.logo} source={this.logo}/>
                         <Text style={styles.baseline}>What's your firstname?</Text>
                         <TextInput
                             style={styles.textInput}
@@ -250,7 +256,7 @@ export default class LaunchScreen extends React.Component {
                 return (
                     <View style={styles.container}>
                         <LightStatusBar/>
-                        <Image style={styles.logo} source={require('../assets/images/logo-small.png')}/>
+                        <Image style={styles.logo} source={this.logo}/>
                         <Text style={styles.baseline}>And your lastname?</Text>
                         <TextInput
                             style={styles.textInput}
@@ -278,7 +284,7 @@ export default class LaunchScreen extends React.Component {
                             onDateChange={(date) => this.setState({currentBirthdate: date})}
                             onDone={() => this.changeBirthdate()}
                         />
-                        <Image style={styles.logo} source={require('../assets/images/logo-small.png')}/>
+                        <Image style={styles.logo} source={this.logo}/>
                         <Text style={styles.baseline}>What about your birthdate?</Text>
                         <TouchableOpacity activeOpacity={.5} style={styles.inputTouchable} onPress={() => this.refs.datePicker.setState({opened: true})}>
                             <TextInput
@@ -304,7 +310,7 @@ export default class LaunchScreen extends React.Component {
                 return (
                     <View style={styles.container}>
                         <LightStatusBar/>
-                        <Image style={styles.logo} source={require('../assets/images/logo-small.png')}/>
+                        <Image style={styles.logo} source={this.logo}/>
                         <Text style={styles.baseline}>And your E-Mail?</Text>
                         <TextInput
                             style={styles.textInput}
@@ -328,11 +334,9 @@ export default class LaunchScreen extends React.Component {
                 return (
                     <View style={styles.container}>
                         <LightStatusBar/>
-                        <Image style={styles.logo} source={require('../assets/images/logo-small.png')}/>
+                        <Image style={styles.logo} source={this.logo}/>
                         <Text style={styles.baseline}>Finally, chose an avatar</Text>
-                        <TouchableOpacity onPress={() => this._pickImage()} style={{
-                            marginTop: 20
-                        }}>
+                        <TouchableOpacity onPress={() => this._pickImage()} style={styles.avatarContainer}>
                             <Image source={{uri: this.state.avatar !== null ? this.state.avatar : '../assets/images/user.png'}} style={{
                                 display: this.state.avatar !== null ? 'flex' : 'none',
                                 height: 120,
@@ -353,11 +357,7 @@ export default class LaunchScreen extends React.Component {
                             {text: 'Cancel', onPress: () => {}, style:'cancel'},
                             {text: 'OK', onPress: () => this.storeValue('avatar', 'done')}
                         ])}>
-                            <Text style={{
-                                color: '#FFFFFF',
-                                textAlign: 'center',
-                                marginTop: 40
-                            }}>Ignore this step</Text>
+                            <Text style={styles.avatarIgnore}>Ignore this step</Text>
                         </TouchableOpacity>
                         <LaunchFooter/>
                     </View>
@@ -368,7 +368,7 @@ export default class LaunchScreen extends React.Component {
                 return (
                     <View style={styles.container}>
                         <LightStatusBar/>
-                        <Image style={styles.logo} source={require('../assets/images/logo-small.png')}/>
+                        <Image style={styles.logo} source={this.logo}/>
                         <Text style={styles.baseline}>Do you have an address?</Text>
                         <TextInput
                             style={styles.textInput}
@@ -391,7 +391,7 @@ export default class LaunchScreen extends React.Component {
                 return (
                     <View style={styles.container}>
                         <LightStatusBar/>
-                        <Image style={styles.logo} source={require('../assets/images/logo-small.png')}/>
+                        <Image style={styles.logo} source={this.logo}/>
                         <Text style={styles.baseline}>And a phone number?</Text>
                         <TextInput
                             style={styles.textInput}
@@ -415,7 +415,7 @@ export default class LaunchScreen extends React.Component {
                 return (
                     <View style={styles.container}>
                         <LightStatusBar/>
-                        <Image style={styles.logo} source={require('../assets/images/logo-small.png')}/>
+                        <Image style={styles.logo} source={this.logo}/>
                         <Text style={styles.baseline}>Enter the code you received by SMS</Text>
                         <TextInput
                             style={styles.textInput}
@@ -438,7 +438,7 @@ export default class LaunchScreen extends React.Component {
                 return (
                     <View style={styles.container}>
                         <LightStatusBar/>
-                        <Image style={styles.logo} source={require('../assets/images/logo-small.png')}/>
+                        <Image style={styles.logo} source={this.logo}/>
                         <Text style={styles.baseline}>Congratulations!</Text>
                         <Text style={styles.warningText}>
                             You successfully registered into JustAuth.Me! All the personnal informations you just provided
@@ -446,8 +446,8 @@ export default class LaunchScreen extends React.Component {
                             You can now login on any website which provide the "Login with JustAuth.Me" button, without
                             getting through any registration process, without any password, without even thinking about it!
                         </Text>
-                        <ContinueButton text={'Finish'} ref={'continueBtn'} disabled={true} onPress={this.finish} />
-                        <View style={{height: 0, width: 0}}>
+                        <ContinueButton text={'Got it!'} ref={'continueBtn'} disabled={true} onPress={this.finish} />
+                        <View style={styles.webview}>
                             <WebView
                                 source={{uri: 'https://init.justauth.me'}}
                                 onL
@@ -461,7 +461,7 @@ export default class LaunchScreen extends React.Component {
                 return (
                     <View style={styles.container}>
                         <LightStatusBar/>
-                        <Image style={styles.logo} source={require('../assets/images/logo-small.png')}/>
+                        <Image style={styles.logo} source={this.logo}/>
                         <Text style={styles.baseline}>Join the revolution</Text>
                         <TouchableOpacity style={styles.startBtn} onPress={() => this.props.navigation.push('LaunchScreen', {step: 'firstname'})}>
                             <Ionicons name="ios-arrow-forward" size={56} color="white" style={styles.arrowIcon}/>
@@ -482,9 +482,9 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     logo: {
-        marginTop: isBorderless ? 150 : 80,
+        marginTop: isBorderless ? 100 : 80,
         width: '100%',
-        height: 65,
+        height: 150,
         resizeMode: 'contain'
     },
     baseline: {
@@ -492,7 +492,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         color: 'white',
         fontWeight: '300',
-        marginTop: 80
+        marginTop: 50
     },
     startBtn: {
         width: 100,
@@ -543,5 +543,17 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         paddingLeft: 15,
         paddingRight: 15
+    },
+    avatarContainer: {
+        marginTop: 20
+    },
+    avatarIgnore: {
+        color: '#FFFFFF',
+        textAlign: 'center',
+        marginTop: 40
+    },
+    webview: {
+        height: 0,
+        width: 0
     }
 });

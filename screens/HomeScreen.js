@@ -9,7 +9,8 @@ import {
     Alert,
     TouchableOpacity,
     StatusBar,
-    Button
+    Button,
+    FlatList
 } from 'react-native';
 import { Linking } from 'expo';
 
@@ -24,6 +25,7 @@ import LightStatusBar from "../components/LightStatusBar";
 import {AuthModel} from "../models/AuthModel";
 import ActionBtn from "../components/ActionBtn";
 import {DropdownSingleton} from "../models/DropdownSingleton";
+import {ServicesModel} from "../models/ServicesModel";
 
 export default class HomeScreen extends React.Component {
     static navigationOptions = {
@@ -31,12 +33,14 @@ export default class HomeScreen extends React.Component {
     };
 
     state = {
-        user: {}
+        user: {},
+        services: null
     };
 
     constructor(props) {
         super(props);
         this.user = {};
+        this.services = {};
         this.authModel = new AuthModel();
     }
 
@@ -51,10 +55,24 @@ export default class HomeScreen extends React.Component {
         this.setState({
             user: this.user
         });
+        ServicesModel.getServices().then((services) => {
+            this.setState({
+                services: services
+            });
+        });
         StatusBar.setBarStyle('light-content');
     };
 
     componentDidMount() {
+        /**
+         * USED TO RESET SERVICES LIST AT LAUNCH, DO NOT UCOMMENT
+         */
+        //AsyncStorage.setItem(Config.servicesKey, JSON.stringify({}), () => {});
+        /**
+         * USED TO RESET SERVICES LIST AT LAUNCH, DO NOT UCOMMENT
+         */
+
+
         Linking.addEventListener('url', this._handleDeepLinkEvent);
         Linking.getInitialURL().then(url => {
             this.authModel.authByDeepLink(url, this.props.navigation);
@@ -88,6 +106,22 @@ export default class HomeScreen extends React.Component {
         }).catch(err => console.log(err));
     }
 
+    parseServices = () => {
+        if (this.state.services === null) {
+            return [];
+        }
+
+        let items = [];
+        for (let i in this.state.services) {
+            items.push({
+                key: i
+            });
+        }
+
+        console.log('parsed items:', items);
+        return items;
+    };
+
     logout = () => {
         Alert.alert('Are you sure?', '', [
             {text: 'Cancel', onPress: () => {}, style:'cancel'},
@@ -117,11 +151,11 @@ export default class HomeScreen extends React.Component {
         return (
             <View style={styles.container}>
                 <LightStatusBar/>
-                <ScrollView style={styles.container}>
+                <View style={styles.container}>
                     <View style={styles.userHeader}>
                         <TouchableOpacity style={styles.switchIcon} onPress={() => DropdownSingleton.get().alertWithType('error', 'This app is still in beta', 'We\'re sorry..., This feature isn\'t implemented yet.')}>
                             <Icon.Ionicons
-                                name={'md-switch'}
+                                name={'ios-settings'}
                                 size={26}
                                 color={'#FFFFFF'}
                             />
@@ -141,6 +175,33 @@ export default class HomeScreen extends React.Component {
                             btnText={'Authenticate'}
                         />
                     </View>
+                    {/*<Text>{this.state.services !== null ? this.state.services.demo.logo : ''}</Text>*/}
+                    <Text style={styles.servicesTitle}>Services</Text>
+                    <FlatList
+                        style={styles.servicesList}
+                        data={this.parseServices()}
+                        renderItem={(item) => {
+                            if (this.state.services === null || this.state.services.length === 0) {
+                                return (<View></View>);
+                            }
+
+                            return (
+                                <TouchableOpacity
+                                    style={styles.serviceContainer}
+                                    onPress={null}
+                                >
+                                    <Image source={{uri: this.state.services[item.item.key].logo}} style={styles.serviceIcon}/>
+                                    <Text style={styles.serviceName}>{this.state.services[item.item.key].name}</Text>
+                                    <Icon.Ionicons
+                                        name={'ios-arrow-forward'}
+                                        size={24}
+                                        color={'#ccc'}
+                                        style={styles.serviceArrow}
+                                    />
+                                </TouchableOpacity>
+                            );
+                        }}
+                    />
                     <View style={{
                         alignItems: 'center',
                         paddingTop: 10
@@ -148,7 +209,7 @@ export default class HomeScreen extends React.Component {
                         <Text>Build {Constants.manifest.version}</Text>
                         <Button onPress={() => this.logout()} title={'Logout'} />
                     </View>
-                </ScrollView>
+                </View>
             </View>
         );
     }
@@ -198,5 +259,44 @@ const styles = StyleSheet.create({
         fontSize: 26,
         color: '#FFFFFF',
         fontWeight: '200'
+    },
+    servicesTitle: {
+        fontWeight: 700,
+        fontSize: 36,
+        width: '100%',
+        textAlign: 'left',
+        paddingLeft: 15,
+        paddingTop: 10
+    },
+    servicesList: {
+        width: '100%',
+        paddingTop: 25,
+        marginBottom: isBorderless ? 20 : 0
+    },
+    serviceContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        height: 70,
+        width: '100%',
+        borderTopWidth: 1,
+        borderBottomWidth: 1,
+        borderColor: '#eee',
+        borderStyle: 'solid',
+        paddingLeft: 15,
+        paddingRight: 15
+    },
+    serviceIcon: {
+        width: 35,
+        height: 35,
+        borderRadius: 18,
+    },
+    serviceName: {
+        fontSize: 18,
+        paddingLeft: 20
+    },
+    serviceArrow: {
+        position: 'absolute',
+        right: 15,
+        top: 23
     }
 });

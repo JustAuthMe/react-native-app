@@ -134,7 +134,7 @@ export default class UserScreen extends React.Component {
                 />
                 <ScrollView style={styles.ScrollView}>
                     <View style={styles.content}>
-                        <TouchableOpacity onPress={() => this._pickImage()} style={{marginTop: 20}}>
+                        <TouchableOpacity onPress={() => this._pickImage()} style={styles.avatarEdit}>
                             <View style={styles.avatarUpdateBtn}>
                                 <Icon.Ionicons
                                     name={'ios-camera'}
@@ -249,5 +249,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#bdbdbd',
         alignItems: 'center',
         justifyContent: 'center'
+    },
+    avatarEdit: {
+        marginTop: 20
     }
 });

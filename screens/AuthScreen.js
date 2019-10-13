@@ -15,6 +15,7 @@ import {Encryption} from "../models/Encryption";
 import DarkStatusBar from "../components/DarkStatusBar";
 import {DropdownSingleton} from "../models/DropdownSingleton";
 import {NavigationActions, StackActions} from "react-navigation";
+import {ServicesModel} from "../models/ServicesModel";
 
 export default class AuthScreen extends React.Component {
     static navigationOptions = {
@@ -125,7 +126,15 @@ export default class AuthScreen extends React.Component {
                 console.log(responseJson);
 
                 if (responseJson.status === 'success') {
-                    // TODO: Save service to AsyncStorage
+                    console.log('CLIENT APP:', this.state.auth.client_app);
+                    const service = {
+                        app_id: this.state.auth.client_app.app_id,
+                        name: this.state.auth.client_app.name,
+                        logo: this.state.auth.client_app.logo,
+                        domain: this.state.auth.client_app.domain
+                    };
+                    console.log('CREATED SERVICE:', service);
+                    await ServicesModel.addService(this.state.auth.client_app.app_id, service);
                     this.props.navigation.navigate('Success');
                 } else {
                     const resetAction = StackActions.reset({

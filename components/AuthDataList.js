@@ -37,11 +37,7 @@ export default class AuthDataList extends React.Component {
         console.log(this.props.data);
         return (
             <View style={this.props.style}>
-                <Text style={{
-                    fontSize: 20,
-                    fontWeight: '600',
-                    textAlign: 'center'
-                }}>{this.props.domain} will have access to the following:</Text>
+                <Text style={styles.authWarning}>{this.props.domain} will have access to the following:</Text>
                 <FlatList
                     style={styles.listContainer}
                     data={this.props.data}
@@ -98,5 +94,10 @@ const styles = StyleSheet.create({
     },
     loginBtn: {
         alignSelf: 'center'
+    },
+    authWarning: {
+        fontSize: 20,
+        fontWeight: '600',
+        textAlign: 'center'
     }
 });

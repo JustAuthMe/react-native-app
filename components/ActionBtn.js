@@ -18,9 +18,7 @@ export default class ActionBtn extends React.Component {
                         name={this.props.btnIcon}
                         size={22}
                         color={'#FFFFFF'}
-                        style={{
-                            paddingTop: 3
-                        }}
+                        style={styles.JamBtnIcon}
                     />
                     <Text style={styles.JamBtnText}>{this.props.btnText}</Text>
                 </TouchableOpacity>
@@ -52,5 +50,8 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
         paddingLeft: 10,
         fontSize: 18
+    },
+    JamBtnIcon: {
+        paddingTop: 3
     }
 });
