@@ -153,7 +153,7 @@ export default class HomeScreen extends React.Component {
                 <LightStatusBar/>
                 <View style={styles.container}>
                     <View style={styles.userHeader}>
-                        <TouchableOpacity style={styles.switchIcon} onPress={() => DropdownSingleton.get().alertWithType('error', 'This app is still in beta', 'We\'re sorry..., This feature isn\'t implemented yet.')}>
+                        <TouchableOpacity style={styles.switchIcon} onPress={() => this.props.navigation.navigate('Settings')}>
                             <Icon.Ionicons
                                 name={'ios-settings'}
                                 size={26}
