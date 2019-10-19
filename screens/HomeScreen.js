@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
         fontWeight: '200'
     },
     servicesTitle: {
-        fontWeight: 700,
+        fontWeight: '700',
         fontSize: 36,
         width: '100%',
         textAlign: 'left',

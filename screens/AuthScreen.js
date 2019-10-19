@@ -34,6 +34,7 @@ export default class AuthScreen extends React.Component {
 
     async getAuthDetails() {
         const endpointUrl = Config.apiUrl + 'auth/' + this.state.token;
+        this.services = await ServicesModel.getServices();
         console.log(endpointUrl);
         try {
             const response = await fetch(endpointUrl);
@@ -127,11 +128,19 @@ export default class AuthScreen extends React.Component {
 
                 if (responseJson.status === 'success') {
                     console.log('CLIENT APP:', this.state.auth.client_app);
+                    let dataToStore = [];
+                    for (let i in this.actualData) {
+                        if (this.actualData[i]) {
+                            dataToStore.push(i.indexOf('!') === i.length - 1 ? i.slice(0, -1) : i);
+                        }
+                    }
+
                     const service = {
                         app_id: this.state.auth.client_app.app_id,
                         name: this.state.auth.client_app.name,
                         logo: this.state.auth.client_app.logo,
-                        domain: this.state.auth.client_app.domain
+                        domain: this.state.auth.client_app.domain,
+                        data: dataToStore
                     };
                     console.log('CREATED SERVICE:', service);
                     await ServicesModel.addService(this.state.auth.client_app.app_id, service);
@@ -162,6 +171,9 @@ export default class AuthScreen extends React.Component {
         let content;
         if (this.state.auth === null) {
             content = <Text style={styles.loadingText}>Loading authentication details...</Text>;
+        } else if (this.services.hasOwnProperty(this.state.auth.client_app.app_id)) {
+            this.onAcceptLogin();
+            content = <Text style={styles.loadingText}>Authenticating...</Text>
         } else {
             let data = [];
             for (let i = 0; i < this.state.auth.data.length; i++) {

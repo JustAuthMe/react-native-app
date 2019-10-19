@@ -4,9 +4,11 @@ import {
     StyleSheet,
     Text,
     StatusBar,
-    Image
+    Image,
+    FlatList
 } from 'react-native';
 import {DropdownSingleton} from "../models/DropdownSingleton";
+import Config from "../constants/Config";
 
 export default class ServiceScreen extends React.Component {
     static navigationOptions = ({ navigation }) => {
@@ -43,6 +45,7 @@ export default class ServiceScreen extends React.Component {
             return;
         }
 
+        console.log('shown service:', service);
         this.setState({
             service: service
         });
@@ -52,6 +55,14 @@ export default class ServiceScreen extends React.Component {
         if (this.state.service === null) {
             return (<View></View>);
         }
+
+        let dataToShow = [];
+        for (let i = 0; i < this.state.service.data.length; i++) {
+            dataToShow.push({
+                key: this.state.service.data[i]
+            });
+        }
+        console.log('data to show:', dataToShow);
 
         return (
             <View style={styles.content}>
@@ -77,10 +88,30 @@ export default class ServiceScreen extends React.Component {
                 <Text style={{
                     width: '100%',
                     textAlign: 'center',
-                    fontWeight: 600,
+                    fontWeight: '600',
                     fontSize: 20,
                     marginTop: 20
                 }}>{this.state.service.domain}</Text>
+                <Text style={{
+                    width: '100%',
+                    textAlign: 'center',
+                    fontSize: 16,
+                    marginTop: 5
+                }}>Has access to the following:</Text>
+                <FlatList
+                    style={{
+                        width: '100%',
+                        marginTop: 30
+                    }}
+                    data={this.state.service.data}
+                    renderItem={({item}) =>
+                        <Text style={{
+                            fontSize: 18,
+                            paddingLeft: 30,
+                            paddingTop: 5
+                        }}>> {Config.dataList[item]}</Text>
+                    }
+                />
             </View>
         );
     }
