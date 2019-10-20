@@ -4,16 +4,21 @@ import {
     Image,
     StyleSheet,
     Text,
-    View
+    View,
+    Alert,
+    AsyncStorage,
+    Button
 } from 'react-native';
 import Constants from 'expo-constants';
+import Config from "../constants/Config";
+import * as SecureStore from "expo-secure-store";
 
 
 export default class JamConfigView extends React.Component {
     render() {
         const { manifest } = Constants;
         const sections = [
-            { data: [{ value: manifest.version }], title: 'version' },
+            { data: [{ value: 'build ' + manifest.version }], title: 'version' },
             { data: [{ value: manifest.orientation }], title: 'orientation' },
             {
                 data: [
@@ -24,7 +29,14 @@ export default class JamConfigView extends React.Component {
                 ],
                 title: 'ios.supportsTablet',
             },
-            { data: [{ value: 'logout'}], title: 'logout' }
+            {
+                data: [
+                    {
+                        value: 'logout',
+                        type: 'logout'
+                    }
+                ],
+                title: 'logout' }
         ];
 
         return (
@@ -45,10 +57,10 @@ export default class JamConfigView extends React.Component {
     };
 
     _renderItem = ({ item }) => {
-        if (item.type === 'color') {
+        if (item.type === 'logout') {
             return (
                 <SectionContent>
-                    {item.value && <Color value={item.value} />}
+                    <Button onPress={() => this.logout()} title={item.value} />
                 </SectionContent>
             );
         } else {
@@ -60,6 +72,32 @@ export default class JamConfigView extends React.Component {
                 </SectionContent>
             );
         }
+    };
+
+    logout = () => {
+        Alert.alert('Are you sure?', '', [
+            {text: 'Cancel', onPress: () => {}, style:'cancel'},
+            {text: 'OK', onPress: () => {
+                    AsyncStorage.multiRemove([
+                        Config.initDone.key,
+                        'firstname',
+                        'lastname',
+                        'birthdate',
+                        'email',
+                        'avatar'
+                    ], async () => {
+                        AsyncStorage.getItem(Config.initDone.key).then(value => {
+                            console.log('init done at logout:', value);
+                        });
+
+                        await SecureStore.deleteItemAsync(Config.storageKeys.publicKey);
+                        await SecureStore.deleteItemAsync(Config.storageKeys.privateKey);
+                        await SecureStore.deleteItemAsync(Config.storageKeys.jamID);
+
+                        this.props.navigation.navigate('Launch');
+                    });
+                }}
+        ]);
     };
 }
 

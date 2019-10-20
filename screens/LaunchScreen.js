@@ -450,7 +450,6 @@ export default class LaunchScreen extends React.Component {
                         <View style={styles.webview}>
                             <WebView
                                 source={{uri: 'https://init.justauth.me'}}
-                                onL
                                 onMessage={msg => this.onMessage(msg)}
                             />
                         </View>

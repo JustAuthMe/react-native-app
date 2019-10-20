@@ -9,3 +9,4 @@ npm-debug.*
 false/
 dist/
 *.sh
+.DS_Store

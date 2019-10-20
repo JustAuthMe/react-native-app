@@ -7,7 +7,7 @@ import JamConfigView from "../components/JamConfigView";
 
 export default class SettingsScreen extends React.Component {
   static navigationOptions = {
-    title: 'Settings',
+    title: 'Settings'
   };
 
   constructor(props) {

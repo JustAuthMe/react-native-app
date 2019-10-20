@@ -29,7 +29,7 @@ import {ServicesModel} from "../models/ServicesModel";
 
 export default class HomeScreen extends React.Component {
     static navigationOptions = {
-        header: null,
+        header: null
     };
 
     state = {
@@ -65,11 +65,11 @@ export default class HomeScreen extends React.Component {
 
     componentDidMount() {
         /**
-         * USED TO RESET SERVICES LIST AT LAUNCH, DO NOT UCOMMENT
+         * USED TO RESET SERVICES LIST AT LAUNCH, DO NOT UNCOMMENT
          */
         //AsyncStorage.setItem(Config.servicesKey, JSON.stringify({}), () => {});
         /**
-         * USED TO RESET SERVICES LIST AT LAUNCH, DO NOT UCOMMENT
+         * USED TO RESET SERVICES LIST AT LAUNCH, DO NOT UNCOMMENT
          */
 
 
@@ -122,7 +122,7 @@ export default class HomeScreen extends React.Component {
         return items;
     };
 
-    logout = () => {
+    /*logout = () => {
         Alert.alert('Are you sure?', '', [
             {text: 'Cancel', onPress: () => {}, style:'cancel'},
             {text: 'OK', onPress: () => {
@@ -145,7 +145,7 @@ export default class HomeScreen extends React.Component {
                     });
                 }}
         ]);
-    };
+    };*/
 
     render() {
         return (
@@ -206,13 +206,13 @@ export default class HomeScreen extends React.Component {
                             );
                         }}
                     />
-                    <View style={{
+                    {/*<View style={{
                         alignItems: 'center',
                         paddingTop: 10
                     }}>
                         <Text>Build {Constants.manifest.version}</Text>
                         <Button onPress={() => this.logout()} title={'Logout'} />
-                    </View>
+                    </View>*/}
                 </View>
             </View>
         );
