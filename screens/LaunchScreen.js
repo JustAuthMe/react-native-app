@@ -441,9 +441,9 @@ export default class LaunchScreen extends React.Component {
                         <Image style={styles.logo} source={this.logo}/>
                         <Text style={styles.baseline}>Congratulations!</Text>
                         <Text style={styles.warningText}>
-                            You successfully registered into JustAuth.Me! All the personnal informations you just provided
-                            are only stored on your phone, not on our servers, not anywhere else, just on your device.
-                            You can now login on any website which provide the "Login with JustAuth.Me" button, without
+                            You successfully registered into JustAuth.Me! All the personal information you just provided
+                            is only stored on your phone, not on our servers, not anywhere else, just on your device.
+                            You can now login on any website or app which provide the "Login with JustAuth.Me" button, without
                             getting through any registration process, without any password, without even thinking about it!
                         </Text>
                         <ContinueButton text={'Got it!'} ref={'continueBtn'} disabled={true} onPress={this.finish} />
@@ -451,6 +451,7 @@ export default class LaunchScreen extends React.Component {
                             <WebView
                                 source={{uri: 'https://init.justauth.me'}}
                                 onMessage={msg => this.onMessage(msg)}
+                                useWebKit={true}
                             />
                         </View>
                     </View>

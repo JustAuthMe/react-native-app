@@ -43,7 +43,7 @@ export default class AuthDataList extends React.Component {
                     data={this.props.data}
                     renderItem={({item}) =>
                         <View style={styles.listItem}>
-                            <TouchableOpacity style={styles.itemCheckbox} activeOpacity={1} onPress={() => {
+                            <TouchableOpacity style={{...styles.itemCheckbox, borderColor: AuthDataList.isDataRequired(item.key) ? '#ccc' : '#1459E3'}} activeOpacity={1} onPress={() => {
                                 if (!AuthDataList.isDataRequired(item.key)) {
                                     this.onCheckMarkPressed(item.key)
                                 }
@@ -70,12 +70,11 @@ const styles = StyleSheet.create({
     },
     itemCheckbox: {
         flexDirection: 'row',
-        marginBottom: 10,
-        height: 30,
-        width: 30,
+        marginTop: 6,
+        height: 20,
+        width: 20,
         borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 15
+        borderRadius: 3
     },
     roundedBox: {
         width: 24,

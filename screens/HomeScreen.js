@@ -72,10 +72,9 @@ export default class HomeScreen extends React.Component {
          * USED TO RESET SERVICES LIST AT LAUNCH, DO NOT UNCOMMENT
          */
 
-
         Linking.addEventListener('url', this._handleDeepLinkEvent);
         Linking.getInitialURL().then(url => {
-            this.authModel.authByDeepLink(url, this.props.navigation);
+            this._handleDeepLinkEvent({url: url});
         });
         this._navListener = this.props.navigation.addListener("didFocus", () => {
             this._bootstrapAsync().then();

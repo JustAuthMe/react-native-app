@@ -60,7 +60,7 @@ export default class JamConfigView extends React.Component {
         if (item.type === 'logout') {
             return (
                 <SectionContent>
-                    <Button onPress={() => this.logout()} title={item.value} />
+                    <Button onPress={this.props.onLogout} title={item.value} />
                 </SectionContent>
             );
         } else {
@@ -72,32 +72,6 @@ export default class JamConfigView extends React.Component {
                 </SectionContent>
             );
         }
-    };
-
-    logout = () => {
-        Alert.alert('Are you sure?', '', [
-            {text: 'Cancel', onPress: () => {}, style:'cancel'},
-            {text: 'OK', onPress: () => {
-                    AsyncStorage.multiRemove([
-                        Config.initDone.key,
-                        'firstname',
-                        'lastname',
-                        'birthdate',
-                        'email',
-                        'avatar'
-                    ], async () => {
-                        AsyncStorage.getItem(Config.initDone.key).then(value => {
-                            console.log('init done at logout:', value);
-                        });
-
-                        await SecureStore.deleteItemAsync(Config.storageKeys.publicKey);
-                        await SecureStore.deleteItemAsync(Config.storageKeys.privateKey);
-                        await SecureStore.deleteItemAsync(Config.storageKeys.jamID);
-
-                        this.props.navigation.navigate('Launch');
-                    });
-                }}
-        ]);
     };
 }
 
