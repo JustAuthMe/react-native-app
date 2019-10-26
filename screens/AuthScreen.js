@@ -11,7 +11,7 @@ import * as SecureStore from 'expo-secure-store';
 import * as LocalAuthentication from 'expo-local-authentication';
 import AuthDataList from "../components/AuthDataList";
 import Config from "../constants/Config";
-import {Encryption} from "../models/Encryption";
+import {EncryptionModel} from "../models/EncryptionModel";
 import DarkStatusBar from "../components/DarkStatusBar";
 import {DropdownSingleton} from "../models/DropdownSingleton";
 import {NavigationActions, StackActions} from "react-navigation";
@@ -79,7 +79,7 @@ export default class AuthScreen extends React.Component {
             }
 
             if (this.actualData[authData[i]]) {
-                console.log('date sent: ' + dataName);
+                console.log('data sent: ' + dataName);
                 data[dataName] = await AsyncStorage.getItem(dataName);
             }
         }
@@ -92,15 +92,17 @@ export default class AuthScreen extends React.Component {
         const isEnrolled = await LocalAuthentication.isEnrolledAsync();
         let canLogin = true;
         if (hasHardware && isEnrolled) {
-            const localAuth = await LocalAuthentication.authenticateAsync('Confirm login attempt');
+            const localAuth = await LocalAuthentication.authenticateAsync({promptMessage: 'Confirm login attempt'});
             canLogin = localAuth.success;
         }
 
         if (canLogin) {
             const endpointUrl = Config.apiUrl + 'login';
             const data = await this.getUserDataFromDataset();
-            const plain = encodeURIComponent(JSON.stringify(data));
-            const enc = new Encryption();
+            const enc = new EncryptionModel();
+            console.log('encryption model instanciated');
+            const plain = enc.urlencode(enc.json_encode(data));
+            console.log('calculated plain: ', plain);
             const sign = await enc.sign(plain);
             console.log(data);
             console.log(plain);
@@ -116,7 +118,7 @@ export default class AuthScreen extends React.Component {
                         },
                         body: JSON.stringify({
                             // TODO: Check all possibilities for accents and REMOVE plain (possible security flaw)
-                            /*plain: plain,*/
+                            plain: plain,
                             data: data,
                             sign: sign
                         })

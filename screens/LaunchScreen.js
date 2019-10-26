@@ -137,7 +137,7 @@ export default class LaunchScreen extends React.Component {
         console.log('Generating...');
         // Giving time to UI to update
         window.setTimeout(async () => {
-            const enc = new Encryption();
+            const enc = new EncryptionModel();
             await enc.generateKeypair();
 
             window.setTimeout(() => {

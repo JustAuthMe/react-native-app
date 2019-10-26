@@ -2,7 +2,7 @@ import forge from 'node-forge';
 import * as SecureStore from 'expo-secure-store';
 import Config from "../constants/Config";
 
-export class Encryption {
+export class EncryptionModel {
     async generateKeypair() {
         // Keypair generation (take a hell of a time)
         const start = new Date().getTime();
@@ -37,5 +37,21 @@ export class Encryption {
         hash.update(dataString);
 
         return forge.util.encode64(privKey.sign(hash));
+    }
+
+    urlencode(data) {
+        return encodeURIComponent(data)
+            .replace(/!/g, '%21')
+            .replace(/'/g, '%27')
+            .replace(/\(/g, '%28')
+            .replace(/\)/g, '%29')
+            .replace(/\*/g, '%2A')
+            .replace(/~/g, '%7E')
+            .replace(/%20/g, '+');
+    }
+
+    json_encode(data) {
+        return JSON.stringify(data)
+            .replace(/\//g, '\\/');
     }
 }
