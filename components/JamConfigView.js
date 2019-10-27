@@ -7,7 +7,8 @@ import {
     View,
     Alert,
     AsyncStorage,
-    Button
+    Button,
+    Linking
 } from 'react-native';
 import Constants from 'expo-constants';
 import Config from "../constants/Config";
@@ -18,8 +19,8 @@ export default class JamConfigView extends React.Component {
     render() {
         const { manifest } = Constants;
         const sections = [
-            { data: [{ value: 'build ' + manifest.version }], title: 'version' },
-            { data: [{ value: manifest.orientation }], title: 'orientation' },
+            { data: [{ value: 'Build ' + manifest.version }], title: 'Version' },
+            { data: [{ value: manifest.orientation }], title: 'Orientation' },
             {
                 data: [
                     {
@@ -32,11 +33,24 @@ export default class JamConfigView extends React.Component {
             {
                 data: [
                     {
-                        value: 'logout',
-                        type: 'logout'
+                        value: 'Contact support',
+                        onPress: () => Linking.openURL('mailto:support@justauth.me?subject=[Support] ' + manifest.version),
+                        color: '',
+                        type: 'button',
                     }
                 ],
-                title: 'logout' }
+                title: 'Help & Support'
+            },
+            {
+                data: [
+                    {
+                        value: 'Logout',
+                        onPress: this.props.onLogout,
+                        color: '#f00',
+                        type: 'button'
+                    }
+                ],
+                title: 'Logout' }
         ];
 
         return (
@@ -57,10 +71,10 @@ export default class JamConfigView extends React.Component {
     };
 
     _renderItem = ({ item }) => {
-        if (item.type === 'logout') {
+        if (item.type === 'button') {
             return (
                 <SectionContent>
-                    <Button onPress={this.props.onLogout} title={item.value} />
+                    <Button color={item.color} onPress={item.onPress} title={item.value} />
                 </SectionContent>
             );
         } else {

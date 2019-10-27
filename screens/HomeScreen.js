@@ -22,9 +22,8 @@ import * as SecureStore from 'expo-secure-store';
 
 import Config from "../constants/Config";
 import LightStatusBar from "../components/LightStatusBar";
-import {AuthModel} from "../models/AuthModel";
+import {AuthSingleton} from "../models/AuthSingleton";
 import ActionBtn from "../components/ActionBtn";
-import {DropdownSingleton} from "../models/DropdownSingleton";
 import {ServicesModel} from "../models/ServicesModel";
 
 export default class HomeScreen extends React.Component {
@@ -41,7 +40,6 @@ export default class HomeScreen extends React.Component {
         super(props);
         this.user = {};
         this.services = {};
-        this.authModel = new AuthModel();
     }
 
     async _bootstrapAsync() {
@@ -86,7 +84,7 @@ export default class HomeScreen extends React.Component {
     }
 
     _handleDeepLinkEvent = event => {
-        this.authModel.authByDeepLink(event.url, this.props.navigation);
+        AuthSingleton.get().authByDeepLink(event.url, this.props.navigation);
     };
 
     run() {

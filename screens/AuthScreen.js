@@ -174,7 +174,7 @@ export default class AuthScreen extends React.Component {
         if (this.state.auth === null) {
             content = <Text style={styles.loadingText}>Loading authentication details...</Text>;
         } else if (this.services.hasOwnProperty(this.state.auth.client_app.app_id)) {
-            this.onAcceptLogin();
+            this.onAcceptLogin().then();
             content = <Text style={styles.loadingText}>Authenticating...</Text>
         } else {
             let data = [];

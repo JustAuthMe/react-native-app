@@ -6,7 +6,7 @@ import {
 } from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import Config from "../constants/Config";
-import {AuthModel} from "../models/AuthModel";
+import {AuthSingleton} from "../models/AuthSingleton";
 import DarkStatusBar from "../components/DarkStatusBar";
 import * as Permissions from 'expo-permissions';
 import {DropdownSingleton} from "../models/DropdownSingleton";
@@ -43,9 +43,9 @@ export default class ScannerScreen extends React.Component {
 
     _handleBarCodeScanned = ({ type, data }) => {
         if (this.isBarCodeScannerEnabled && type === 'org.iso.QRCode') {
+            console.log('scanned');
             this.isBarCodeScannerEnabled = false;
-            const authModel = new AuthModel();
-            authModel.authByDeepLink(data, this.props.navigation);
+            AuthSingleton.get().authByDeepLink(data, this.props.navigation);
 
             window.setTimeout(() => {
                 this.isBarCodeScannerEnabled = true;
