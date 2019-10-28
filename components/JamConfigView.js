@@ -5,10 +5,9 @@ import {
     StyleSheet,
     Text,
     View,
-    Alert,
-    AsyncStorage,
     Button,
-    Linking
+    Linking,
+    Platform
 } from 'react-native';
 import Constants from 'expo-constants';
 import Config from "../constants/Config";
@@ -34,7 +33,7 @@ export default class JamConfigView extends React.Component {
                 data: [
                     {
                         value: 'Contact support',
-                        onPress: () => Linking.openURL('mailto:support@justauth.me?subject=[Support] ' + manifest.version),
+                        onPress: () => Linking.openURL('mailto:support@justauth.me?subject=[Support] ' + Platform.OS + ' ' + manifest.version),
                         color: '',
                         type: 'button',
                     }
