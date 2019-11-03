@@ -20,6 +20,7 @@ export default class App extends React.Component {
 
     render() {
         if (!this.state.isLoadingComplete) {
+            console.log('render AppLoading');
             return (
                 <AppLoading
                     startAsync={this._loadResourcesAsync}
@@ -34,6 +35,7 @@ export default class App extends React.Component {
             console.log('init done at app init:', value);
         });
 
+        console.log('render AppNavigator');
         return (
             <View style={styles.container}>
                 <AppNavigator/>
@@ -57,7 +59,7 @@ export default class App extends React.Component {
     _handleLoadingError = error => {
         // In this case, you might want to report the error to your error
         // reporting service, for example Sentry
-        console.warn(error);
+        console.warn('App Loading Error:', error);
     };
 
     _handleFinishLoading = () => {

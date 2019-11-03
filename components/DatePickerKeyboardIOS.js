@@ -3,7 +3,8 @@ import {
     StyleSheet,
     View,
     Button,
-    DatePickerIOS
+    DatePickerIOS,
+    Platform
 } from 'react-native';
 
 export default class DatePickerKeyboardIOS extends React.Component {
@@ -23,6 +24,10 @@ export default class DatePickerKeyboardIOS extends React.Component {
     };
 
     render() {
+        if (Platform.OS !== 'ios') {
+            return null;
+        }
+
         return (
             <View
                 style={{

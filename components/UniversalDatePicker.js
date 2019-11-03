@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-    View,
     StyleSheet,
     Platform,
     DatePickerAndroid
@@ -29,10 +28,12 @@ export default class UniversalDatePicker extends React.Component {
                 />
             );
         }
+
+        return null;
     }
 
     async open (options) {
-        this.setState(options);
+        await this.setState(options);
         if (Platform.OS === 'ios') {
             this.datePickerIos.setState({opened: true});
         } else {
@@ -44,8 +45,12 @@ export default class UniversalDatePicker extends React.Component {
             });
 
             if (action === DatePickerAndroid.dateSetAction) {
+                const realDay = day < 10 ? '0' + day : day;
+                let realMonth = month + 1;
+                realMonth = realMonth < 10 ? '0' + realMonth : realMonth;
+                console.log(realDay + '/' + realMonth + '/' + year);
                 this.state.onDateChange(new Date(
-                    year + '-' + month + '-' + day + 'T00:00:00'
+                    year + '-' + realMonth + '-' + realDay + 'T00:00:00'
                 ));
                 this.state.onDone();
             }
