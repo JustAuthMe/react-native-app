@@ -9,6 +9,8 @@ import {AudioModel} from "./models/AudioModel";
 import AudioLibrary from "./constants/AudioLibrary";
 import DropdownAlert from "react-native-dropdownalert";
 import {DropdownSingleton} from "./models/DropdownSingleton";
+import UniversalDatePicker from "./components/UniversalDatePicker";
+import {DatePickerSingleton} from "./models/DatePickerSingleton";
 
 export default class App extends React.Component {
     state = {
@@ -35,7 +37,8 @@ export default class App extends React.Component {
         return (
             <View style={styles.container}>
                 <AppNavigator/>
-                <DropdownAlert ref={(ref) => DropdownSingleton.set(ref)}/>
+                <DropdownAlert ref={ref => DropdownSingleton.set(ref)} />
+                <UniversalDatePicker ref={ref => DatePickerSingleton.set(ref)} />
             </View>
         );
     }

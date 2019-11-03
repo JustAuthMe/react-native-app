@@ -10,8 +10,6 @@ import {
     Platform
 } from 'react-native';
 import Constants from 'expo-constants';
-import Config from "../constants/Config";
-import * as SecureStore from "expo-secure-store";
 
 
 export default class JamConfigView extends React.Component {

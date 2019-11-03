@@ -18,6 +18,8 @@ import Constants from "expo-constants";
 import * as Permissions from "expo-permissions";
 import * as ImagePicker from "expo-image-picker";
 import * as Icon from "@expo/vector-icons";
+import KeyboardShift from "../components/KeyboardShift";
+import {DatePickerSingleton} from "../models/DatePickerSingleton";
 
 export default class UserScreen extends React.Component {
     static navigationOptions = {
@@ -79,7 +81,6 @@ export default class UserScreen extends React.Component {
                 birthdate: humanDate
             }
         });
-        this.refs.datePicker.setState({opened: false});
     }
 
     _pickImage = async () => {
@@ -125,81 +126,84 @@ export default class UserScreen extends React.Component {
     render() {
         return (
             <View style={styles.container}>
-                <DatePickerKeyboardIOS
-                    ref={'datePicker'}
-                    date={this.state.currentBirthdate}
-                    onDateChange={(date) => this.setState({currentBirthdate: date})}
-                    onDone={() => this.changeBirthdate()}
-                    maximumDate={new Date()}
-                />
-                <ScrollView style={styles.ScrollView}>
-                    <View style={styles.content}>
-                        <TouchableOpacity onPress={() => this._pickImage()} style={styles.avatarEdit}>
-                            <View style={styles.avatarUpdateBtn}>
-                                <Icon.Ionicons
-                                    name={'ios-camera'}
-                                    size={20}
-                                    color={'#FFFFFF'}
+                <KeyboardShift>
+                    {() => (
+                        <ScrollView style={styles.ScrollView}>
+                            <View style={styles.content}>
+                                <TouchableOpacity onPress={() => this._pickImage()} style={styles.avatarEdit}>
+                                    <View style={styles.avatarUpdateBtn}>
+                                        <Icon.Ionicons
+                                            name={'ios-camera'}
+                                            size={20}
+                                            color={'#FFFFFF'}
+                                        />
+                                    </View>
+                                    <Image source={{uri: this.state.user.avatar}} style={styles.avatar} />
+                                </TouchableOpacity>
+                                <TextInput
+                                    ref={"firstname"}
+                                    style={styles.textInput}
+                                    placeholder={"e.g. Aiden"}
+                                    returnKeyType={"done"}
+                                    autoCorrect={false}
+                                    spellCheck={false}
+                                    textContentType={"givenName"}
+                                    clearButtonMode={"always"}
+                                    value={this.state.user.firstname}
+                                    onChangeText={(text) => this.setState({user:{...this.state.user, firstname:text}})}
                                 />
+                                <TextInput
+                                    ref={"lastname"}
+                                    style={styles.textInput}
+                                    placeholder={"e.g. Pearce"}
+                                    returnKeyType={"done"}
+                                    autoCorrect={false}
+                                    spellCheck={false}
+                                    textContentType={"familyName"}
+                                    clearButtonMode={"always"}
+                                    value={this.state.user.lastname}
+                                    onChangeText={(text) => this.setState({user:{...this.state.user, lastname:text}})}
+                                />
+                                <TouchableOpacity activeOpacity={.5} style={styles.inputTouchable} onPress={() => {
+                                    DatePickerSingleton.get().open({
+                                        date: this.state.currentBirthdate,
+                                        onDateChange: date => this.setState({currentBirthdate: date}),
+                                        onDone: () => this.changeBirthdate()
+                                    })
+                                }}>
+                                    <TextInput
+                                        ref={'birthdateInput'}
+                                        style={styles.textInput}
+                                        placeholder={"e.g. 02/05/1974"}
+                                        placeholderTextColor={"rgba(255,255,255,.5)"}
+                                        returnKeyType={"done"}
+                                        autoCorrect={false}
+                                        spellCheck={false}
+                                        editable={false}
+                                        onChangeText={(text) => this.setState({user:{...this.state.user, birthdate:text}})}
+                                        pointerEvents={"none"}
+                                        value={this.state.birthdateInputValue}
+                                    />
+                                </TouchableOpacity>
+                                <TextInput
+                                    ref={"email"}
+                                    style={styles.textInput}
+                                    placeholder={"e.g. aiden@pearce.me"}
+                                    returnKeyType={"done"}
+                                    autoCorrect={false}
+                                    spellCheck={false}
+                                    autoCapitalize={"none"}
+                                    textContentType={"emailAddress"}
+                                    keyboardType={"email-address"}
+                                    clearButtonMode={"always"}
+                                    value={this.state.user.email}
+                                    onChangeText={(text) => this.setState({user:{...this.state.user, email:text}})}
+                                />
+                                <ActionBtn btnText={"Save"} btnIcon={'md-checkmark'} onPress={() => this.updateInfos()}/>
                             </View>
-                            <Image source={{uri: this.state.user.avatar}} style={styles.avatar} />
-                        </TouchableOpacity>
-                        <TextInput
-                            ref={"firstname"}
-                            style={styles.textInput}
-                            placeholder={"e.g. Aiden"}
-                            returnKeyType={"done"}
-                            autoCorrect={false}
-                            spellCheck={false}
-                            textContentType={"givenName"}
-                            clearButtonMode={"always"}
-                            value={this.state.user.firstname}
-                            onChangeText={(text) => this.setState({user:{...this.state.user, firstname:text}})}
-                        />
-                        <TextInput
-                            ref={"lastname"}
-                            style={styles.textInput}
-                            placeholder={"e.g. Pearce"}
-                            returnKeyType={"done"}
-                            autoCorrect={false}
-                            spellCheck={false}
-                            textContentType={"familyName"}
-                            clearButtonMode={"always"}
-                            value={this.state.user.lastname}
-                            onChangeText={(text) => this.setState({user:{...this.state.user, lastname:text}})}
-                        />
-                        <TouchableOpacity activeOpacity={.5} style={styles.inputTouchable} onPress={() => this.refs.datePicker.setState({opened: true})}>
-                            <TextInput
-                                ref={'birthdateInput'}
-                                style={styles.textInput}
-                                placeholder={"e.g. 02/05/1974"}
-                                placeholderTextColor={"rgba(255,255,255,.5)"}
-                                returnKeyType={"done"}
-                                autoCorrect={false}
-                                spellCheck={false}
-                                editable={false}
-                                onChangeText={(text) => this.setState({user:{...this.state.user, birthdate:text}})}
-                                pointerEvents={"none"}
-                                value={this.state.birthdateInputValue}
-                            />
-                        </TouchableOpacity>
-                        <TextInput
-                            ref={"email"}
-                            style={styles.textInput}
-                            placeholder={"e.g. aiden@pearce.me"}
-                            returnKeyType={"done"}
-                            autoCorrect={false}
-                            spellCheck={false}
-                            autoCapitalize={"none"}
-                            textContentType={"emailAddress"}
-                            keyboardType={"email-address"}
-                            clearButtonMode={"always"}
-                            value={this.state.user.email}
-                            onChangeText={(text) => this.setState({user:{...this.state.user, email:text}})}
-                        />
-                        <ActionBtn btnText={"Save"} btnIcon={'md-checkmark'} onPress={() => this.updateInfos()}/>
-                    </View>
-                </ScrollView>
+                        </ScrollView>
+                    )}
+                </KeyboardShift>
             </View>
         );
     }
@@ -212,7 +216,7 @@ const styles = StyleSheet.create({
     scrollView: {
         flex: 1,
         paddingTop: 15,
-        backgroundColor: 'white',
+        backgroundColor: 'white'
     },
     content: {
         alignItems: 'center'

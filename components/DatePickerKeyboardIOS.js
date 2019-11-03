@@ -5,7 +5,6 @@ import {
     Button,
     DatePickerIOS
 } from 'react-native';
-import ContinueButton from "./ContinueButton";
 
 export default class DatePickerKeyboardIOS extends React.Component {
 
@@ -19,6 +18,7 @@ export default class DatePickerKeyboardIOS extends React.Component {
 
     state = {
         opened: false,
+        minimumDate: this.props.minimumDate || new Date('1900-01-01T00:00:00'),
         maximumDate: this.props.maximumDate || new Date((new Date().getFullYear()) + '-12-31T00:00:00')
     };
 
@@ -48,7 +48,10 @@ export default class DatePickerKeyboardIOS extends React.Component {
                     />
                     <Button
                         style={styles.button}
-                        onPress={() => this.props.onDone()}
+                        onPress={() => {
+                            this.props.onDone();
+                            this.setState({opened: false});
+                        }}
                         title={"Done"}
                         accessibilityLabel={"Validate the date"}
                     />
@@ -56,6 +59,7 @@ export default class DatePickerKeyboardIOS extends React.Component {
                 <DatePickerIOS
                     date={this.props.date}
                     onDateChange={this.props.onDateChange}
+                    minimumDate={this.state.minimumDate}
                     maximumDate={this.state.maximumDate}
                     mode={'date'}
                 />

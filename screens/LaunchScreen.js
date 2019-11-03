@@ -7,7 +7,9 @@ import {
     TouchableOpacity,
     TextInput,
     AsyncStorage,
-    Platform, Alert
+    Platform,
+    Alert,
+    ScrollView
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { SplashScreen } from 'expo';
@@ -24,6 +26,8 @@ import Config from "../constants/Config";
 import LightStatusBar from "../components/LightStatusBar";
 import { StackActions, NavigationActions } from 'react-navigation';
 import {DropdownSingleton} from "../models/DropdownSingleton";
+import KeyboardShift from "../components/KeyboardShift";
+import {DatePickerSingleton} from "../models/DatePickerSingleton";
 
 export default class LaunchScreen extends React.Component {
 
@@ -56,7 +60,7 @@ export default class LaunchScreen extends React.Component {
 
     onInputChange(key, value) {
         this.personnalInfos[key] = value;
-        this.refs.continueBtn.setState({
+        this.continueBtn.setState({
             disabled: this.isEmpty(key)
         });
     }
@@ -100,7 +104,6 @@ export default class LaunchScreen extends React.Component {
         this.setState({
             birthdateInputValue: humanDate
         });
-        this.refs.datePicker.setState({opened: false});
     }
 
     async onMessage(message) {
@@ -124,7 +127,7 @@ export default class LaunchScreen extends React.Component {
         console.log('Took ' + data.t + ' seconds');
 
         this.register().then(() => {
-            this.refs.continueBtn.setState({disabled: false});
+            this.continueBtn.setState({disabled: false});
         });
     }
 
@@ -143,7 +146,7 @@ export default class LaunchScreen extends React.Component {
             window.setTimeout(() => {
                 this.register().then(() => {
                     this.setState({generationStatus: 'Done!'});
-                    this.refs.continueBtn.setState({disabled: false});
+                    this.continueBtn.setState({disabled: false});
                 });
             }, 500);
         }, 500);
@@ -224,7 +227,7 @@ export default class LaunchScreen extends React.Component {
             const avatarUri = 'data:image/jpeg;base64,' + result.base64;
             this.personnalInfos['avatar'] = avatarUri;
             this.setState({avatar: avatarUri});
-            this.refs.continueBtn.setState({disabled: false});
+            this.continueBtn.setState({disabled: false});
         }
     };
 
@@ -232,61 +235,69 @@ export default class LaunchScreen extends React.Component {
         switch (this.state.step) {
             case 'firstname':
                 return (
-                    <View style={styles.container}>
-                        <LightStatusBar/>
-                        <Image style={styles.logo} source={this.logo}/>
-                        <Text style={styles.baseline}>What's your firstname?</Text>
-                        <TextInput
-                            style={styles.textInput}
-                            placeholder={"e.g. Aiden"}
-                            placeholderTextColor={"rgba(255,255,255,.5)"}
-                            returnKeyType={"done"}
-                            autoCorrect={false}
-                            spellCheck={false}
-                            textContentType={"givenName"}
-                            clearButtonMode={"always"}
-                            onChangeText={(text) => this.onInputChange('firstname', text)}
-                        />
-                        <ContinueButton ref={'continueBtn'} disabled={true} onPress={() => this.storeValue('firstname', 'lastname')} />
-                        <LaunchFooter/>
-                    </View>
+                    <KeyboardShift>
+                        {() => (
+                            <ScrollView style={styles.scrollView} contentContainerStyle={styles.container}>
+                                <LightStatusBar/>
+                                <Image style={styles.logo} source={this.logo}/>
+                                <Text style={styles.baseline}>What's your firstname?</Text>
+                                <TextInput
+                                    style={styles.textInput}
+                                    placeholder={"e.g. Aiden"}
+                                    placeholderTextColor={"rgba(255,255,255,.5)"}
+                                    returnKeyType={"done"}
+                                    autoCorrect={false}
+                                    spellCheck={false}
+                                    textContentType={"givenName"}
+                                    clearButtonMode={"always"}
+                                    onChangeText={(text) => this.onInputChange('firstname', text)}
+                                />
+                                <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('firstname', 'lastname')} />
+                                <LaunchFooter/>
+                            </ScrollView>
+                        )}
+                    </KeyboardShift>
                 );
 
             case 'lastname':
                 return (
-                    <View style={styles.container}>
-                        <LightStatusBar/>
-                        <Image style={styles.logo} source={this.logo}/>
-                        <Text style={styles.baseline}>And your lastname?</Text>
-                        <TextInput
-                            style={styles.textInput}
-                            placeholder={"e.g. Pearce"}
-                            placeholderTextColor={"rgba(255,255,255,.5)"}
-                            returnKeyType={"done"}
-                            autoCorrect={false}
-                            spellCheck={false}
-                            textContentType={"familyName"}
-                            clearButtonMode={"always"}
-                            onChangeText={(text) => this.onInputChange('lastname', text)}
-                        />
-                        <ContinueButton ref={'continueBtn'} disabled={true} onPress={() => this.storeValue('lastname', 'birthdate')} />
-                        <LaunchFooter/>
-                    </View>
+                    <KeyboardShift>
+                        {() => (
+                            <View style={styles.container}>
+                                <LightStatusBar/>
+                                <Image style={styles.logo} source={this.logo}/>
+                                <Text style={styles.baseline}>And your lastname?</Text>
+                                <TextInput
+                                    style={styles.textInput}
+                                    placeholder={"e.g. Pearce"}
+                                    placeholderTextColor={"rgba(255,255,255,.5)"}
+                                    returnKeyType={"done"}
+                                    autoCorrect={false}
+                                    spellCheck={false}
+                                    textContentType={"familyName"}
+                                    clearButtonMode={"always"}
+                                    onChangeText={(text) => this.onInputChange('lastname', text)}
+                                />
+                                <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('lastname', 'birthdate')} />
+                                <LaunchFooter/>
+                            </View>
+                        )}
+                    </KeyboardShift>
                 );
 
             case 'birthdate':
                 return (
                     <View style={styles.container}>
                         <LightStatusBar/>
-                        <DatePickerKeyboardIOS
-                            ref={'datePicker'}
-                            date={this.state.currentBirthdate}
-                            onDateChange={(date) => this.setState({currentBirthdate: date})}
-                            onDone={() => this.changeBirthdate()}
-                        />
                         <Image style={styles.logo} source={this.logo}/>
                         <Text style={styles.baseline}>What about your birthdate?</Text>
-                        <TouchableOpacity activeOpacity={.5} style={styles.inputTouchable} onPress={() => this.refs.datePicker.setState({opened: true})}>
+                        <TouchableOpacity activeOpacity={.5} style={styles.inputTouchable} onPress={() => {
+                            DatePickerSingleton.get().open({
+                                date: this.state.currentBirthdate,
+                                onDateChange: date => this.setState({currentBirthdate: date}),
+                                onDone: () => this.changeBirthdate()
+                            })
+                        }}>
                             <TextInput
                                 ref={'birthdateInput'}
                                 style={styles.textInput}
@@ -301,33 +312,37 @@ export default class LaunchScreen extends React.Component {
                                 value={this.state.birthdateInputValue}
                             />
                         </TouchableOpacity>
-                        <ContinueButton ref={'continueBtn'} disabled={true} onPress={() => this.storeValue('birthdate', 'email')} />
+                        <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('birthdate', 'email')} />
                         <LaunchFooter/>
                     </View>
                 );
 
             case 'email':
                 return (
-                    <View style={styles.container}>
-                        <LightStatusBar/>
-                        <Image style={styles.logo} source={this.logo}/>
-                        <Text style={styles.baseline}>And your E-Mail?</Text>
-                        <TextInput
-                            style={styles.textInput}
-                            placeholder={"e.g. aiden@pearce.me"}
-                            placeholderTextColor={"rgba(255,255,255,.5)"}
-                            returnKeyType={"done"}
-                            autoCorrect={false}
-                            spellCheck={false}
-                            autoCapitalize={"none"}
-                            textContentType={"emailAddress"}
-                            keyboardType={"email-address"}
-                            clearButtonMode={"always"}
-                            onChangeText={(text) => this.onInputChange('email', text)}
-                        />
-                        <ContinueButton ref={'continueBtn'} disabled={true} onPress={() => this.storeValue('email', 'avatar')} />
-                        <LaunchFooter/>
-                    </View>
+                    <KeyboardShift>
+                        {() => (
+                            <View style={styles.container}>
+                                <LightStatusBar/>
+                                <Image style={styles.logo} source={this.logo}/>
+                                <Text style={styles.baseline}>And your E-Mail?</Text>
+                                <TextInput
+                                    style={styles.textInput}
+                                    placeholder={"e.g. aiden@pearce.me"}
+                                    placeholderTextColor={"rgba(255,255,255,.5)"}
+                                    returnKeyType={"done"}
+                                    autoCorrect={false}
+                                    spellCheck={false}
+                                    autoCapitalize={"none"}
+                                    textContentType={"emailAddress"}
+                                    keyboardType={"email-address"}
+                                    clearButtonMode={"always"}
+                                    onChangeText={(text) => this.onInputChange('email', text)}
+                                />
+                                <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('email', 'avatar')} />
+                                <LaunchFooter/>
+                            </View>
+                        )}
+                    </KeyboardShift>
                 );
 
             case 'avatar':
@@ -352,7 +367,7 @@ export default class LaunchScreen extends React.Component {
                                  }}
                             />
                         </TouchableOpacity>
-                        <ContinueButton ref={'continueBtn'} disabled={true} onPress={() => this.storeValue('avatar', 'done')} marginTop={20} />
+                        <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('avatar', 'done')} marginTop={20} />
                         <TouchableOpacity onPress={() => Alert.alert('Are you sure? You still could update your avatar later.', '', [
                             {text: 'Cancel', onPress: () => {}, style:'cancel'},
                             {text: 'OK', onPress: () => this.storeValue('avatar', 'done')}
@@ -381,7 +396,7 @@ export default class LaunchScreen extends React.Component {
                             clearButtonMode={"always"}
                             onChangeText={(text) => this.onInputChange('address', text)}
                         />
-                        <ContinueButton ref={'continueBtn'} disabled={true} onPress={() => this.storeValue('address', 'phone')} />
+                        <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('address', 'phone')} />
                         <LaunchFooter/>
                     </View>
                 );
@@ -405,7 +420,7 @@ export default class LaunchScreen extends React.Component {
                             clearButtonMode={"always"}
                             onChangeText={(text) => this.onInputChange('address', text)}
                         />
-                        <ContinueButton ref={'continueBtn'} disabled={true} onPress={() => this.storeValue('phone', 'otp')} />
+                        <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('phone', 'otp')} />
                         <LaunchFooter/>
                     </View>
                 );
@@ -429,7 +444,7 @@ export default class LaunchScreen extends React.Component {
                             clearButtonMode={"always"}
                             onChangeText={(text) => this.onInputChange('address', text)}
                         />
-                        <ContinueButton ref={'continueBtn'} disabled={true} onPress={() => this.storeValue('otp', 'keygen')} />
+                        <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('otp', 'keygen')} />
                         <LaunchFooter/>
                     </View>
                 );
@@ -446,7 +461,7 @@ export default class LaunchScreen extends React.Component {
                             You can now login on any website or app which provide the "Login with JustAuth.Me" button, without
                             getting through any registration process, without any password, without even thinking about it!
                         </Text>
-                        <ContinueButton text={'Got it!'} ref={'continueBtn'} disabled={true} onPress={this.finish} />
+                        <ContinueButton text={'Got it!'} ref={ref => this.continueBtn = ref} disabled={true} onPress={this.finish} />
                         <View style={styles.webview}>
                             <WebView
                                 source={{uri: 'https://init.justauth.me'}}
@@ -474,9 +489,11 @@ export default class LaunchScreen extends React.Component {
 }
 const isBorderless = Constants.statusBarHeight > 20;
 const styles = StyleSheet.create({
+    scrollView: {
+        backgroundColor: '#3598DB'
+    },
     container: {
         backgroundColor: '#3598DB',
-        flex: 1,
         width: '100%',
         height: '100%',
         alignItems: 'center'
