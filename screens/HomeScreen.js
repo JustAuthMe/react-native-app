@@ -203,13 +203,6 @@ export default class HomeScreen extends React.Component {
                             );
                         }}
                     />
-                    {/*<View style={{
-                        alignItems: 'center',
-                        paddingTop: 10
-                    }}>
-                        <Text>Build {Constants.manifest.version}</Text>
-                        <Button onPress={() => this.logout()} title={'Logout'} />
-                    </View>*/}
                 </View>
             </View>
         );
@@ -230,11 +223,11 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 300,
         alignItems: 'center',
-        paddingTop: isBorderless ? 50 : 20
+        paddingTop: isBorderless ? 50 : 30
     },
     switchIcon: {
         position: 'absolute',
-        top: isBorderless ? 40 : 10,
+        top: isBorderless ? 40 : 20,
         left: 5,
         width: 50,
         height: 50,
@@ -243,7 +236,7 @@ const styles = StyleSheet.create({
     },
     editIcon: {
         position: 'absolute',
-        top: isBorderless ? 40 : 10,
+        top: isBorderless ? 40 : 20,
         right: 5,
         width: 50,
         height: 50,
@@ -272,7 +265,7 @@ const styles = StyleSheet.create({
     servicesList: {
         width: '100%',
         paddingTop: 25,
-        marginBottom: isBorderless ? 20 : 0
+        marginBottom: 30
     },
     serviceContainer: {
         flexDirection: 'row',

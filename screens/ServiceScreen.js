@@ -101,7 +101,8 @@ export default class ServiceScreen extends React.Component {
                 <FlatList
                     style={{
                         width: '100%',
-                        marginTop: 30
+                        marginTop: 30,
+                        marginBottom: 30
                     }}
                     data={this.state.service.data}
                     renderItem={({item}) =>

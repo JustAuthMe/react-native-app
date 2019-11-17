@@ -216,10 +216,11 @@ const styles = StyleSheet.create({
     scrollView: {
         flex: 1,
         paddingTop: 15,
-        backgroundColor: 'white'
+        backgroundColor: 'white',
     },
     content: {
-        alignItems: 'center'
+        alignItems: 'center',
+        marginBottom: 30
     },
     textInput: {
         width: '70%',
