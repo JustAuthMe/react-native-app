@@ -5,7 +5,8 @@ import {
     StyleSheet,
     Image,
     AsyncStorage,
-    ScrollView
+    ScrollView,
+    Platform
 } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import * as LocalAuthentication from 'expo-local-authentication';
@@ -16,6 +17,7 @@ import DarkStatusBar from "../components/DarkStatusBar";
 import {DropdownSingleton} from "../models/DropdownSingleton";
 import {NavigationActions, StackActions} from "react-navigation";
 import {ServicesModel} from "../models/ServicesModel";
+import AndroidBiometricPrompt from "../components/AndroidBiometricPrompt";
 
 export default class AuthScreen extends React.Component {
     static navigationOptions = {
@@ -90,10 +92,22 @@ export default class AuthScreen extends React.Component {
     onAcceptLogin = async () => {
         const hasHardware = await LocalAuthentication.hasHardwareAsync();
         const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+
+        console.log('has hardware:', hasHardware);
+        console.log('is enrolled:', isEnrolled);
+
         let canLogin = true;
         if (hasHardware && isEnrolled) {
+            if (Platform.OS === 'android') {
+                this.androidPrompt.setState({visible: true});
+            }
+
             const localAuth = await LocalAuthentication.authenticateAsync({promptMessage: 'Confirm login attempt'});
             canLogin = localAuth.success;
+
+            if (Platform.OS === 'android') {
+                this.androidPrompt.setState({status: localAuth.success ? 'success' : 'error'});
+            }
         }
 
         if (canLogin) {
@@ -175,7 +189,7 @@ export default class AuthScreen extends React.Component {
             content = <Text style={styles.loadingText}>Loading authentication details...</Text>;
         } else if (this.services.hasOwnProperty(this.state.auth.client_app.app_id)) {
             this.onAcceptLogin().then();
-            content = <Text style={styles.loadingText}>Authenticating...</Text>
+            content = <Text style={styles.loadingText}>Authenticating...</Text>;
         } else {
             let data = [];
             for (let i = 0; i < this.state.auth.data.length; i++) {
@@ -202,6 +216,7 @@ export default class AuthScreen extends React.Component {
         return (
             <View style={styles.container}>
                 <DarkStatusBar/>
+                <AndroidBiometricPrompt ref={ref => this.androidPrompt = ref}/>
                 {content}
             </View>
         );

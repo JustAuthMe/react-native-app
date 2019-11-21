@@ -6,10 +6,8 @@ import {
     Text,
     View,
     AsyncStorage,
-    Alert,
     TouchableOpacity,
     StatusBar,
-    Button,
     FlatList
 } from 'react-native';
 import { Linking } from 'expo';
@@ -118,31 +116,6 @@ export default class HomeScreen extends React.Component {
         console.log('parsed items:', items);
         return items;
     };
-
-    /*logout = () => {
-        Alert.alert('Are you sure?', '', [
-            {text: 'Cancel', onPress: () => {}, style:'cancel'},
-            {text: 'OK', onPress: () => {
-                    AsyncStorage.multiRemove([
-                        Config.initDone.key,
-                        'firstname',
-                        'lastname',
-                        'birthdate',
-                        'email'
-                    ], async () => {
-                        AsyncStorage.getItem(Config.initDone.key).then(value => {
-                            console.log('init done at logout:', value);
-                        });
-
-                        await SecureStore.deleteItemAsync(Config.storageKeys.publicKey);
-                        await SecureStore.deleteItemAsync(Config.storageKeys.privateKey);
-                        await SecureStore.deleteItemAsync(Config.storageKeys.jamID);
-
-                        this.props.navigation.navigate('Launch');
-                    });
-                }}
-        ]);
-    };*/
 
     render() {
         return (

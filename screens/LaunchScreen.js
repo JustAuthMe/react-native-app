@@ -21,13 +21,14 @@ import Constants from 'expo-constants';
 import { Ionicons } from '@expo/vector-icons';
 import LaunchFooter from "../components/LaunchFooter";
 import ContinueButton from "../components/ContinueButton";
-import DatePickerKeyboardIOS from "../components/DatePickerKeyboardIOS";
 import Config from "../constants/Config";
 import LightStatusBar from "../components/LightStatusBar";
 import { StackActions, NavigationActions } from 'react-navigation';
 import {DropdownSingleton} from "../models/DropdownSingleton";
 import KeyboardShift from "../components/KeyboardShift";
 import {DatePickerSingleton} from "../models/DatePickerSingleton";
+import Swiper from 'react-native-swiper';
+import ExplanationTitle from "../components/ExplanationTitle";
 
 export default class LaunchScreen extends React.Component {
 
@@ -41,6 +42,7 @@ export default class LaunchScreen extends React.Component {
         birthdateInputValue: '',
         generationStatus: 'Generating...',
         avatar: null,
+        explanationTitle: 'Welcome'
     };
 
     constructor(props) {
@@ -49,6 +51,13 @@ export default class LaunchScreen extends React.Component {
             avatar: Config.defaultAvatar
         };
         this.logo = require('../assets/images/logo-new.png');
+        this.explanationTitles = [
+            'Welcome',
+            'How it works?',
+            'Biometric rocks',
+            'Privacy matters',
+            'Ready to go!'
+        ];
 
         AsyncStorage.getItem(Config.initDone.key).then(value => {
             SplashScreen.hide();
@@ -233,6 +242,74 @@ export default class LaunchScreen extends React.Component {
 
     render() {
         switch (this.state.step) {
+            case 'explanation':
+                return (
+                    <View style={{
+                        ...styles.container,
+                        justifyContent: 'center'
+                    }}>
+                        <LightStatusBar/>
+                        <ExplanationTitle ref={ref => this.explanationTitle = ref} style={styles.welcomeText} text={this.explanationTitles[0]}/>
+                        <View style={styles.swiperContainer}>
+                            <Swiper
+                                activeDotColor={'#555'}
+                                autoplay={true}
+                                autoplayTimeout={15}
+                                removeClippedSubviews={false}
+                                onIndexChanged={(index) => {
+                                    this.explanationTitle.setState({text: this.explanationTitles[index]});
+                                }}
+                            >
+                                <View style={styles.swipablePage}>
+                                    <Image source={require('../assets/images/undraw/celebrating.png')} style={styles.pageImage}/>
+                                    <Text style={styles.pageText}>
+                                        Welcome to JustAuth.Me! This app is meant to help you login to any website or
+                                        app with the "Sign in with JAM" button, without a single password.
+                                    </Text>
+                                </View>
+                                <View style={styles.swipablePage}>
+                                    <Image source={require('../assets/images/undraw/accept_terms.png')} style={styles.pageImage}/>
+                                    <Text style={styles.pageText}>
+                                        The only thing you need to do to login to apps or websites is to click the "Sign
+                                        in with JAM" button and accept the login from the App after checking which
+                                        informations you want to share.
+                                    </Text>
+                                </View>
+                                <View style={styles.swipablePage}>
+                                    <Image source={require('../assets/images/undraw/confirmed.png')} style={styles.pageImage}/>
+                                    <Text style={styles.pageText}>
+                                        From there, you will be prompt to check your biometrical print (if your device
+                                        is equiped) and the informations needed to log you will be sent automatically.
+                                    </Text>
+                                </View>
+                                <View style={styles.swipablePage}>
+                                    <Image source={require('../assets/images/undraw/privacy.png')} style={styles.pageImage}/>
+                                    <Text style={styles.pageText}>
+                                        Your personal informations are stored only on this device and will never be
+                                        stored on our servers. If we can't access them, we can't sell them to anyone.
+                                    </Text>
+                                </View>
+                                <View style={styles.swipablePage}>
+                                    <Image source={require('../assets/images/undraw/done.png')} style={styles.pageImage}/>
+                                    <Text style={styles.pageText}>
+                                        We assume that your phone is the best way to authenticate yourself. Never
+                                        remember a single password or fill a boring register form again.{"\n"}This is
+                                        JustAuth.Me.
+                                    </Text>
+                                </View>
+                            </Swiper>
+                        </View>
+                        <ContinueButton
+                            text={'Let\'s go!'}
+                            ref={ref => this.continueBtn = ref}
+                            onPress={() => this.props.navigation.push('LaunchScreen', {step: 'firstname'})}
+                        />
+                        <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
+                            <Text style={styles.swipeBack}>Not now</Text>
+                        </TouchableOpacity>
+                    </View>
+                );
+
             case 'firstname':
                 return (
                     <KeyboardShift>
@@ -478,7 +555,7 @@ export default class LaunchScreen extends React.Component {
                         <LightStatusBar/>
                         <Image style={styles.logo} source={this.logo}/>
                         <Text style={styles.baseline}>Join the revolution</Text>
-                        <TouchableOpacity style={styles.startBtn} onPress={() => this.props.navigation.push('LaunchScreen', {step: 'firstname'})}>
+                        <TouchableOpacity style={styles.startBtn} onPress={() => this.props.navigation.push('LaunchScreen', {step: 'explanation'})}>
                             <Ionicons name="ios-arrow-forward" size={56} color="white" style={styles.arrowIcon}/>
                         </TouchableOpacity>
                         <LaunchFooter/>
@@ -501,7 +578,7 @@ const styles = StyleSheet.create({
     logo: {
         marginTop: isBorderless ? 100 : 80,
         width: '100%',
-        height: 150,
+        height: isBorderless ? 150 : 120,
         resizeMode: 'contain'
     },
     baseline: {
@@ -572,5 +649,37 @@ const styles = StyleSheet.create({
     webview: {
         height: 0,
         width: 0
+    },
+    welcomeText: {
+        fontSize: 32,
+        color: 'white',
+        fontWeight: '600'
+    },
+    swiperContainer: {
+        width: '80%',
+        height: '50%',
+        backgroundColor: 'white',
+        borderRadius: 20,
+        marginTop: 50
+    },
+    swipablePage: {
+        padding: 20,
+        alignItems: 'center',
+        justifyContent: 'flex-start'
+    },
+    pageImage: {
+        height: '60%',
+        resizeMode: 'contain'
+    },
+    pageText: {
+        marginTop: 20,
+        fontSize: 15,
+        textAlign: 'center',
+        color: '#555'
+    },
+    swipeBack: {
+        color: '#A7CADD',
+        textAlign: 'center',
+        marginTop: 30
     }
 });
