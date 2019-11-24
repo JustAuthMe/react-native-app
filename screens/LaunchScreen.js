@@ -9,7 +9,8 @@ import {
     AsyncStorage,
     Platform,
     Alert,
-    ScrollView
+    ScrollView,
+    Dimensions
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { SplashScreen } from 'expo';
@@ -54,7 +55,7 @@ export default class LaunchScreen extends React.Component {
         this.explanationTitles = [
             'Welcome',
             'How it works?',
-            'Biometric rocks',
+            'Biometrics rocks',
             'Privacy matters',
             'Ready to go!'
         ];
@@ -65,6 +66,8 @@ export default class LaunchScreen extends React.Component {
                 this.props.navigation.navigate('Main');
             }
         });
+        console.log('window height:', Dimensions.get('window').height);
+        console.log('status bar height:', Constants.statusBarHeight);
     }
 
     onInputChange(key, value) {
@@ -140,27 +143,6 @@ export default class LaunchScreen extends React.Component {
         });
     }
 
-    /*async keygen() {
-        /*
-         TODO: Make sure that actual keygen and THEN registration is workign as expected
-         (I think that maybe the keypair do not have the time to save itself onto the SecureStore before the
-         registration process begins)
-
-        console.log('Generating...');
-        // Giving time to UI to update
-        window.setTimeout(async () => {
-            const enc = new EncryptionModel();
-            await enc.generateKeypair();
-
-            window.setTimeout(() => {
-                this.register().then(() => {
-                    this.setState({generationStatus: 'Done!'});
-                    this.continueBtn.setState({disabled: false});
-                });
-            }, 500);
-        }, 500);
-    }*/
-
     async register() {
         const pubkey = await SecureStore.getItemAsync(Config.storageKeys.publicKey);
         const endpointUrl = Config.apiUrl + 'register';
@@ -203,7 +185,7 @@ export default class LaunchScreen extends React.Component {
     finish = () => {
         AsyncStorage.setItem(Config.initDone.key, Config.initDone.value, () => {
             AsyncStorage.getItem(Config.initDone.key, (value) => {
-                console.log('init done at and of launch:', value);
+                console.log('init done at end of launch:', value);
             });
             AsyncStorage.setItem(Config.servicesKey, JSON.stringify({}), () => {
                 AsyncStorage.getItem(Config.servicesKey, (value) => {
@@ -246,7 +228,7 @@ export default class LaunchScreen extends React.Component {
                 return (
                     <View style={{
                         ...styles.container,
-                        justifyContent: 'center'
+                        justifyContent: 'space-between'
                     }}>
                         <LightStatusBar/>
                         <ExplanationTitle ref={ref => this.explanationTitle = ref} style={styles.welcomeText} text={this.explanationTitles[0]}/>
@@ -270,22 +252,22 @@ export default class LaunchScreen extends React.Component {
                                 <View style={styles.swipablePage}>
                                     <Image source={require('../assets/images/undraw/accept_terms.png')} style={styles.pageImage}/>
                                     <Text style={styles.pageText}>
-                                        The only thing you need to do to login to apps or websites is to click the "Sign
-                                        in with JAM" button and accept the login from the App after checking which
-                                        informations you want to share.
+                                        To login to apps or websites, just to click the "Sign in with JAM" button and
+                                        accept the login from the App, where you can check which informations you want
+                                        to share.
                                     </Text>
                                 </View>
                                 <View style={styles.swipablePage}>
                                     <Image source={require('../assets/images/undraw/confirmed.png')} style={styles.pageImage}/>
                                     <Text style={styles.pageText}>
                                         From there, you will be prompt to check your biometrical print (if your device
-                                        is equiped) and the informations needed to log you will be sent automatically.
+                                        is equiped) and the informations needed to log you will be automatically sent.
                                     </Text>
                                 </View>
                                 <View style={styles.swipablePage}>
                                     <Image source={require('../assets/images/undraw/privacy.png')} style={styles.pageImage}/>
                                     <Text style={styles.pageText}>
-                                        Your personal informations are stored only on this device and will never be
+                                        Your personal informations are stored only on your device and will never be
                                         stored on our servers. If we can't access them, we can't sell them to anyone.
                                     </Text>
                                 </View>
@@ -303,6 +285,7 @@ export default class LaunchScreen extends React.Component {
                             text={'Let\'s go!'}
                             ref={ref => this.continueBtn = ref}
                             onPress={() => this.props.navigation.push('LaunchScreen', {step: 'firstname'})}
+                            marginTop={30}
                         />
                         <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
                             <Text style={styles.swipeBack}>Not now</Text>
@@ -430,10 +413,8 @@ export default class LaunchScreen extends React.Component {
                         <Text style={styles.baseline}>Finally, chose an avatar</Text>
                         <TouchableOpacity onPress={() => this._pickImage()} style={styles.avatarContainer}>
                             <Image source={{uri: this.state.avatar !== null ? this.state.avatar : '../assets/images/user.png'}} style={{
+                                ...styles.avatar,
                                 display: this.state.avatar !== null ? 'flex' : 'none',
-                                height: 120,
-                                width: 120,
-                                borderRadius: 60
                             }} />
                             <Icon.Ionicons
                                 name={'ios-cloud-upload'}
@@ -451,7 +432,6 @@ export default class LaunchScreen extends React.Component {
                         ])}>
                             <Text style={styles.avatarIgnore}>Ignore this step</Text>
                         </TouchableOpacity>
-                        <LaunchFooter/>
                     </View>
                 );
 
@@ -532,13 +512,13 @@ export default class LaunchScreen extends React.Component {
                         <LightStatusBar/>
                         <Image style={styles.logo} source={this.logo}/>
                         <Text style={styles.baseline}>Congratulations!</Text>
-                        <Text style={styles.warningText}>
-                            You successfully registered into JustAuth.Me! All the personal information you just provided
-                            is only stored on your phone, not on our servers, not anywhere else, just on your device.
-                            You can now login on any website or app which provide the "Login with JustAuth.Me" button, without
-                            getting through any registration process, without any password, without even thinking about it!
-                        </Text>
-                        <ContinueButton text={'Got it!'} ref={ref => this.continueBtn = ref} disabled={true} onPress={this.finish} />
+                        <View style={styles.warningTextContainer}>
+                            <Text style={styles.warningText}>
+                                You successfully registered into JustAuth.Me! You can now login on any website or app which
+                                provide the "Login with JustAuth.Me" button.
+                            </Text>
+                        </View>
+                        <ContinueButton text={'Got it!'} ref={ref => this.continueBtn = ref} disabled={true} onPress={this.finish} marginTop={30} />
                         <View style={styles.webview}>
                             <WebView
                                 source={{uri: 'https://init.justauth.me'}}
@@ -564,7 +544,8 @@ export default class LaunchScreen extends React.Component {
         }
     }
 }
-const isBorderless = Constants.statusBarHeight > 20;
+const isBorderless = Platform.OS === 'ios' && Constants.statusBarHeight > 20;
+const isZoomed = Platform.OS === 'ios' && Dimensions.get('window').height < 667;
 const styles = StyleSheet.create({
     scrollView: {
         backgroundColor: '#3598DB'
@@ -576,9 +557,9 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     logo: {
-        marginTop: isBorderless ? 100 : 80,
+        marginTop: isBorderless ? 100 : (isZoomed ? 50 : 80),
         width: '100%',
-        height: isBorderless ? 150 : 120,
+        height: isBorderless ? 170 : 120,
         resizeMode: 'contain'
     },
     baseline: {
@@ -630,16 +611,25 @@ const styles = StyleSheet.create({
         width: '100%',
         alignItems: 'center'
     },
-    warningText: {
+    warningTextContainer: {
         marginTop: 30,
+        padding: 20,
+        backgroundColor: 'white',
+        borderRadius: 20,
+        width: '80%',
+    },
+    warningText: {
         fontSize: 18,
-        color: 'white',
+        color: '#555',
         textAlign: 'center',
-        paddingLeft: 15,
-        paddingRight: 15
     },
     avatarContainer: {
         marginTop: 20
+    },
+    avatar: {
+        height: 120,
+        width: 120,
+        borderRadius: 60
     },
     avatarIgnore: {
         color: '#FFFFFF',
@@ -653,14 +643,14 @@ const styles = StyleSheet.create({
     welcomeText: {
         fontSize: 32,
         color: 'white',
-        fontWeight: '600'
+        fontWeight: '600',
+        marginTop: isBorderless ? 80 : 30
     },
     swiperContainer: {
         width: '80%',
-        height: '50%',
+        height: isZoomed ? 330 : 400,
         backgroundColor: 'white',
         borderRadius: 20,
-        marginTop: 50
     },
     swipablePage: {
         padding: 20,
@@ -668,7 +658,7 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start'
     },
     pageImage: {
-        height: '60%',
+        height: isZoomed ? '50%' : '60%',
         resizeMode: 'contain'
     },
     pageText: {
@@ -680,6 +670,7 @@ const styles = StyleSheet.create({
     swipeBack: {
         color: '#A7CADD',
         textAlign: 'center',
-        marginTop: 30
+        marginTop: 10,
+        marginBottom: isBorderless ? 50 : 30
     }
 });

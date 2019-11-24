@@ -33,7 +33,8 @@
     "react-native-gesture-handler": "^1.3.0",
     "react-native-swiper": "^1.6.0-nightly.5",
     "react-native-webview": "^7.0.5",
-    "react-navigation": "^3.0.9"
+    "react-navigation": "^3.0.9",
+    "expo-localization": "~7.0.0"
   },
   "devDependencies": {
     "babel-preset-expo": "^5.0.0",

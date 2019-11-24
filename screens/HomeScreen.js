@@ -118,6 +118,44 @@ export default class HomeScreen extends React.Component {
     };
 
     render() {
+        let servicesList = <View></View>;
+        if (this.state.services === null || Object.keys(this.state.services).length === 0) {
+            servicesList = <Text style={{
+                textAlign: 'center',
+                marginTop: 30,
+                padding: 20
+            }}>
+                You haven't logged to any of our partners website or app yet. Just click the
+                "Authenticate" button above to begin your JustAuth.Me experience.
+            </Text>;
+        } else {
+            servicesList = <FlatList
+                style={styles.servicesList}
+                data={this.parseServices()}
+                renderItem={(item) => {
+                    return (
+                        <TouchableOpacity
+                            style={styles.serviceContainer}
+                            onPress={() => {
+                                this.props.navigation.navigate('Service', {
+                                    service: this.state.services[item.item.key]
+                                });
+                            }}
+                        >
+                            <Image source={{uri: this.state.services[item.item.key].logo}} style={styles.serviceIcon}/>
+                            <Text style={styles.serviceName}>{this.state.services[item.item.key].name}</Text>
+                            <Icon.Ionicons
+                                name={'ios-arrow-forward'}
+                                size={24}
+                                color={'#ccc'}
+                                style={styles.serviceArrow}
+                            />
+                        </TouchableOpacity>
+                    );
+                }}
+            />;
+        }
+
         return (
             <View style={styles.container}>
                 <LightStatusBar/>
@@ -145,37 +183,8 @@ export default class HomeScreen extends React.Component {
                             btnText={'Authenticate'}
                         />
                     </View>
-                    {/*<Text>{this.state.services !== null ? this.state.services.demo.logo : ''}</Text>*/}
                     <Text style={styles.servicesTitle}>Services</Text>
-                    <FlatList
-                        style={styles.servicesList}
-                        data={this.parseServices()}
-                        renderItem={(item) => {
-                            if (this.state.services === null || this.state.services.length === 0) {
-                                return (<View></View>);
-                            }
-
-                            return (
-                                <TouchableOpacity
-                                    style={styles.serviceContainer}
-                                    onPress={() => {
-                                        this.props.navigation.navigate('Service', {
-                                            service: this.state.services[item.item.key]
-                                        });
-                                    }}
-                                >
-                                    <Image source={{uri: this.state.services[item.item.key].logo}} style={styles.serviceIcon}/>
-                                    <Text style={styles.serviceName}>{this.state.services[item.item.key].name}</Text>
-                                    <Icon.Ionicons
-                                        name={'ios-arrow-forward'}
-                                        size={24}
-                                        color={'#ccc'}
-                                        style={styles.serviceArrow}
-                                    />
-                                </TouchableOpacity>
-                            );
-                        }}
-                    />
+                    {servicesList}
                 </View>
             </View>
         );
