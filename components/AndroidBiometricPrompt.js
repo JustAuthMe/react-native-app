@@ -31,12 +31,12 @@ export default class AndroidBiometricPrompt extends React.Component {
                     <Icon.Ionicons
                         name={'md-finger-print'}
                         size={70}
-                        color={this.state.status === 'wait' ? '#bbb' : (this.state.status === 'success' ? styles.biometricSuccessColor : styles.biometricErrorColor)}
+                        color={this.state.status === 'wait' ? '#bbb' : (this.state.status === 'success' ? userStyles.biometricSuccessColor : userStyles.biometricErrorColor)}
                         style={styles.icon}
                     />
                     <Text style={{
                         ...styles.statusText,
-                        color: this.state.status === 'wait' ? '#bbb' : (this.state.status === 'success' ? styles.biometricSuccessColor : styles.biometricErrorColor)
+                        color: this.state.status === 'wait' ? '#bbb' : (this.state.status === 'success' ? userStyles.biometricSuccessColor : userStyles.biometricErrorColor)
                     }}>{this.state.status === 'wait' ? 'Waiting...' : (this.state.status === 'success' ? 'Verified!' : 'Please retry')}</Text>
                     <View style={styles.btnContainer}>
                         <Button
@@ -67,7 +67,6 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         position: 'absolute',
         zIndex: 101,
-        background: 'white',
         alignSelf: 'center',
         width: '80%',
         height: 280,
@@ -100,7 +99,10 @@ const styles = StyleSheet.create({
     statusText: {
         fontSize: 12,
         alignSelf: 'center'
-    },
+    }
+});
+
+const userStyles = {
     biometricSuccessColor: '#00c853',
     biometricErrorColor: '#b71c1c'
-});
+};

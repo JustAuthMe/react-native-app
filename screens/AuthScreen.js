@@ -42,13 +42,13 @@ export default class AuthScreen extends React.Component {
             const response = await fetch(endpointUrl);
             const responseJson = await response.json();
             console.log(responseJson);
-            if (responseJson.auth) {
+            if (responseJson.status === 'success') {
                 this.setState({
                     auth: responseJson.auth
                 });
                 this.actualData = {};
-                for (let i = 0; i < responseJson.auth.data.length; i++) {
-                    this.actualData[responseJson.auth.data[i]] = true;
+                for (let i = 0; i < responseJson.auth.client_app.data.length; i++) {
+                    this.actualData[responseJson.auth.client_app.data[i]] = true;
                 }
             } else {
                 console.log('error retreiving auth details');
@@ -73,7 +73,7 @@ export default class AuthScreen extends React.Component {
             token: this.state.token
         };
 
-        const authData = this.state.auth.data;
+        const authData = this.state.auth.client_app.data;
         for (let i = 0; i < authData.length; i++) {
             let dataName = authData[i];
             if (authData[i].indexOf('!') !== -1) {
@@ -162,6 +162,16 @@ export default class AuthScreen extends React.Component {
                     await ServicesModel.addService(this.state.auth.client_app.app_id, service);
                     this.props.navigation.navigate('Success');
                 } else {
+                    if (response.status === 401) {
+                        DropdownSingleton.get().alertWithType('error', 'Unauthorized login', 'A wrong authentication attempt has been detected.');
+                    } else if (response.status === 403) {
+                        DropdownSingleton.get().alertWithType('error', 'Non confirmed E-Mail', 'Please confirm your E-Mail address before trying to authenticate.');
+                    } else if (response.status === 404) {
+                        DropdownSingleton.get().alertWithType('error', 'Invalid token', 'There is no such authentication token.');
+                    } else {
+                        DropdownSingleton.get().alertWithType('error', 'Unknow error', 'An error occurred during login challenge. Please contact support.');
+                    }
+
                     const resetAction = StackActions.reset({
                         index: 0,
                         actions: [NavigationActions.navigate({
@@ -169,7 +179,6 @@ export default class AuthScreen extends React.Component {
                         })],
                     });
                     this.props.navigation.dispatch(resetAction);
-                    DropdownSingleton.get().alertWithType('error', 'Unknow error', 'An error occurred during login challenge. Please contact support.');
                 }
             } catch (error) {
                 console.error(error);
@@ -192,8 +201,8 @@ export default class AuthScreen extends React.Component {
             content = <Text style={styles.loadingText}>Authenticating...</Text>;
         } else {
             let data = [];
-            for (let i = 0; i < this.state.auth.data.length; i++) {
-                data.push({key: this.state.auth.data[i]});
+            for (let i = 0; i < this.state.auth.client_app.data.length; i++) { //TODO
+                data.push({key: this.state.auth.client_app.data[i]});
             }
             content =
                 <ScrollView style={styles.container}>

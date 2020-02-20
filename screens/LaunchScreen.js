@@ -43,7 +43,9 @@ export default class LaunchScreen extends React.Component {
         birthdateInputValue: '',
         generationStatus: 'Generating...',
         avatar: null,
-        explanationTitle: 'Welcome'
+        explanationTitle: 'Welcome',
+        congratsTitle: 'Please wait...',
+        displayCongrats: false
     };
 
     constructor(props) {
@@ -138,13 +140,20 @@ export default class LaunchScreen extends React.Component {
 
         console.log('Took ' + data.t + ' seconds');
 
-        this.register().then(() => {
-            this.continueBtn.setState({disabled: false});
+        this.register().then(registered => {
+            if (registered) {
+                this.setState({
+                    congratsTitle: 'Congratulations!',
+                    displayCongrats: true
+                });
+                this.continueBtn.setState({disabled: false});
+            }
         });
     }
 
     async register() {
         const pubkey = await SecureStore.getItemAsync(Config.storageKeys.publicKey);
+        const email = await AsyncStorage.getItem('email');
         const endpointUrl = Config.apiUrl + 'register';
         console.log('sent pubkey: ', pubkey);
         try {
@@ -157,24 +166,51 @@ export default class LaunchScreen extends React.Component {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        pubkey: pubkey
+                        pubkey: pubkey,
+                        email: email
                     })
                 }
             );
             let responseJson = await response.json();
             console.log(responseJson);
-            if (responseJson.user.username) {
+            if (responseJson.status === 'success') {
                 await SecureStore.setItemAsync(Config.storageKeys.jamID, responseJson.user.username, {
                     keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY
                 });
                 const jamID = await SecureStore.getItemAsync(Config.storageKeys.jamID);
                 console.log(jamID);
-            } else {
-                // TODO: make a real error handling
-                console.log('error retreiving username');
+
+                return true;
             }
+
+            let step  = '';
+            if (response.status === 400) {
+                DropdownSingleton.get().alertWithType('error', 'A HTTP 400 error occured', 'Please contact support at support@justauth.me mentionning the error code 400 at registration');
+            } else if (response.status === 409) {
+                DropdownSingleton.get().alertWithType('error', 'Already member', 'You already have a JustAuth.Me account, please log in');
+                step = ''; // TODO redirect to Login screen
+            } else if (response.status === 429) {
+                DropdownSingleton.get().alertWithType('error', 'Anti-spam', 'Please try again in 30 seconds, this an anti-spam measure');
+            }
+
+            console.log('error retreiving username: ' + response.status);
+
+            const resetAction = StackActions.reset({
+                index: 0,
+                actions: [NavigationActions.navigate({
+                    routeName: 'LaunchScreen',
+                    params: {
+                        step: step
+                    }
+                })],
+            });
+            this.props.navigation.dispatch(resetAction);
+
+            return false;
         } catch (error) {
             console.error(error);
+
+            return false;
         }
     }
 
@@ -284,13 +320,41 @@ export default class LaunchScreen extends React.Component {
                         <ContinueButton
                             text={'Let\'s go!'}
                             ref={ref => this.continueBtn = ref}
-                            onPress={() => this.props.navigation.push('LaunchScreen', {step: 'firstname'})}
+                            onPress={() => this.props.navigation.push('LaunchScreen', {step: 'email'})}
                             marginTop={30}
                         />
                         <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
                             <Text style={styles.swipeBack}>Not now</Text>
                         </TouchableOpacity>
                     </View>
+                );
+
+            case 'email':
+                return (
+                    <KeyboardShift>
+                        {() => (
+                            <View style={styles.container}>
+                                <LightStatusBar/>
+                                <Image style={styles.logo} source={this.logo}/>
+                                <Text style={styles.baseline}>Let's begin with your E-Mail</Text>
+                                <TextInput
+                                    style={styles.textInput}
+                                    placeholder={"e.g. aiden@pearce.me"}
+                                    placeholderTextColor={"rgba(255,255,255,.5)"}
+                                    returnKeyType={"done"}
+                                    autoCorrect={false}
+                                    spellCheck={false}
+                                    autoCapitalize={"none"}
+                                    textContentType={"emailAddress"}
+                                    keyboardType={"email-address"}
+                                    clearButtonMode={"always"}
+                                    onChangeText={(text) => this.onInputChange('email', text)}
+                                />
+                                <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('email', 'firstname')} />
+                                <LaunchFooter/>
+                            </View>
+                        )}
+                    </KeyboardShift>
                 );
 
             case 'firstname':
@@ -372,37 +436,9 @@ export default class LaunchScreen extends React.Component {
                                 value={this.state.birthdateInputValue}
                             />
                         </TouchableOpacity>
-                        <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('birthdate', 'email')} />
+                        <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('birthdate', 'avatar')} />
                         <LaunchFooter/>
                     </View>
-                );
-
-            case 'email':
-                return (
-                    <KeyboardShift>
-                        {() => (
-                            <View style={styles.container}>
-                                <LightStatusBar/>
-                                <Image style={styles.logo} source={this.logo}/>
-                                <Text style={styles.baseline}>And your E-Mail?</Text>
-                                <TextInput
-                                    style={styles.textInput}
-                                    placeholder={"e.g. aiden@pearce.me"}
-                                    placeholderTextColor={"rgba(255,255,255,.5)"}
-                                    returnKeyType={"done"}
-                                    autoCorrect={false}
-                                    spellCheck={false}
-                                    autoCapitalize={"none"}
-                                    textContentType={"emailAddress"}
-                                    keyboardType={"email-address"}
-                                    clearButtonMode={"always"}
-                                    onChangeText={(text) => this.onInputChange('email', text)}
-                                />
-                                <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('email', 'avatar')} />
-                                <LaunchFooter/>
-                            </View>
-                        )}
-                    </KeyboardShift>
                 );
 
             case 'avatar':
@@ -511,8 +547,8 @@ export default class LaunchScreen extends React.Component {
                     <View style={styles.container}>
                         <LightStatusBar/>
                         <Image style={styles.logo} source={this.logo}/>
-                        <Text style={styles.baseline}>Congratulations!</Text>
-                        <View style={styles.warningTextContainer}>
+                        <Text style={styles.baseline}>{this.state.congratsTitle /*Congratulations!*/}</Text>
+                        <View style={{...styles.warningTextContainer, display: this.state.displayCongrats ? 'flex' : 'none'}}>
                             <Text style={styles.warningText}>
                                 You successfully registered into JustAuth.Me! You can now login on any website or app which
                                 provide the "Login with JustAuth.Me" button.

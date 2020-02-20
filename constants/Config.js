@@ -4,7 +4,7 @@ export default {
         key: 'init_done',
         value: 'done'
     },
-    apiUrl: 'https://alpha.justauth.me/api/',
+    apiUrl: 'http://192.168.0.9/JustAuth.Me/server/api/', // TODO REMOVE BEFORE PROD
     storageKeys: {
         publicKey: 'pubkey',
         privateKey: 'privkey',
