@@ -31,7 +31,7 @@ export default class HomeScreen extends React.Component {
 
     state = {
         user: {},
-        services: null
+        services: null,
     };
 
     constructor(props) {

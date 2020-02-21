@@ -11,7 +11,7 @@ export default class CheckMark extends React.Component {
     };
 
     getCheckMarkStyle = (data) => {
-        const bgColor = AuthDataList.isDataRequired(data) ? '#fff' : '#1459E3';
+        const bgColor = AuthDataList.isDataRequired(data) || !this.props.isFirstLogin ? '#fff' : '#1459E3';
         const visible = this.state.visible ? 'flex' : 'none';
         return {
             width: 18,
@@ -32,7 +32,7 @@ export default class CheckMark extends React.Component {
                 <Icon.Ionicons
                     name={'md-checkmark'}
                     size={16}
-                    color={AuthDataList.isDataRequired(this.props.itemKey) ? '#ccc' : '#fff'}
+                    color={AuthDataList.isDataRequired(this.props.itemKey) || !this.props.isFirstLogin ? '#ccc' : '#fff'}
                 />
             </View>
         );

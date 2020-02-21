@@ -18,6 +18,7 @@ import {DropdownSingleton} from "../models/DropdownSingleton";
 import {NavigationActions, StackActions} from "react-navigation";
 import {ServicesModel} from "../models/ServicesModel";
 import AndroidBiometricPrompt from "../components/AndroidBiometricPrompt";
+import ActionBtn from "../components/ActionBtn";
 
 export default class AuthScreen extends React.Component {
     static navigationOptions = {
@@ -26,7 +27,8 @@ export default class AuthScreen extends React.Component {
 
     state = {
         token: this.props.navigation.getParam('token'),
-        auth: null
+        auth: null,
+        isFirstLogin: false
     };
 
     constructor(props) {
@@ -44,8 +46,10 @@ export default class AuthScreen extends React.Component {
             console.log(responseJson);
             if (responseJson.status === 'success') {
                 this.setState({
-                    auth: responseJson.auth
+                    auth: responseJson.auth,
+                    isFirstLogin: !this.services.hasOwnProperty(responseJson.auth.client_app.app_id)
                 });
+                console.log('FIRST LOGIN: ', this.state.isFirstLogin);
                 this.actualData = {};
                 for (let i = 0; i < responseJson.auth.client_app.data.length; i++) {
                     this.actualData[responseJson.auth.client_app.data[i]] = true;
@@ -72,6 +76,10 @@ export default class AuthScreen extends React.Component {
             jam_id: jamID,
             token: this.state.token
         };
+
+        if (this.services.hasOwnProperty(this.state.auth.client_app.app_id)) {
+            return data;
+        }
 
         const authData = this.state.auth.client_app.data;
         for (let i = 0; i < authData.length; i++) {
@@ -151,15 +159,17 @@ export default class AuthScreen extends React.Component {
                         }
                     }
 
-                    const service = {
-                        app_id: this.state.auth.client_app.app_id,
-                        name: this.state.auth.client_app.name,
-                        logo: this.state.auth.client_app.logo,
-                        domain: this.state.auth.client_app.domain,
-                        data: dataToStore
-                    };
-                    console.log('CREATED SERVICE:', service);
-                    await ServicesModel.addService(this.state.auth.client_app.app_id, service);
+                    if (this.state.isFirstLogin) {
+                        const service = {
+                            app_id: this.state.auth.client_app.app_id,
+                            name: this.state.auth.client_app.name,
+                            logo: this.state.auth.client_app.logo,
+                            domain: this.state.auth.client_app.domain,
+                            data: dataToStore
+                        };
+                        console.log('CREATED SERVICE:', service);
+                        await ServicesModel.addService(this.state.auth.client_app.app_id, service);
+                    }
                     this.props.navigation.navigate('Success');
                 } else {
                     if (response.status === 401) {
@@ -196,14 +206,19 @@ export default class AuthScreen extends React.Component {
         let content;
         if (this.state.auth === null) {
             content = <Text style={styles.loadingText}>Loading authentication details...</Text>;
-        } else if (this.services.hasOwnProperty(this.state.auth.client_app.app_id)) {
-            this.onAcceptLogin().then();
-            content = <Text style={styles.loadingText}>Authenticating...</Text>;
         } else {
             let data = [];
-            for (let i = 0; i < this.state.auth.client_app.data.length; i++) { //TODO
-                data.push({key: this.state.auth.client_app.data[i]});
+
+            if (this.state.isFirstLogin) {
+                for (let i = 0; i < this.state.auth.client_app.data.length; i++) { //TODO
+                    data.push({key: this.state.auth.client_app.data[i]});
+                }
+            } else {
+                for (let i = 0; i < this.services[this.state.auth.client_app.app_id].data.length; i++) { //TODO
+                    data.push({key: this.services[this.state.auth.client_app.app_id].data[i]});
+                }
             }
+
             content =
                 <ScrollView style={styles.container}>
                     <View style={styles.authHeader}>
@@ -215,6 +230,7 @@ export default class AuthScreen extends React.Component {
                         style={styles.data}
                         domain={this.state.auth.client_app.domain}
                         data={data}
+                        isFirstLogin={this.state.isFirstLogin}
                         onAccept={this.onAcceptLogin}
                         onUpdate={this.onUpdateData}
                     />

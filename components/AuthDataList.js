@@ -37,18 +37,18 @@ export default class AuthDataList extends React.Component {
         console.log(this.props.data);
         return (
             <View style={this.props.style}>
-                <Text style={styles.authWarning}>{this.props.domain} will have access to the following:</Text>
+                <Text style={styles.authWarning}>{this.props.domain + ' ' + (this.props.isFirstLogin ? 'will have access to the following:' : 'have access to the following:')}</Text>
                 <FlatList
                     style={styles.listContainer}
                     data={this.props.data}
                     renderItem={({item}) =>
                         <View style={styles.listItem}>
-                            <TouchableOpacity style={{...styles.itemCheckbox, borderColor: AuthDataList.isDataRequired(item.key) ? '#ccc' : '#1459E3'}} activeOpacity={1} onPress={() => {
-                                if (!AuthDataList.isDataRequired(item.key)) {
+                            <TouchableOpacity style={{...styles.itemCheckbox, borderColor: AuthDataList.isDataRequired(item.key) || !this.props.isFirstLogin ? '#ccc' : '#1459E3'}} activeOpacity={1} onPress={() => {
+                                if (!AuthDataList.isDataRequired(item.key) && this.props.isFirstLogin) {
                                     this.onCheckMarkPressed(item.key)
                                 }
                             }}>
-                                <CheckMark ref={ref =>(this.checkmarks[item.key] = ref)} itemKey={item.key} />
+                                <CheckMark ref={ref =>(this.checkmarks[item.key] = ref)} itemKey={item.key} isFirstLogin={this.props.isFirstLogin} />
                             </TouchableOpacity>
                             <Text style={styles.itemText}>{this.getDataLabelFromID(item.key)}</Text>
                         </View>
