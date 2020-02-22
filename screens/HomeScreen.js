@@ -1,7 +1,6 @@
 import React from 'react';
 import {
     Image,
-    ScrollView,
     StyleSheet,
     Text,
     View,
@@ -23,6 +22,8 @@ import LightStatusBar from "../components/LightStatusBar";
 import {AuthSingleton} from "../models/AuthSingleton";
 import ActionBtn from "../components/ActionBtn";
 import {ServicesModel} from "../models/ServicesModel";
+import {DropdownSingleton} from "../models/DropdownSingleton";
+import {AlertModel} from "../models/AlertModel";
 
 export default class HomeScreen extends React.Component {
     static navigationOptions = {
@@ -32,6 +33,7 @@ export default class HomeScreen extends React.Component {
     state = {
         user: {},
         services: null,
+        alert: null
     };
 
     constructor(props) {
@@ -51,12 +53,16 @@ export default class HomeScreen extends React.Component {
         this.setState({
             user: this.user
         });
-        ServicesModel.getServices().then((services) => {
+        ServicesModel.getServices().then(services => {
             this.setState({
                 services: services
             });
         });
         StatusBar.setBarStyle('light-content');
+
+        AlertModel.getAlert().then(alert => {
+            this.setState({alert: alert})
+        });
     };
 
     componentDidMount() {
@@ -156,6 +162,67 @@ export default class HomeScreen extends React.Component {
             />;
         }
 
+        let alert = <View></View>;
+        if (this.state.alert !== null) {
+            alert =
+                <View style={{
+                    margin: 20,
+                    marginBottom: 10,
+                    padding: 15,
+                    borderRadius: 10,
+                    shadowChild: '#888',
+                    shadowOffset: {width: 0, height: 0},
+                    shadowOpacity: .3,
+                    shadowRadius: 5,
+                    backgroundColor: '#FFFFFF',
+                    flexDirection: 'row',
+                    alignItems: 'center'
+                }}>
+                    <TouchableOpacity
+                        onPress={() => {
+                            AlertModel.closeAlert(this.state.alert.id).then(() => {
+                                this.setState({alert: null})
+                            });
+                        }}
+                        style={{
+                            position: 'absolute',
+                            zIndex: 10,
+                            top: -2,
+                            right: -5,
+                            height: 50,
+                            width: 50,
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}>
+                        <Icon.Ionicons
+                            name={'ios-close'}
+                            size={36}
+                            color={'#555'}
+                        />
+                    </TouchableOpacity>
+                    <Icon.Ionicons
+                        name={this.state.alert.type === 'warning' ? 'ios-warning' : 'ios-information-circle'}
+                        size={48}
+                        color={this.state.alert.type === 'warning' ? '#FF9900' : '#3498DB'}
+                    />
+                    <View style={{
+                        paddingLeft: 15,
+                        width: 0,
+                        flexGrow: 1,
+                    }}>
+                        <Text style={{
+                            fontSize: 18,
+                            fontWeight: 600,
+                            paddingBottom: 5
+                        }}>{this.state.alert.type === 'warning' ? 'Alert' : 'Information'}</Text>
+                        <Text style={{
+                            flexWrap: 'wrap'
+                        }}>{this.state.alert.text}</Text>
+                    </View>
+                </View>
+            ;
+        }
+
         return (
             <View style={styles.container}>
                 <LightStatusBar/>
@@ -183,6 +250,7 @@ export default class HomeScreen extends React.Component {
                             btnText={'Authenticate'}
                         />
                     </View>
+                    {alert}
                     <Text style={styles.servicesTitle}>Services</Text>
                     {servicesList}
                 </View>

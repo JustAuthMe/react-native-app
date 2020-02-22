@@ -37,7 +37,7 @@ export default class AuthDataList extends React.Component {
         console.log(this.props.data);
         return (
             <View style={this.props.style}>
-                <Text style={styles.authWarning}>{this.props.domain + ' ' + (this.props.isFirstLogin ? 'will have access to the following:' : 'have access to the following:')}</Text>
+                <Text style={styles.authWarning}>{this.props.domain + ' ' + (this.props.isFirstLogin ? 'will have access to the following:' : 'has access to the following:')}</Text>
                 <FlatList
                     style={styles.listContainer}
                     data={this.props.data}
