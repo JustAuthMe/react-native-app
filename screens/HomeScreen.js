@@ -6,8 +6,9 @@ import {
     View,
     AsyncStorage,
     TouchableOpacity,
+    TouchableHighlight,
     StatusBar,
-    FlatList
+    Dimensions, Alert
 } from 'react-native';
 import { Linking } from 'expo';
 
@@ -22,8 +23,8 @@ import LightStatusBar from "../components/LightStatusBar";
 import {AuthSingleton} from "../models/AuthSingleton";
 import ActionBtn from "../components/ActionBtn";
 import {ServicesModel} from "../models/ServicesModel";
-import {DropdownSingleton} from "../models/DropdownSingleton";
 import {AlertModel} from "../models/AlertModel";
+import {SwipeListView} from "react-native-swipe-list-view";
 
 export default class HomeScreen extends React.Component {
     static navigationOptions = {
@@ -40,6 +41,7 @@ export default class HomeScreen extends React.Component {
         super(props);
         this.user = {};
         this.services = {};
+        this.isSwipeToDeleteEnabled = true;
     }
 
     async _bootstrapAsync() {
@@ -123,6 +125,17 @@ export default class HomeScreen extends React.Component {
         return items;
     };
 
+    deletePopupAlert = service => {
+        Alert.alert('Delete the ' + service.name + ' service?', 'This will NOT remove your ' + service.domain + ' account, it will only remove the service from your login history.', [
+            {text: 'Cancel', onPress: () => {
+                    this.isSwipeToDeleteEnabled = true;
+                }, style:'cancel'},
+            {text: 'OK', onPress: () => {
+                    this.isSwipeToDeleteEnabled = true;
+                }}
+        ]);
+    };
+
     render() {
         let servicesList = <View></View>;
         if (this.state.services === null || Object.keys(this.state.services).length === 0) {
@@ -135,29 +148,56 @@ export default class HomeScreen extends React.Component {
                 "Authenticate" button above to begin your JustAuth.Me experience.
             </Text>;
         } else {
-            servicesList = <FlatList
+            servicesList = <SwipeListView
                 style={styles.servicesList}
                 data={this.parseServices()}
-                renderItem={(item) => {
+                renderItem={item => {
                     return (
-                        <TouchableOpacity
-                            style={styles.serviceContainer}
+                        <TouchableHighlight
                             onPress={() => {
                                 this.props.navigation.navigate('Service', {
                                     service: this.state.services[item.item.key]
                                 });
                             }}
                         >
-                            <Image source={{uri: this.state.services[item.item.key].logo}} style={styles.serviceIcon}/>
-                            <Text style={styles.serviceName}>{this.state.services[item.item.key].name}</Text>
-                            <Icon.Ionicons
-                                name={'ios-arrow-forward'}
-                                size={24}
-                                color={'#ccc'}
-                                style={styles.serviceArrow}
-                            />
-                        </TouchableOpacity>
+                            <View style={styles.serviceContainer}>
+                                <Image source={{uri: this.state.services[item.item.key].logo}} style={styles.serviceIcon}/>
+                                <Text style={styles.serviceName}>{this.state.services[item.item.key].name}</Text>
+                                <Icon.Ionicons
+                                    name={'ios-arrow-forward'}
+                                    size={28}
+                                    color={'#ccc'}
+                                    style={styles.serviceArrow}
+                                />
+                            </View>
+                        </TouchableHighlight>
                     );
+                }}
+                renderHiddenItem={item => {
+                    return (
+                        <View style={styles.rowBack}>
+                            <TouchableOpacity
+                                style={[styles.backRightBtn, styles.backRightBtnRight]}
+                                onPress={() => this.deletePopupAlert(this.state.services[item.item.key])}
+                            >
+                                <Icon.Ionicons
+                                    name={'ios-close'}
+                                    size={32}
+                                    color={'#fff'}
+                                    style={{marginTop:3}}
+                                />
+                                <Text style={styles.backTextWhite}>Delete</Text>
+                            </TouchableOpacity>
+                        </View>
+                    );
+                }}
+                rightOpenValue={-80}
+                disableRightSwipe
+                onSwipeValueChange={swipeData => {
+                    if (this.isSwipeToDeleteEnabled && swipeData.direction === 'left' && swipeData.value <= -(Dimensions.get('window').width * 0.5)) {
+                        this.isSwipeToDeleteEnabled = false;
+                        this.deletePopupAlert(this.state.services[swipeData.key]);
+                    }
                 }}
             />;
         }
@@ -318,6 +358,7 @@ const styles = StyleSheet.create({
         marginBottom: 30
     },
     serviceContainer: {
+        backgroundColor: '#FFF',
         flexDirection: 'row',
         alignItems: 'center',
         height: 70,
@@ -342,5 +383,30 @@ const styles = StyleSheet.create({
         position: 'absolute',
         right: 15,
         top: 23
+    },
+    rowBack: {
+        alignItems: 'center',
+        backgroundColor: 'red',
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingLeft: 15,
+    },
+    backRightBtn: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        bottom: 0,
+        justifyContent: 'center',
+        position: 'absolute',
+        top: 0,
+        width: 75,
+    },
+    backRightBtnRight: {
+        backgroundColor: 'red',
+        right: 0,
+    },
+    backTextWhite: {
+        color: '#FFF',
+        paddingLeft: 5,
     }
 });

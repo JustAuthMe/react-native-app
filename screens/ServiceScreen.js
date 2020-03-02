@@ -104,13 +104,13 @@ export default class ServiceScreen extends React.Component {
                         marginTop: 30,
                         marginBottom: 30
                     }}
-                    data={this.state.service.data}
+                    data={dataToShow}
                     renderItem={({item}) =>
                         <Text style={{
                             fontSize: 18,
                             paddingLeft: 30,
                             paddingTop: 5
-                        }}>> {Config.dataList[item]}</Text>
+                        }}>> {Config.dataList[item.key]}</Text>
                     }
                 />
             </View>
