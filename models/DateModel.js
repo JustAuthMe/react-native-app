@@ -4,4 +4,8 @@ export class DateModel {
         const month = (date.getMonth() + 1 < 10 ? '0' : '') + (date.getMonth() + 1);
         return day + '/' + month + '/' + date.getFullYear();
     }
+
+    getUnixTimestamp() {
+        return Math.floor((new Date()).getTime() / 1000);
+    }
 }

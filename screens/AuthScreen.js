@@ -139,8 +139,6 @@ export default class AuthScreen extends React.Component {
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
-                            // TODO: Check all possibilities for accents and REMOVE plain (possible security flaw)
-                            plain: plain,
                             data: data,
                             sign: sign
                         })
@@ -210,11 +208,11 @@ export default class AuthScreen extends React.Component {
             let data = [];
 
             if (this.state.isFirstLogin) {
-                for (let i = 0; i < this.state.auth.client_app.data.length; i++) { //TODO
+                for (let i = 0; i < this.state.auth.client_app.data.length; i++) {
                     data.push({key: this.state.auth.client_app.data[i]});
                 }
             } else {
-                for (let i = 0; i < this.services[this.state.auth.client_app.app_id].data.length; i++) { //TODO
+                for (let i = 0; i < this.services[this.state.auth.client_app.app_id].data.length; i++) {
                     data.push({key: this.services[this.state.auth.client_app.app_id].data[i]});
                 }
             }

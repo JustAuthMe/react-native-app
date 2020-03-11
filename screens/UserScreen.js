@@ -20,6 +20,10 @@ import * as ImagePicker from "expo-image-picker";
 import * as Icon from "@expo/vector-icons";
 import KeyboardShift from "../components/KeyboardShift";
 import {DatePickerSingleton} from "../models/DatePickerSingleton";
+import Config from "../constants/Config";
+import {EncryptionModel} from "../models/EncryptionModel";
+import * as SecureStore from "expo-secure-store";
+import {ServicesModel} from "../models/ServicesModel";
 
 export default class UserScreen extends React.Component {
     static navigationOptions = {
@@ -117,10 +121,54 @@ export default class UserScreen extends React.Component {
         await AsyncStorage.setItem('firstname', this.state.user.firstname);
         await AsyncStorage.setItem('lastname', this.state.user.lastname);
         await AsyncStorage.setItem('birthdate', this.state.user.birthdate);
-        await AsyncStorage.setItem('email', this.state.user.email);
+
+        const oldEmail = await AsyncStorage.getItem('email');
+        let hasEmailChanged = false;
+        if (oldEmail !== this.state.user.email) {
+
+            await AsyncStorage.setItem('email', this.state.user.email);
+            const dateModel = new DateModel();
+            const enc = new EncryptionModel();
+            const dataToSend = {
+                email: this.state.user.email,
+                jam_id: await SecureStore.getItemAsync(Config.storageKeys.jamID),
+                timestamp: dateModel.getUnixTimestamp()
+            };
+            const sign = await enc.sign(enc.urlencode(enc.json_encode(dataToSend)));
+            const response = await fetch(
+                Config.apiUrl + 'mail/update',
+                {
+                    method: 'POST',
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        data: dataToSend,
+                        sign: sign
+                    })
+                }
+            );
+            const responseJson = await response.json();
+            console.log('RESPONSE JSON: ', responseJson);
+
+            if (response.status === 200 ) {
+                hasEmailChanged = true;
+            } else if (response.status === 401) {
+                DropdownSingleton.get().alertWithType('error', 'Authentication error', 'Please contact support for further assistance.');
+            } else if (response.status === 405) {
+                DropdownSingleton.get().alertWithType('error', 'Unknow error', 'Please try again later. Contact support if the problem persists.')
+            }
+        }
+
         await AsyncStorage.setItem('avatar', this.state.user.avatar);
         this.props.navigation.goBack();
-        DropdownSingleton.get().alertWithType('success', 'My infos', 'Saved successfully');
+
+        if (hasEmailChanged) {
+            DropdownSingleton.get().alertWithType('info', 'Check your inbox!', 'We sent you a confirmation E-Mail to ' + this.state.user.email + '. Click on the link to confirm your new E-Mail address.')
+        } else {
+            DropdownSingleton.get().alertWithType('success', 'My infos', 'Saved successfully');
+        }
     }
 
     render() {
@@ -198,6 +246,7 @@ export default class UserScreen extends React.Component {
                                     clearButtonMode={"always"}
                                     value={this.state.user.email}
                                     onChangeText={(text) => this.setState({user:{...this.state.user, email:text}})}
+                                    onFocus={() => DropdownSingleton.get().alertWithType('info', 'Information', 'If you change your E-Mail address, you\'ll need to confirm your new address before continuing to use JustAuth.Me')}
                                 />
                                 <ActionBtn btnText={"Save"} btnIcon={'md-checkmark'} onPress={() => this.updateInfos()}/>
                             </View>

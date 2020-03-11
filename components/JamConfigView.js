@@ -10,6 +10,8 @@ import {
     Platform
 } from 'react-native';
 import Constants from 'expo-constants';
+import * as SecureStore from "expo-secure-store";
+import Config from "../constants/Config";
 
 
 export default class JamConfigView extends React.Component {
@@ -38,6 +40,18 @@ export default class JamConfigView extends React.Component {
                 ],
                 title: 'Help & Support'
             },
+            { // TODO: TO REMOVE BEFORE PROD
+                data: [
+                    {
+                        value: 'Display private key',
+                        onPress: async () => {
+                            const privKey = await SecureStore.getItemAsync(Config.storageKeys.privateKey);
+                            console.log(privKey);
+                        },
+                        type: 'button'
+                    }
+                ]
+            },
             {
                 data: [
                     {
@@ -47,7 +61,8 @@ export default class JamConfigView extends React.Component {
                         type: 'button'
                     }
                 ],
-                title: 'Logout' }
+                title: 'Logout'
+            }
         ];
 
         return (

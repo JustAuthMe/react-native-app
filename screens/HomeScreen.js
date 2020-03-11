@@ -25,6 +25,9 @@ import ActionBtn from "../components/ActionBtn";
 import {ServicesModel} from "../models/ServicesModel";
 import {AlertModel} from "../models/AlertModel";
 import {SwipeListView} from "react-native-swipe-list-view";
+import {DateModel} from "../models/DateModel";
+import {EncryptionModel} from "../models/EncryptionModel";
+import {DropdownSingleton} from "../models/DropdownSingleton";
 
 export default class HomeScreen extends React.Component {
     static navigationOptions = {
@@ -130,9 +133,43 @@ export default class HomeScreen extends React.Component {
             {text: 'Cancel', onPress: () => {
                     this.isSwipeToDeleteEnabled = true;
                 }, style:'cancel'},
-            {text: 'OK', onPress: () => {
-                    this.isSwipeToDeleteEnabled = true;
-                }}
+            {text: 'OK', onPress: async () => {
+                this.isSwipeToDeleteEnabled = true;
+                const dateModel = new DateModel();
+                const enc = new EncryptionModel();
+                const dataToSend = {
+                    app_id: service.app_id,
+                    jam_id: await SecureStore.getItemAsync(Config.storageKeys.jamID),
+                    timestamp: dateModel.getUnixTimestamp()
+                };
+                const sign = await enc.sign(enc.urlencode(enc.json_encode(dataToSend)));
+                const response = await fetch(
+                    Config.apiUrl + 'user_login',
+                    {
+                        method: 'DELETE',
+                        headers: {
+                            Accept: 'application/json',
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            data: dataToSend,
+                            sign: sign
+                        })
+                    }
+                );
+                console.log(response);
+                const responseJson = await response.json();
+                console.log('RESPONSE JSON: ', responseJson);
+
+                if (response.status === 200 || response.status === 404) {
+                    await ServicesModel.removeService(service.app_id);
+                    const newServices = {...this.state.services};
+                    delete newServices[service.app_id];
+                    this.setState({services: newServices});
+                } else {
+                    DropdownSingleton.get().alertWithType('error', 'Cannot delete service', 'Please contact support for further assistance.');
+                }
+            }}
         ]);
     };
 
@@ -386,7 +423,7 @@ const styles = StyleSheet.create({
     },
     rowBack: {
         alignItems: 'center',
-        backgroundColor: 'red',
+        backgroundColor: '#ff3838',
         flex: 1,
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -402,7 +439,7 @@ const styles = StyleSheet.create({
         width: 75,
     },
     backRightBtnRight: {
-        backgroundColor: 'red',
+        backgroundColor: '#ff3838',
         right: 0,
     },
     backTextWhite: {
