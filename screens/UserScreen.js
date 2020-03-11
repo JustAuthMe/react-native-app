@@ -125,8 +125,6 @@ export default class UserScreen extends React.Component {
         const oldEmail = await AsyncStorage.getItem('email');
         let hasEmailChanged = false;
         if (oldEmail !== this.state.user.email) {
-
-            await AsyncStorage.setItem('email', this.state.user.email);
             const dateModel = new DateModel();
             const enc = new EncryptionModel();
             const dataToSend = {
@@ -153,11 +151,10 @@ export default class UserScreen extends React.Component {
             console.log('RESPONSE JSON: ', responseJson);
 
             if (response.status === 200 ) {
+                await AsyncStorage.setItem('email', this.state.user.email);
                 hasEmailChanged = true;
-            } else if (response.status === 401) {
-                DropdownSingleton.get().alertWithType('error', 'Authentication error', 'Please contact support for further assistance.');
-            } else if (response.status === 405) {
-                DropdownSingleton.get().alertWithType('error', 'Unknow error', 'Please try again later. Contact support if the problem persists.')
+            } else {
+                DropdownSingleton.get().alertWithType('error', 'Cannot update E-Mail address', 'Please contact support for further assistance.');
             }
         }
 
