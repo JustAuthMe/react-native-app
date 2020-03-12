@@ -4,7 +4,7 @@ export default {
         key: 'init_done',
         value: 'done'
     },
-    apiUrl: 'http://192.168.0.9/JustAuth.Me/server/api/', // TODO REMOVE BEFORE PROD
+    apiUrl: 'http://172.20.10.2/JustAuth.Me/server/api/', // TODO CHANGE BEFORE PROD
     storageKeys: {
         publicKey: 'pubkey',
         privateKey: 'privkey',

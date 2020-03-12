@@ -57,9 +57,10 @@ export default class ServiceScreen extends React.Component {
         }
 
         let dataToShow = [];
-        for (let i = 0; i < this.state.service.data.length; i++) {
+        for (let i in this.state.service.data) {
             dataToShow.push({
-                key: this.state.service.data[i]
+                key: i,
+                value: this.state.service.data[i]
             });
         }
         console.log('data to show:', dataToShow);
@@ -110,7 +111,7 @@ export default class ServiceScreen extends React.Component {
                             fontSize: 18,
                             paddingLeft: 30,
                             paddingTop: 5
-                        }}>> {Config.dataList[item.key]}</Text>
+                        }}>> {Config.dataList[item.key]} : {item.value}</Text>
                     }
                 />
             </View>

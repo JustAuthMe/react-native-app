@@ -127,7 +127,6 @@ export default class AuthScreen extends React.Component {
             console.log('calculated plain: ', plain);
             const sign = await enc.sign(plain);
             console.log(data);
-            console.log(plain);
             console.log(sign);
             try {
                 const response = await fetch(
@@ -150,10 +149,11 @@ export default class AuthScreen extends React.Component {
 
                 if (responseJson.status === 'success') {
                     console.log('CLIENT APP:', this.state.auth.client_app);
-                    let dataToStore = [];
+                    let dataToStore = {};
                     for (let i in this.actualData) {
                         if (this.actualData[i]) {
-                            dataToStore.push(i.indexOf('!') === i.length - 1 ? i.slice(0, -1) : i);
+                            const dataKey = i.indexOf('!') === i.length - 1 ? i.slice(0, -1) : i;
+                            dataToStore[dataKey] = data[dataKey];
                         }
                     }
 
@@ -212,8 +212,8 @@ export default class AuthScreen extends React.Component {
                     data.push({key: this.state.auth.client_app.data[i]});
                 }
             } else {
-                for (let i = 0; i < this.services[this.state.auth.client_app.app_id].data.length; i++) {
-                    data.push({key: this.services[this.state.auth.client_app.app_id].data[i]});
+                for (let i in this.services[this.state.auth.client_app.app_id].data) {
+                    data.push({key: i});
                 }
             }
 
