@@ -5,10 +5,11 @@ import {
     Text,
     StatusBar,
     Image,
-    FlatList
+    FlatList, TouchableOpacity
 } from 'react-native';
 import {DropdownSingleton} from "../models/DropdownSingleton";
 import Config from "../constants/Config";
+import * as Icon from '@expo/vector-icons';
 
 export default class ServiceScreen extends React.Component {
     static navigationOptions = ({ navigation }) => {
@@ -107,11 +108,35 @@ export default class ServiceScreen extends React.Component {
                     }}
                     data={dataToShow}
                     renderItem={({item}) =>
-                        <Text style={{
-                            fontSize: 18,
-                            paddingLeft: 30,
-                            paddingTop: 5
-                        }}>> {Config.dataList[item.key]} : {item.value}</Text>
+                        <View style={{
+                            height: 70,
+                            backgroundColor: '#FFF',
+                            paddingTop: 5,
+                            paddingLeft: 15,
+                            paddingRight: 15
+                        }}>
+                            <Text style={{
+                                fontWeight: 700
+                            }}>{Config.dataList[item.key]}</Text>
+                            <View style={{
+                                flexDirection: 'row'
+                            }}>
+                                <Icon.Ionicons
+                                    name={'ios-arrow-forward'}
+                                    size={22}
+                                    color={'#666'}
+                                    style={{
+                                        paddingTop: 6
+                                    }}
+                                />
+                                <Text style={{
+                                    paddingTop: 5,
+                                    paddingLeft: 10,
+                                    fontSize: 18,
+                                    color: '#666'
+                                }}>{item.value}</Text>
+                            </View>
+                        </View>
                     }
                 />
             </View>
