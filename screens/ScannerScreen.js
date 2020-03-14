@@ -15,7 +15,7 @@ export default class ScannerScreen extends React.Component {
     };
 
     state = {
-        hasCameraPermission: null
+        hasCameraPermission: false
     };
 
     async componentDidMount() {
@@ -23,7 +23,7 @@ export default class ScannerScreen extends React.Component {
     }
 
     getPermissionsAsync = async () => {
-        const { status } = await Permissions.askAsync(Permissions.CAMERA);
+        const status = await Permissions.askAsync(Permissions.CAMERA);
         console.log(status);
         if (status !== 'granted') {
             this.props.navigation.goBack();

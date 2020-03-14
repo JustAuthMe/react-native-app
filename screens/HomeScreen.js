@@ -28,6 +28,7 @@ import {SwipeListView} from "react-native-swipe-list-view";
 import {DateModel} from "../models/DateModel";
 import {EncryptionModel} from "../models/EncryptionModel";
 import {DropdownSingleton} from "../models/DropdownSingleton";
+import * as Permissions from "expo-permissions";
 
 export default class HomeScreen extends React.Component {
     static navigationOptions = {
@@ -48,6 +49,8 @@ export default class HomeScreen extends React.Component {
     }
 
     async _bootstrapAsync() {
+        await Permissions.askAsync(Permissions.CAMERA);
+
         this.user = {
             firstname: await AsyncStorage.getItem('firstname'),
             lastname: await AsyncStorage.getItem('lastname'),
