@@ -30,6 +30,7 @@ import KeyboardShift from "../components/KeyboardShift";
 import {DatePickerSingleton} from "../models/DatePickerSingleton";
 import Swiper from 'react-native-swiper';
 import ExplanationTitle from "../components/ExplanationTitle";
+import NetworkLoader from "../components/NetworkLoader";
 
 export default class LaunchScreen extends React.Component {
 
@@ -45,7 +46,8 @@ export default class LaunchScreen extends React.Component {
         avatar: null,
         explanationTitle: 'Welcome',
         congratsTitle: 'Please wait...',
-        displayCongrats: false
+        displayCongrats: false,
+        networkLoaderVisible: false
     };
 
     constructor(props) {
@@ -92,9 +94,8 @@ export default class LaunchScreen extends React.Component {
             AsyncStorage.getItem(key).then(value => {
                 console.log(key + ':', value);
             });
-            if (nextStep !== 'done') {
-                this.props.navigation.push('LaunchScreen', {step: nextStep});
-            } else {
+
+            if (nextStep === 'done') {
                 const resetAction = StackActions.reset({
                     index: 0,
                     actions: [NavigationActions.navigate({
@@ -105,7 +106,60 @@ export default class LaunchScreen extends React.Component {
                     })],
                 });
                 this.props.navigation.dispatch(resetAction);
+            } else if (key === 'email') {
+                this.setState({networkLoaderVisible: true});
+                console.log('fetching...');
+                fetch(
+                    Config.apiUrl + 'mail/check',
+                    {
+                        method: 'POST',
+                        headers: {
+                            Accept: 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            email: this.personnalInfos[key]
+                        })
+                    }
+                ).then(async response => {
+                    this.setState({networkLoaderVisible: false});
+
+                    if (response.status === 200) {
+                        const responseJson = await response.json();
+                        console.log('RESPONSE JSON: ', responseJson);
+                        if (responseJson.available) {
+                            this.props.navigation.push('LaunchScreen', {step: 'firstname'});
+                        } else {
+                            this.props.navigation.push('LaunchScreen', {step: 'login'});
+                            // TODO
+                            /*fetch(
+                                Config.apiUrl + 'applogin/request',
+                                {
+                                    method: POST,
+                                    headers: {
+                                        Accept: 'application/json',
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: {
+                                        email: this.personnalInfos[key]
+                                    }
+                                }
+                            ).then(response => {
+
+                            });*/
+                        }
+                    } else if (response.status === 400) {
+                        DropdownSingleton.get().alertWithType('error', 'Invalid E-Mail', 'Please enter a valid E-Mail address.');
+                    } else if (response.status === 429) {
+                        DropdownSingleton.get().alertWithType('error', 'Anti-Spam', 'You have tried to many times. Please wait a few minutes.');
+                    } else {
+                        DropdownSingleton.get().alertWithType('error', 'Unknow', 'An unknow error occured. Please contact support mentionning that an HTTP ' + response.status + ' appeared during email check.');
+                    }
+                });
+            } else {
+                this.props.navigation.push('LaunchScreen', {step: nextStep});
             }
+
         });
     }
 
@@ -190,7 +244,7 @@ export default class LaunchScreen extends React.Component {
                 DropdownSingleton.get().alertWithType('error', 'Already member', 'You already have a JustAuth.Me account, please log in');
                 step = ''; // TODO redirect to Login screen
             } else if (response.status === 429) {
-                DropdownSingleton.get().alertWithType('error', 'Anti-spam', 'Please try again in 30 seconds, this an anti-spam measure');
+                DropdownSingleton.get().alertWithType('error', 'Anti-spam', 'Please try again in 30 seconds, this is an anti-spam measure');
             }
 
             console.log('error retreiving username: ' + response.status);
@@ -335,6 +389,7 @@ export default class LaunchScreen extends React.Component {
                         {() => (
                             <View style={styles.container}>
                                 <LightStatusBar/>
+                                <NetworkLoader visible={this.state.networkLoaderVisible} />
                                 <Image style={styles.logo} source={this.logo}/>
                                 <Text style={styles.baseline}>Let's begin with your E-Mail</Text>
                                 <TextInput
@@ -350,8 +405,38 @@ export default class LaunchScreen extends React.Component {
                                     clearButtonMode={"always"}
                                     onChangeText={(text) => this.onInputChange('email', text)}
                                 />
-                                <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('email', 'firstname')} />
-                                <LaunchFooter/>
+                                <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('email')} />
+                            </View>
+                        )}
+                    </KeyboardShift>
+                );
+
+            case 'login':
+                return (
+                    <KeyboardShift>
+                        {() => (
+                            <View style={styles.container}>
+                                <LightStatusBar/>
+                                <Image style={styles.logo} source={this.logo}/>
+                                <Text style={styles.baseline}>Enter the passcode you just received by E-Mail</Text>
+                                <TextInput
+                                    style={{
+                                        ...styles.textInput,
+                                        fontSize: 36,
+                                        textAlign: 'center',
+                                        letterSpacing: 50
+                                    }}
+                                    placeholder={"123456"}
+                                    placeholderTextColor={"rgba(255,255,255,.5)"}
+                                    returnKeyType={'done'}
+                                    autoCorrect={false}
+                                    spellCheck={false}
+                                    autoFocus={true}
+                                    clearButtonMode={'never'}
+                                    keyboardType={'numeric'}
+                                    maxLength={6}
+                                    textContentType={'oneTimeCode'}
+                                />
                             </View>
                         )}
                     </KeyboardShift>
@@ -377,7 +462,6 @@ export default class LaunchScreen extends React.Component {
                                     onChangeText={(text) => this.onInputChange('firstname', text)}
                                 />
                                 <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('firstname', 'lastname')} />
-                                <LaunchFooter/>
                             </ScrollView>
                         )}
                     </KeyboardShift>
@@ -403,7 +487,6 @@ export default class LaunchScreen extends React.Component {
                                     onChangeText={(text) => this.onInputChange('lastname', text)}
                                 />
                                 <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('lastname', 'birthdate')} />
-                                <LaunchFooter/>
                             </View>
                         )}
                     </KeyboardShift>
@@ -437,7 +520,6 @@ export default class LaunchScreen extends React.Component {
                             />
                         </TouchableOpacity>
                         <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('birthdate', 'avatar')} />
-                        <LaunchFooter/>
                     </View>
                 );
 
@@ -490,7 +572,6 @@ export default class LaunchScreen extends React.Component {
                             onChangeText={(text) => this.onInputChange('address', text)}
                         />
                         <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('address', 'phone')} />
-                        <LaunchFooter/>
                     </View>
                 );
 
@@ -514,7 +595,6 @@ export default class LaunchScreen extends React.Component {
                             onChangeText={(text) => this.onInputChange('address', text)}
                         />
                         <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('phone', 'otp')} />
-                        <LaunchFooter/>
                     </View>
                 );
 
@@ -538,7 +618,6 @@ export default class LaunchScreen extends React.Component {
                             onChangeText={(text) => this.onInputChange('address', text)}
                         />
                         <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('otp', 'keygen')} />
-                        <LaunchFooter/>
                     </View>
                 );
 
@@ -574,7 +653,7 @@ export default class LaunchScreen extends React.Component {
                         <TouchableOpacity style={styles.startBtn} onPress={() => this.props.navigation.push('LaunchScreen', {step: 'explanation'})}>
                             <Ionicons name="ios-arrow-forward" size={56} color="white" style={styles.arrowIcon}/>
                         </TouchableOpacity>
-                        <LaunchFooter/>
+                        <LaunchFooter onPress={() => this.props.navigation.push('LaunchScreen', {step: 'email'})}/>
                     </View>
                 );
         }
@@ -603,7 +682,9 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         color: 'white',
         fontWeight: '300',
-        marginTop: 50
+        marginTop: 50,
+        marginRight: 10,
+        marginLeft: 10
     },
     startBtn: {
         width: 100,

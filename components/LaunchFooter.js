@@ -14,7 +14,7 @@ export default class LaunchFooter extends React.Component {
         return (
             <View style={styles.footer}>
                 <Text style={styles.alreadyMember}>Are you already a JustAuth.Me member?</Text>
-                <TouchableOpacity onPress={() => DropdownSingleton.get().alertWithType('error', 'This app is still in beta', 'We\'re sorry..., This feature isn\'t implemented yet.')}>
+                <TouchableOpacity onPress={this.props.onPress}>
                     <Text style={styles.recover}>Recover your account</Text>
                 </TouchableOpacity>
             </View>
