@@ -24,6 +24,8 @@ import Config from "../constants/Config";
 import {EncryptionModel} from "../models/EncryptionModel";
 import * as SecureStore from "expo-secure-store";
 import {ServicesModel} from "../models/ServicesModel";
+import {NavigationActions, StackActions} from "react-navigation";
+import NetworkLoader from "../components/NetworkLoader";
 
 export default class UserScreen extends React.Component {
     static navigationOptions = {
@@ -33,7 +35,8 @@ export default class UserScreen extends React.Component {
     state = {
         user: {},
         currentBirthdate: new Date(),
-        birthdateInputValue: ''
+        birthdateInputValue: '',
+        isLogin: false
     };
 
     constructor(props) {
@@ -56,11 +59,13 @@ export default class UserScreen extends React.Component {
             email: await AsyncStorage.getItem('email'),
             avatar: await AsyncStorage.getItem('avatar')
         };
-        const splitDate = user.birthdate.split('/');
+        console.log('STORED USER : ', user);
+        const splitDate = user.birthdate !== null ? user.birthdate.split('/') : [];
         this.setState({
             user: user,
             birthdateInputValue: user.birthdate,
-            currentBirthdate: splitDate.length === 3 ? new Date(splitDate[1] + '/' + splitDate[0] + '/' + splitDate[2]) : new Date()
+            currentBirthdate: splitDate.length === 3 ? new Date(splitDate[1] + '/' + splitDate[0] + '/' + splitDate[2]) : new Date(),
+            isLogin: this.props.navigation.getParam('login')
         });
         StatusBar.setBarStyle('dark-content');
     };
@@ -112,7 +117,7 @@ export default class UserScreen extends React.Component {
 
     async updateInfos() {
         for (let i = 0; i < this.requiredInfos.length; i++) {
-            if (this.state.user[this.requiredInfos[i]] === '') {
+            if (this.state.user[this.requiredInfos[i]] === '' || this.state.user[this.requiredInfos[i]] === null) {
                 DropdownSingleton.get().alertWithType('error', 'Empty field(s)', 'Please fill all the required informations.');
                 return;
             }
@@ -125,6 +130,8 @@ export default class UserScreen extends React.Component {
         const oldEmail = await AsyncStorage.getItem('email');
         let hasEmailChanged = false;
         if (oldEmail !== this.state.user.email) {
+            this.networkLoader.setState({visible: true});
+
             const dateModel = new DateModel();
             const enc = new EncryptionModel();
             const dataToSend = {
@@ -150,6 +157,8 @@ export default class UserScreen extends React.Component {
             const responseJson = await response.json();
             console.log('RESPONSE JSON: ', responseJson);
 
+            this.networkLoader.setState({visible: false});
+
             if (response.status === 200 ) {
                 await AsyncStorage.setItem('email', this.state.user.email);
                 hasEmailChanged = true;
@@ -159,7 +168,18 @@ export default class UserScreen extends React.Component {
         }
 
         await AsyncStorage.setItem('avatar', this.state.user.avatar);
-        this.props.navigation.goBack();
+
+        if (!this.state.isLogin) {
+            this.props.navigation.goBack();
+        } else {
+            const resetAction = StackActions.reset({
+                index: 0,
+                actions: [NavigationActions.navigate({
+                    routeName: 'Home'
+                })],
+            });
+            this.props.navigation.dispatch(resetAction);
+        }
 
         if (hasEmailChanged) {
             DropdownSingleton.get().alertWithType('info', 'Check your inbox!', 'We sent you a confirmation E-Mail to ' + this.state.user.email + '. Click on the link to confirm your new E-Mail address.')
@@ -171,9 +191,13 @@ export default class UserScreen extends React.Component {
     render() {
         return (
             <View style={styles.container}>
+                <NetworkLoader ref={ref => this.networkLoader = ref} />
                 <KeyboardShift>
                     {() => (
-                        <ScrollView style={styles.ScrollView}>
+                        <ScrollView style={{
+                            ...styles.ScrollView,
+                            paddingTop: this.state.isLogin ? 75 : 15
+                        }}>
                             <View style={styles.content}>
                                 <TouchableOpacity onPress={() => this._pickImage()} style={styles.avatarEdit}>
                                     <View style={styles.avatarUpdateBtn}>
@@ -261,7 +285,6 @@ const styles = StyleSheet.create({
     },
     scrollView: {
         flex: 1,
-        paddingTop: 15,
         backgroundColor: 'white',
     },
     content: {

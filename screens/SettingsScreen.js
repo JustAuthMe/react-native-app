@@ -3,7 +3,6 @@ import {
     Alert, AsyncStorage,
     StatusBar
 } from 'react-native';
-import { ExpoConfigView } from '@expo/samples';
 import JamConfigView from "../components/JamConfigView";
 import Config from "../constants/Config";
 import * as SecureStore from "expo-secure-store";
@@ -27,17 +26,13 @@ export default class SettingsScreen extends React.Component {
             {text: 'Cancel', onPress: () => {}, style:'cancel'},
             {text: 'OK', onPress: () => {
                 AsyncStorage.multiRemove([
-                    Config.initDone.key,
                     'firstname',
                     'lastname',
                     'birthdate',
                     'email',
-                    'avatar'
+                    'avatar',
+                    Config.servicesKey
                 ], async () => {
-                    AsyncStorage.getItem(Config.initDone.key).then(value => {
-                        console.log('init done at logout:', value);
-                    });
-
                     await SecureStore.deleteItemAsync(Config.storageKeys.publicKey);
                     await SecureStore.deleteItemAsync(Config.storageKeys.privateKey);
                     await SecureStore.deleteItemAsync(Config.storageKeys.jamID);

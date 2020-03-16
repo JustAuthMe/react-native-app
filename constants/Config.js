@@ -1,9 +1,5 @@
 export default {
     urlScheme: 'jam://',
-    initDone: {
-        key: 'init_done',
-        value: 'done'
-    },
     apiUrl: 'http://192.168.0.9/JustAuth.Me/server/api/', // TODO CHANGE BEFORE PROD
     storageKeys: {
         publicKey: 'pubkey',

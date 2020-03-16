@@ -6,11 +6,15 @@ import {
 } from 'react-native';
 
 export default class NetworkLoader extends React.Component {
+    state = {
+        visible: false
+    };
+
     render() {
         return (
             <View style={{
                 ...styles.overlay,
-                display: this.props.visible ? 'flex' : 'none'
+                display: this.state.visible ? 'flex' : 'none'
             }}>
                   <View style={styles.container}>
                       <ActivityIndicator size={'large'} color={'#555'} />

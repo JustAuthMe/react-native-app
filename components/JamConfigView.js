@@ -40,18 +40,6 @@ export default class JamConfigView extends React.Component {
                 ],
                 title: 'Help & Support'
             },
-            { // TODO: TO REMOVE BEFORE PROD
-                data: [
-                    {
-                        value: 'Display private key',
-                        onPress: async () => {
-                            const privKey = await SecureStore.getItemAsync(Config.storageKeys.privateKey);
-                            console.log(privKey);
-                        },
-                        type: 'button'
-                    }
-                ]
-            },
             {
                 data: [
                     {

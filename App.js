@@ -31,10 +31,6 @@ export default class App extends React.Component {
             );
         }
 
-        AsyncStorage.getItem(Config.initDone.key).then(value => {
-            console.log('init done at app init:', value);
-        });
-
         console.log('render AppNavigator');
         return (
             <View style={styles.container}>

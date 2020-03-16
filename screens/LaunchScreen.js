@@ -47,7 +47,6 @@ export default class LaunchScreen extends React.Component {
         explanationTitle: 'Welcome',
         congratsTitle: 'Please wait...',
         displayCongrats: false,
-        networkLoaderVisible: false
     };
 
     constructor(props) {
@@ -55,6 +54,7 @@ export default class LaunchScreen extends React.Component {
         this.personnalInfos = {
             avatar: Config.defaultAvatar
         };
+        this.passcode = '';
         this.logo = require('../assets/images/logo-new.png');
         this.explanationTitles = [
             'Welcome',
@@ -64,15 +64,37 @@ export default class LaunchScreen extends React.Component {
             'Ready to go!'
         ];
 
-        AsyncStorage.getItem(Config.initDone.key).then(value => {
+        this.isLoggedIn().then(loggedIn => {
             SplashScreen.hide();
-            if (value === Config.initDone.value) {
+            if (loggedIn) {
                 this.props.navigation.navigate('Main');
             }
         });
         console.log('window height:', Dimensions.get('window').height);
         console.log('status bar height:', Constants.statusBarHeight);
     }
+
+    isLoggedIn = async () => {
+        const email = await AsyncStorage.getItem('email');
+        console.log('LOGGED EMAIL : ', email);
+        const pubkey = await SecureStore.getItemAsync(Config.storageKeys.publicKey);
+        const privkey = await SecureStore.getItemAsync(Config.storageKeys.privateKey);
+        const jam_id = await SecureStore.getItemAsync(Config.storageKeys.jamID);
+
+        return email !== null && pubkey !== null && privkey !== null && jam_id !== null;
+    };
+
+    hasInfos = async () => {
+        const firstname = await AsyncStorage.getItem('firstname');
+        const lastname = await AsyncStorage.getItem('lastname');
+        const birthdate = await AsyncStorage.getItem('birthdate');
+        const avatar = await AsyncStorage.getItem('avatar');
+        if (avatar === null) {
+            await AsyncStorage.setItem('avatar', Config.defaultAvatar);
+        }
+
+        return firstname !== null && lastname !== null && birthdate !== null;
+    };
 
     onInputChange(key, value) {
         this.personnalInfos[key] = value;
@@ -107,10 +129,10 @@ export default class LaunchScreen extends React.Component {
                 });
                 this.props.navigation.dispatch(resetAction);
             } else if (key === 'email') {
-                this.setState({networkLoaderVisible: true});
+                this.networkLoader.setState({visible: true});
                 console.log('fetching...');
                 fetch(
-                    Config.apiUrl + 'mail/check',
+                    Config.apiUrl + 'applogin/request',
                     {
                         method: 'POST',
                         headers: {
@@ -122,38 +144,28 @@ export default class LaunchScreen extends React.Component {
                         })
                     }
                 ).then(async response => {
-                    this.setState({networkLoaderVisible: false});
+                    this.networkLoader.setState({visible: false});
 
                     if (response.status === 200) {
-                        const responseJson = await response.json();
-                        console.log('RESPONSE JSON: ', responseJson);
-                        if (responseJson.available) {
-                            this.props.navigation.push('LaunchScreen', {step: 'firstname'});
-                        } else {
-                            this.props.navigation.push('LaunchScreen', {step: 'login'});
-                            // TODO
-                            /*fetch(
-                                Config.apiUrl + 'applogin/request',
-                                {
-                                    method: POST,
-                                    headers: {
-                                        Accept: 'application/json',
-                                        'Content-Type': 'application/json'
-                                    },
-                                    body: {
-                                        email: this.personnalInfos[key]
-                                    }
-                                }
-                            ).then(response => {
-
-                            });*/
-                        }
+                        DropdownSingleton.get().alertWithType('info', 'Check your inbox!', 'We sent a Passcode to ' + this.state.user.email + '. Enter the received passcode below to recover your account.')
+                        this.props.navigation.push('LaunchScreen', {step: 'login'});
                     } else if (response.status === 400) {
                         DropdownSingleton.get().alertWithType('error', 'Invalid E-Mail', 'Please enter a valid E-Mail address.');
+                    } else if (response.status === 404) {
+                        this.props.navigation.push('LaunchScreen', {step: 'firstname'});
                     } else if (response.status === 429) {
-                        DropdownSingleton.get().alertWithType('error', 'Anti-Spam', 'You have tried to many times. Please wait a few minutes.');
+                        const responseJson = await response.json();
+                        console.log('RESPONSE JSON: ', responseJson);
+                        if (responseJson.message.match(/code/)) {
+                            DropdownSingleton.get().alertWithType('error', 'Anti-Spam', 'Please wait at least 2 minutes before asking for another code.');
+                        } else {
+                            DropdownSingleton.get().alertWithType('error', 'Anti-Spam', 'You have tried to many times. Please wait a few minutes.');
+                        }
                     } else {
-                        DropdownSingleton.get().alertWithType('error', 'Unknow', 'An unknow error occured. Please contact support mentionning that an HTTP ' + response.status + ' appeared during email check.');
+                        DropdownSingleton.get().alertWithType(
+                            'error',
+                            'Unknow',
+                            'An unknow error occured. Please contact support mentionning that an HTTP ' + response.status + ' appeared during email check.');
                     }
                 });
             } else {
@@ -174,7 +186,7 @@ export default class LaunchScreen extends React.Component {
         });
     }
 
-    async onMessage(message) {
+    async onMessageRegister(message) {
         console.log(message);
         const eventData = message.nativeEvent.data;
         const data = Platform.OS === 'ios' ?
@@ -203,6 +215,30 @@ export default class LaunchScreen extends React.Component {
                 this.continueBtn.setState({disabled: false});
             }
         });
+    }
+
+    async onMessageLogin(message) {
+        console.log(message);
+        const eventData = message.nativeEvent.data;
+        const data = Platform.OS === 'ios' ?
+            JSON.parse(decodeURIComponent(decodeURIComponent(eventData))) :
+            JSON.parse(eventData);
+
+        console.log(data.x);
+        console.log(data.y);
+
+        // Storing keypair
+        await SecureStore.setItemAsync(Config.storageKeys.publicKey, data.x, {
+            keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY
+        });
+        const pubkey = await SecureStore.getItemAsync(Config.storageKeys.publicKey);
+        console.log('NEWLY STORED PUBKEY: ', pubkey);
+
+        await SecureStore.setItemAsync(Config.storageKeys.privateKey, data.y, {
+            keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY
+        });
+
+        console.log('Took ' + data.t + ' seconds');
     }
 
     async register() {
@@ -242,7 +278,7 @@ export default class LaunchScreen extends React.Component {
                 DropdownSingleton.get().alertWithType('error', 'A HTTP 400 error occured', 'Please contact support at support@justauth.me mentionning the error code 400 at registration');
             } else if (response.status === 409) {
                 DropdownSingleton.get().alertWithType('error', 'Already member', 'You already have a JustAuth.Me account, please log in');
-                step = ''; // TODO redirect to Login screen
+                step = 'login';
             } else if (response.status === 429) {
                 DropdownSingleton.get().alertWithType('error', 'Anti-spam', 'Please try again in 30 seconds, this is an anti-spam measure');
             }
@@ -268,23 +304,75 @@ export default class LaunchScreen extends React.Component {
         }
     }
 
+    login = async () => {
+        this.networkLoader.setState({visible: true});
+        const email = await AsyncStorage.getItem('email');
+        const pubkey = await SecureStore.getItemAsync(Config.storageKeys.publicKey);
+        console.log('SENT PUBKEY: ', pubkey);
+
+        const response = await fetch(
+            Config.apiUrl + 'applogin/challenge',
+            {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: email,
+                    passcode: this.passcode,
+                    pubkey: pubkey
+                })
+            }
+        );
+        this.networkLoader.setState({visible: false});
+        console.log('RESPONSE: ', response);
+
+        const responseJson = await response.json();
+        console.log('RESPONSE JSON: ', responseJson);
+
+        if (response.status === 200) {
+            await SecureStore.setItemAsync(Config.storageKeys.jamID, responseJson.jam_id, {
+                keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY
+            });
+            const jamID = await SecureStore.getItemAsync(Config.storageKeys.jamID);
+            console.log(jamID);
+
+            await AsyncStorage.setItem(Config.servicesKey, JSON.stringify({}));
+
+            this.hasInfos().then(hasInfos => {
+                if (hasInfos) {
+                    console.log('YES INFOS');
+                    this.props.navigation.navigate('Main');
+                } else {
+                    console.log('NO INFOS');
+                    this.props.navigation.navigate('Login', {login: true});
+                }
+            });
+        } else if (response.status === 403) {
+            DropdownSingleton.get().alertWithType('error', 'Wrong passcode', 'Please try again.');
+        } else if (response.status === 429) {
+            DropdownSingleton.get().alertWithType('error', 'Anti-Spam', 'You have tried to many times. Please wait a few minutes.');
+        } else {
+            DropdownSingleton.get().alertWithType(
+                'error',
+                'Unknow',
+                'An unknow error occured. Please contact support mentionning that an HTTP ' + response.status + ' appeared during applogin challenge.');
+        }
+    };
+
     lastStep = () => {
         this.props.navigation.push('LaunchScreen', {step: 'done'});
     };
 
     finish = () => {
-        AsyncStorage.setItem(Config.initDone.key, Config.initDone.value, () => {
-            AsyncStorage.getItem(Config.initDone.key, (value) => {
-                console.log('init done at end of launch:', value);
+        AsyncStorage.setItem(Config.servicesKey, JSON.stringify({}), () => {
+            AsyncStorage.getItem(Config.servicesKey, (value) => {
+                console.log('services list:', value);
             });
-            AsyncStorage.setItem(Config.servicesKey, JSON.stringify({}), () => {
-                AsyncStorage.getItem(Config.servicesKey, (value) => {
-                    console.log('services list:', value);
-                });
-            });
-
-            this.props.navigation.navigate('Main');
         });
+
+        this.props.navigation.navigate('Main');
     };
 
     _pickImage = async () => {
@@ -389,7 +477,7 @@ export default class LaunchScreen extends React.Component {
                         {() => (
                             <View style={styles.container}>
                                 <LightStatusBar/>
-                                <NetworkLoader visible={this.state.networkLoaderVisible} />
+                                <NetworkLoader ref={ref => this.networkLoader = ref} />
                                 <Image style={styles.logo} source={this.logo}/>
                                 <Text style={styles.baseline}>Let's begin with your E-Mail</Text>
                                 <TextInput
@@ -417,6 +505,7 @@ export default class LaunchScreen extends React.Component {
                         {() => (
                             <View style={styles.container}>
                                 <LightStatusBar/>
+                                <NetworkLoader ref={ref => this.networkLoader = ref} />
                                 <Image style={styles.logo} source={this.logo}/>
                                 <Text style={styles.baseline}>Enter the passcode you just received by E-Mail</Text>
                                 <TextInput
@@ -436,7 +525,21 @@ export default class LaunchScreen extends React.Component {
                                     keyboardType={'numeric'}
                                     maxLength={6}
                                     textContentType={'oneTimeCode'}
+                                    onChangeText={text => {
+                                        this.passcode = text;
+                                        this.continueBtn.setState({
+                                            disabled: text === ''
+                                        });
+                                    }}
                                 />
+                                <ContinueButton text={'Login'} ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.login()} />
+                                <View style={styles.webview}>
+                                    <WebView
+                                        source={{uri: 'https://init.justauth.me'}}
+                                        onMessage={msg => this.onMessageLogin(msg)}
+                                        useWebKit={true}
+                                    />
+                                </View>
                             </View>
                         )}
                     </KeyboardShift>
@@ -553,74 +656,6 @@ export default class LaunchScreen extends React.Component {
                     </View>
                 );
 
-            case 'address':
-                // TODO: Add address screen to launch process
-                return (
-                    <View style={styles.container}>
-                        <LightStatusBar/>
-                        <Image style={styles.logo} source={this.logo}/>
-                        <Text style={styles.baseline}>Do you have an address?</Text>
-                        <TextInput
-                            style={styles.textInput}
-                            placeholder={"e.g. Owl Motel, Parker Square"}
-                            placeholderTextColor={"rgba(255,255,255,.5)"}
-                            returnKeyType={"done"}
-                            autoCorrect={false}
-                            spellCheck={false}
-                            textContentType={"fullStreetAddress"}
-                            clearButtonMode={"always"}
-                            onChangeText={(text) => this.onInputChange('address', text)}
-                        />
-                        <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('address', 'phone')} />
-                    </View>
-                );
-
-            case 'phone':
-                // TODO: Add phone number to launch process
-                return (
-                    <View style={styles.container}>
-                        <LightStatusBar/>
-                        <Image style={styles.logo} source={this.logo}/>
-                        <Text style={styles.baseline}>And a phone number?</Text>
-                        <TextInput
-                            style={styles.textInput}
-                            placeholder={"e.g. +14213371994"}
-                            placeholderTextColor={"rgba(255,255,255,.5)"}
-                            returnKeyType={"done"}
-                            autoCorrect={false}
-                            spellCheck={false}
-                            textContentType={"telephoneNumber"}
-                            keyboardType={"phone-pad"}
-                            clearButtonMode={"always"}
-                            onChangeText={(text) => this.onInputChange('address', text)}
-                        />
-                        <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('phone', 'otp')} />
-                    </View>
-                );
-
-            case 'otp':
-                // TODO: Implement OTP-Code based phone number verification
-                return (
-                    <View style={styles.container}>
-                        <LightStatusBar/>
-                        <Image style={styles.logo} source={this.logo}/>
-                        <Text style={styles.baseline}>Enter the code you received by SMS</Text>
-                        <TextInput
-                            style={styles.textInput}
-                            placeholder={"Your verification code"}
-                            placeholderTextColor={"rgba(255,255,255,.5)"}
-                            returnKeyType={"done"}
-                            autoCorrect={false}
-                            spellCheck={false}
-                            textContentType={"oneTimeCode"}
-                            keyboardType={"phone-pad"}
-                            clearButtonMode={"always"}
-                            onChangeText={(text) => this.onInputChange('address', text)}
-                        />
-                        <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('otp', 'keygen')} />
-                    </View>
-                );
-
             case 'done':
                 return (
                     <View style={styles.container}>
@@ -637,7 +672,7 @@ export default class LaunchScreen extends React.Component {
                         <View style={styles.webview}>
                             <WebView
                                 source={{uri: 'https://init.justauth.me'}}
-                                onMessage={msg => this.onMessage(msg)}
+                                onMessage={msg => this.onMessageRegister(msg)}
                                 useWebKit={true}
                             />
                         </View>
