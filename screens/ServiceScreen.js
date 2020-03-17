@@ -46,7 +46,6 @@ export default class ServiceScreen extends React.Component {
             return;
         }
 
-        console.log('shown service:', service);
         this.setState({
             service: service
         });
@@ -64,7 +63,6 @@ export default class ServiceScreen extends React.Component {
                 value: this.state.service.data[i]
             });
         }
-        console.log('data to show:', dataToShow);
 
         return (
             <View style={styles.content}>

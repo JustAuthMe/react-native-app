@@ -70,13 +70,10 @@ export default class LaunchScreen extends React.Component {
                 this.props.navigation.navigate('Main');
             }
         });
-        console.log('window height:', Dimensions.get('window').height);
-        console.log('status bar height:', Constants.statusBarHeight);
     }
 
     isLoggedIn = async () => {
         const email = await AsyncStorage.getItem('email');
-        console.log('LOGGED EMAIL : ', email);
         const pubkey = await SecureStore.getItemAsync(Config.storageKeys.publicKey);
         const privkey = await SecureStore.getItemAsync(Config.storageKeys.privateKey);
         const jam_id = await SecureStore.getItemAsync(Config.storageKeys.jamID);
@@ -113,10 +110,6 @@ export default class LaunchScreen extends React.Component {
         }
 
         AsyncStorage.setItem(key, this.personnalInfos[key], () => {
-            AsyncStorage.getItem(key).then(value => {
-                console.log(key + ':', value);
-            });
-
             if (nextStep === 'done') {
                 const resetAction = StackActions.reset({
                     index: 0,
@@ -130,7 +123,6 @@ export default class LaunchScreen extends React.Component {
                 this.props.navigation.dispatch(resetAction);
             } else if (key === 'email') {
                 this.networkLoader.setState({visible: true});
-                console.log('fetching...');
                 fetch(
                     Config.apiUrl + 'applogin/request',
                     {
@@ -155,7 +147,6 @@ export default class LaunchScreen extends React.Component {
                         this.props.navigation.push('LaunchScreen', {step: 'firstname'});
                     } else if (response.status === 429) {
                         const responseJson = await response.json();
-                        console.log('RESPONSE JSON: ', responseJson);
                         if (responseJson.message.match(/code/)) {
                             DropdownSingleton.get().alertWithType('error', 'Anti-Spam', 'Please wait at least 2 minutes before asking for another code.');
                         } else {
@@ -187,14 +178,10 @@ export default class LaunchScreen extends React.Component {
     }
 
     async onMessageRegister(message) {
-        console.log(message);
         const eventData = message.nativeEvent.data;
         const data = Platform.OS === 'ios' ?
             JSON.parse(decodeURIComponent(decodeURIComponent(eventData))) :
             JSON.parse(eventData);
-
-        console.log(data.x);
-        console.log(data.y);
 
         // Storing keypair
         await SecureStore.setItemAsync(Config.storageKeys.publicKey, data.x, {
@@ -203,8 +190,6 @@ export default class LaunchScreen extends React.Component {
         await SecureStore.setItemAsync(Config.storageKeys.privateKey, data.y, {
             keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY
         });
-
-        console.log('Took ' + data.t + ' seconds');
 
         this.register().then(registered => {
             if (registered) {
@@ -218,34 +203,27 @@ export default class LaunchScreen extends React.Component {
     }
 
     async onMessageLogin(message) {
-        console.log(message);
         const eventData = message.nativeEvent.data;
         const data = Platform.OS === 'ios' ?
             JSON.parse(decodeURIComponent(decodeURIComponent(eventData))) :
             JSON.parse(eventData);
-
-        console.log(data.x);
-        console.log(data.y);
 
         // Storing keypair
         await SecureStore.setItemAsync(Config.storageKeys.publicKey, data.x, {
             keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY
         });
         const pubkey = await SecureStore.getItemAsync(Config.storageKeys.publicKey);
-        console.log('NEWLY STORED PUBKEY: ', pubkey);
 
         await SecureStore.setItemAsync(Config.storageKeys.privateKey, data.y, {
             keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY
         });
-
-        console.log('Took ' + data.t + ' seconds');
     }
 
     async register() {
         const pubkey = await SecureStore.getItemAsync(Config.storageKeys.publicKey);
         const email = await AsyncStorage.getItem('email');
         const endpointUrl = Config.apiUrl + 'register';
-        console.log('sent pubkey: ', pubkey);
+
         try {
             let response = await fetch(
                 endpointUrl,
@@ -262,13 +240,11 @@ export default class LaunchScreen extends React.Component {
                 }
             );
             let responseJson = await response.json();
-            console.log(responseJson);
             if (responseJson.status === 'success') {
                 await SecureStore.setItemAsync(Config.storageKeys.jamID, responseJson.user.username, {
                     keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY
                 });
                 const jamID = await SecureStore.getItemAsync(Config.storageKeys.jamID);
-                console.log(jamID);
 
                 return true;
             }
@@ -282,8 +258,6 @@ export default class LaunchScreen extends React.Component {
             } else if (response.status === 429) {
                 DropdownSingleton.get().alertWithType('error', 'Anti-spam', 'Please try again in 30 seconds, this is an anti-spam measure');
             }
-
-            console.log('error retreiving username: ' + response.status);
 
             const resetAction = StackActions.reset({
                 index: 0,
@@ -308,7 +282,6 @@ export default class LaunchScreen extends React.Component {
         this.networkLoader.setState({visible: true});
         const email = await AsyncStorage.getItem('email');
         const pubkey = await SecureStore.getItemAsync(Config.storageKeys.publicKey);
-        console.log('SENT PUBKEY: ', pubkey);
 
         const response = await fetch(
             Config.apiUrl + 'applogin/challenge',
@@ -326,26 +299,19 @@ export default class LaunchScreen extends React.Component {
             }
         );
         this.networkLoader.setState({visible: false});
-        console.log('RESPONSE: ', response);
 
         const responseJson = await response.json();
-        console.log('RESPONSE JSON: ', responseJson);
 
         if (response.status === 200) {
             await SecureStore.setItemAsync(Config.storageKeys.jamID, responseJson.jam_id, {
                 keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY
             });
-            const jamID = await SecureStore.getItemAsync(Config.storageKeys.jamID);
-            console.log(jamID);
-
             await AsyncStorage.setItem(Config.servicesKey, JSON.stringify({}));
 
             this.hasInfos().then(hasInfos => {
                 if (hasInfos) {
-                    console.log('YES INFOS');
                     this.props.navigation.navigate('Main');
                 } else {
-                    console.log('NO INFOS');
                     this.props.navigation.navigate('Login', {login: true});
                 }
             });
@@ -366,11 +332,7 @@ export default class LaunchScreen extends React.Component {
     };
 
     finish = () => {
-        AsyncStorage.setItem(Config.servicesKey, JSON.stringify({}), () => {
-            AsyncStorage.getItem(Config.servicesKey, (value) => {
-                console.log('services list:', value);
-            });
-        });
+        AsyncStorage.setItem(Config.servicesKey, JSON.stringify({}), () => {});
 
         this.props.navigation.navigate('Main');
     };
@@ -391,7 +353,6 @@ export default class LaunchScreen extends React.Component {
             base64: true
         });
 
-        console.log(result);
         if (!result.cancelled) {
             const avatarUri = 'data:image/jpeg;base64,' + result.base64;
             this.personnalInfos['avatar'] = avatarUri;

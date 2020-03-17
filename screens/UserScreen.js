@@ -59,7 +59,6 @@ export default class UserScreen extends React.Component {
             email: await AsyncStorage.getItem('email'),
             avatar: await AsyncStorage.getItem('avatar')
         };
-        console.log('STORED USER : ', user);
         const splitDate = user.birthdate !== null ? user.birthdate.split('/') : [];
         this.setState({
             user: user,
@@ -108,7 +107,6 @@ export default class UserScreen extends React.Component {
             base64: true
         });
 
-        console.log(result);
         if (!result.cancelled) {
             const avatarUri = 'data:image/jpeg;base64,' + result.base64;
             this.setState({user: {...this.state.user, avatar: avatarUri}});
@@ -154,8 +152,6 @@ export default class UserScreen extends React.Component {
                     })
                 }
             );
-            const responseJson = await response.json();
-            console.log('RESPONSE JSON: ', responseJson);
 
             this.networkLoader.setState({visible: false});
 

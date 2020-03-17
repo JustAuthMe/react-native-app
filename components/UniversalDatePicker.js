@@ -48,7 +48,6 @@ export default class UniversalDatePicker extends React.Component {
                 const realDay = day < 10 ? '0' + day : day;
                 let realMonth = month + 1;
                 realMonth = realMonth < 10 ? '0' + realMonth : realMonth;
-                console.log(realDay + '/' + realMonth + '/' + year);
                 this.state.onDateChange(new Date(
                     year + '-' + realMonth + '-' + realDay + 'T00:00:00'
                 ));

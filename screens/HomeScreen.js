@@ -99,22 +99,6 @@ export default class HomeScreen extends React.Component {
         AuthSingleton.get().authByDeepLink(event.url, this.props.navigation);
     };
 
-    run() {
-        SecureStore.getItemAsync(Config.storageKeys.publicKey).then(value => {
-            if (value !== null) {
-                console.log(value);
-                SecureStore.getItemAsync(Config.storageKeys.privateKey).then(value => {
-                    if (value !== null) {
-                        console.log(value);
-                        SecureStore.getItemAsync(Config.storageKeys.jamID).then(value => {
-                            console.log(value);
-                        }).catch(err => console.log(err));
-                    }
-                }).catch(err => console.log(err));
-            }
-        }).catch(err => console.log(err));
-    }
-
     parseServices = () => {
         if (this.state.services === null) {
             return [];
@@ -127,7 +111,6 @@ export default class HomeScreen extends React.Component {
             });
         }
 
-        console.log('parsed items:', items);
         return items;
     };
 
@@ -160,9 +143,6 @@ export default class HomeScreen extends React.Component {
                         })
                     }
                 );
-                console.log(response);
-                const responseJson = await response.json();
-                console.log('RESPONSE JSON: ', responseJson);
 
                 if (response.status === 200 || response.status === 404) {
                     await ServicesModel.removeService(service.app_id);

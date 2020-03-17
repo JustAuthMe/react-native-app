@@ -14,8 +14,6 @@ export class EncryptionModel {
             // Serializing to PEM
             const pubPem  = forge.pki.publicKeyToPem(pub);
             const privPem  = forge.pki.privateKeyToPem(priv);
-            console.log(pubPem);
-            console.log(privPem);
 
             // Storing keypair
             await SecureStore.setItemAsync(Config.storageKeys.publicKey, pubPem, {
@@ -24,9 +22,6 @@ export class EncryptionModel {
             await SecureStore.setItemAsync(Config.storageKeys.privateKey, privPem, {
                 keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY
             });
-
-            const took = (new Date().getTime() - start) / 1000;
-            console.log('Took ' + took + ' seconds');
         });
     }
 

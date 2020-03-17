@@ -39,23 +39,23 @@ export default class AuthScreen extends React.Component {
     async getAuthDetails() {
         const endpointUrl = Config.apiUrl + 'auth/' + this.state.token;
         this.services = await ServicesModel.getServices();
-        console.log(endpointUrl);
+
         try {
             const response = await fetch(endpointUrl);
             const responseJson = await response.json();
-            console.log(responseJson);
+
             if (responseJson.status === 'success') {
                 this.setState({
                     auth: responseJson.auth,
                     isFirstLogin: !this.services.hasOwnProperty(responseJson.auth.client_app.app_id)
                 });
-                console.log('FIRST LOGIN: ', this.state.isFirstLogin);
+
                 this.actualData = {};
                 for (let i = 0; i < responseJson.auth.client_app.data.length; i++) {
                     this.actualData[responseJson.auth.client_app.data[i]] = true;
                 }
             } else {
-                console.log('error retreiving auth details');
+
                 const resetAction = StackActions.reset({
                     index: 0,
                     actions: [NavigationActions.navigate({
@@ -89,7 +89,6 @@ export default class AuthScreen extends React.Component {
             }
 
             if (this.actualData[authData[i]]) {
-                console.log('data sent: ' + dataName);
                 data[dataName] = await AsyncStorage.getItem(dataName);
             }
         }
@@ -100,9 +99,6 @@ export default class AuthScreen extends React.Component {
     onAcceptLogin = async () => {
         const hasHardware = await LocalAuthentication.hasHardwareAsync();
         const isEnrolled = await LocalAuthentication.isEnrolledAsync();
-
-        console.log('has hardware:', hasHardware);
-        console.log('is enrolled:', isEnrolled);
 
         let canLogin = true;
         if (hasHardware && isEnrolled) {
@@ -122,12 +118,9 @@ export default class AuthScreen extends React.Component {
             const endpointUrl = Config.apiUrl + 'login';
             const data = await this.getUserDataFromDataset();
             const enc = new EncryptionModel();
-            console.log('encryption model instanciated');
             const plain = enc.urlencode(enc.json_encode(data));
-            console.log('calculated plain: ', plain);
             const sign = await enc.sign(plain);
-            console.log(data);
-            console.log(sign);
+
             try {
                 const response = await fetch(
                     endpointUrl,
@@ -145,10 +138,8 @@ export default class AuthScreen extends React.Component {
                 );
 
                 const responseJson = await response.json();
-                console.log(responseJson);
 
                 if (responseJson.status === 'success') {
-                    console.log('CLIENT APP:', this.state.auth.client_app);
                     let dataToStore = {};
                     for (let i in this.actualData) {
                         if (this.actualData[i]) {
@@ -165,7 +156,7 @@ export default class AuthScreen extends React.Component {
                             domain: this.state.auth.client_app.domain,
                             data: dataToStore
                         };
-                        console.log('CREATED SERVICE:', service);
+
                         await ServicesModel.addService(this.state.auth.client_app.app_id, service);
                     }
                     this.props.navigation.navigate('Success');
@@ -188,11 +179,7 @@ export default class AuthScreen extends React.Component {
                     });
                     this.props.navigation.dispatch(resetAction);
                 }
-            } catch (error) {
-                console.error(error);
-            }
-        } else {
-            console.log('Forbidden');
+            } catch (error) {}
         }
     };
 

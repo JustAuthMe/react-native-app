@@ -13,11 +13,6 @@ export default class AndroidBiometricPrompt extends React.Component {
         status: 'wait'
     };
 
-    componentDidMount() {
-        console.log('visible:', this.state.visible);
-        console.log('state:', this.state);
-    }
-
     render() {
         if (!this.state.visible) {
             return null;

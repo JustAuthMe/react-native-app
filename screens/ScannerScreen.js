@@ -24,7 +24,6 @@ export default class ScannerScreen extends React.Component {
 
     getPermissionsAsync = async () => {
         const permissionResponse = await Permissions.askAsync(Permissions.CAMERA);
-        console.log(permissionResponse);
         if (permissionResponse.status !== 'granted') {
             this.props.navigation.goBack();
             DropdownSingleton.get().alertWithType('error', 'Permission required', 'You need camera permission to be able to scan QR Codes.');
@@ -40,8 +39,6 @@ export default class ScannerScreen extends React.Component {
     }
 
     _handleBarCodeScanned = ({ type, data }) => {
-        console.log('scanned:', type);
-        console.log('expecting:', BarCodeScanner.Constants.BarCodeType.qr);
         if (this.isBarCodeScannerEnabled && type === BarCodeScanner.Constants.BarCodeType.qr) {
             this.isBarCodeScannerEnabled = false;
             AuthSingleton.get().authByDeepLink(data, this.props.navigation);
