@@ -7,11 +7,11 @@ import {
     AsyncStorage,
     StatusBar,
     TouchableOpacity,
-    Image
+    Image,
+    Text
 } from 'react-native';
 import Colors from '../constants/Colors';
 import {DateModel} from "../models/DateModel";
-import DatePickerKeyboardIOS from "../components/DatePickerKeyboardIOS";
 import ActionBtn from "../components/ActionBtn";
 import {DropdownSingleton} from "../models/DropdownSingleton";
 import Constants from "expo-constants";
@@ -23,7 +23,6 @@ import {DatePickerSingleton} from "../models/DatePickerSingleton";
 import Config from "../constants/Config";
 import {EncryptionModel} from "../models/EncryptionModel";
 import * as SecureStore from "expo-secure-store";
-import {ServicesModel} from "../models/ServicesModel";
 import {NavigationActions, StackActions} from "react-navigation";
 import NetworkLoader from "../components/NetworkLoader";
 
@@ -178,7 +177,11 @@ export default class UserScreen extends React.Component {
         }
 
         if (hasEmailChanged) {
-            DropdownSingleton.get().alertWithType('info', 'Check your inbox!', 'We sent you a confirmation E-Mail to ' + this.state.user.email + '. Click on the link to confirm your new E-Mail address.')
+            DropdownSingleton.get().alertWithType(
+                'info',
+                'Check your inbox!',
+                'We sent you a confirmation E-Mail to ' + this.state.user.email + '. Click on the link to confirm your new E-Mail address.'
+            );
         } else {
             DropdownSingleton.get().alertWithType('success', 'My infos', 'Saved successfully');
         }
@@ -205,6 +208,7 @@ export default class UserScreen extends React.Component {
                                     </View>
                                     <Image source={{uri: this.state.user.avatar}} style={styles.avatar} />
                                 </TouchableOpacity>
+                                <Text style={styles.textLabel}>Firstname:</Text>
                                 <TextInput
                                     ref={"firstname"}
                                     style={styles.textInput}
@@ -217,6 +221,7 @@ export default class UserScreen extends React.Component {
                                     value={this.state.user.firstname}
                                     onChangeText={(text) => this.setState({user:{...this.state.user, firstname:text}})}
                                 />
+                                <Text style={styles.textLabel}>Lastname:</Text>
                                 <TextInput
                                     ref={"lastname"}
                                     style={styles.textInput}
@@ -229,6 +234,7 @@ export default class UserScreen extends React.Component {
                                     value={this.state.user.lastname}
                                     onChangeText={(text) => this.setState({user:{...this.state.user, lastname:text}})}
                                 />
+                                <Text style={styles.textLabel}>Birthdate:</Text>
                                 <TouchableOpacity activeOpacity={.5} style={styles.inputTouchable} onPress={() => {
                                     DatePickerSingleton.get().open({
                                         date: this.state.currentBirthdate,
@@ -250,6 +256,7 @@ export default class UserScreen extends React.Component {
                                         value={this.state.birthdateInputValue}
                                     />
                                 </TouchableOpacity>
+                                <Text style={styles.textLabel}>E-Mail address:</Text>
                                 <TextInput
                                     ref={"email"}
                                     style={styles.textInput}
@@ -263,7 +270,11 @@ export default class UserScreen extends React.Component {
                                     clearButtonMode={"always"}
                                     value={this.state.user.email}
                                     onChangeText={(text) => this.setState({user:{...this.state.user, email:text}})}
-                                    onFocus={() => DropdownSingleton.get().alertWithType('info', 'Information', 'If you change your E-Mail address, you\'ll need to confirm your new address before continuing to use JustAuth.Me')}
+                                    onFocus={() => DropdownSingleton.get().alertWithType(
+                                        'info',
+                                        'Information',
+                                        'If you change your E-Mail address, you\'ll need to confirm your new address before continuing to use JustAuth.Me'
+                                    )}
                                 />
                                 <ActionBtn btnText={"Save"} btnIcon={'md-checkmark'} onPress={() => this.updateInfos()}/>
                             </View>
@@ -287,10 +298,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 30
     },
+    textLabel: {
+        width: '70%',
+        fontWeight: 700,
+        marginTop: 20
+    },
     textInput: {
         width: '70%',
         height: 50,
-        marginTop: 20,
         marginBottom: 20,
         borderBottomColor: Colors.tintColor,
         borderBottomWidth: 1,
@@ -301,7 +316,7 @@ const styles = StyleSheet.create({
         width: '100%',
         alignItems: 'center',
         backgroundColor: '#fff',
-        height: 100
+        height: 70
     },
     avatar: {
         height: 100,

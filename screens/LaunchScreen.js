@@ -139,7 +139,11 @@ export default class LaunchScreen extends React.Component {
                     this.networkLoader.setState({visible: false});
 
                     if (response.status === 200) {
-                        DropdownSingleton.get().alertWithType('info', 'Check your inbox!', 'We sent a Passcode to ' + this.state.user.email + '. Enter the received passcode below to recover your account.')
+                        DropdownSingleton.get().alertWithType(
+                            'info',
+                            'Check your inbox!',
+                            'We sent a Passcode to ' + this.state.user.email + '. Enter the received passcode below to recover your account.'
+                        );
                         this.props.navigation.push('LaunchScreen', {step: 'login'});
                     } else if (response.status === 400) {
                         DropdownSingleton.get().alertWithType('error', 'Invalid E-Mail', 'Please enter a valid E-Mail address.');
