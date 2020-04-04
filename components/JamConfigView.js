@@ -32,9 +32,20 @@ export default class JamConfigView extends React.Component {
             {
                 data: [
                     {
+                        value: 'Send me another confirmation E-Mail',
+                        onPress: this.props.onConfirmEmail,
+                        color: '',
+                        type: 'button',
+                    }
+                ],
+                title: 'Non confirmed E-Mail address?'
+            },
+            {
+                data: [
+                    {
                         value: 'Contact support',
                         onPress: () => Linking.openURL('mailto:support@justauth.me?subject=[Support] ' + Platform.OS + ' ' + manifest.version),
-                        color: '',
+                        color: '#ff9900',
                         type: 'button',
                     }
                 ],

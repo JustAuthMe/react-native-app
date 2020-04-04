@@ -20,7 +20,6 @@ export default class App extends React.Component {
 
     render() {
         if (!this.state.isLoadingComplete) {
-            console.log('render AppLoading');
             return (
                 <AppLoading
                     startAsync={this._loadResourcesAsync}
@@ -31,7 +30,6 @@ export default class App extends React.Component {
             );
         }
 
-        console.log('render AppNavigator');
         return (
             <View style={styles.container}>
                 <AppNavigator/>

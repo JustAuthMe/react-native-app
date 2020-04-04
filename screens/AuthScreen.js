@@ -18,7 +18,7 @@ import {DropdownSingleton} from "../models/DropdownSingleton";
 import {NavigationActions, StackActions} from "react-navigation";
 import {ServicesModel} from "../models/ServicesModel";
 import AndroidBiometricPrompt from "../components/AndroidBiometricPrompt";
-import ActionBtn from "../components/ActionBtn";
+import {UserModel} from "../models/UserModel";
 
 export default class AuthScreen extends React.Component {
     static navigationOptions = {
@@ -63,7 +63,11 @@ export default class AuthScreen extends React.Component {
                     })],
                 });
                 this.props.navigation.dispatch(resetAction);
-                DropdownSingleton.get().alertWithType('error', 'Invalid token', 'An error occurred while attempting to retrieve authentication details. Please try again or contact support.');
+                DropdownSingleton.get().alertWithType(
+                    'error',
+                    'Invalid token',
+                    'An error occurred while attempting to retrieve authentication details. Please try again or contact support.'
+                );
             }
         } catch (error) {
             console.error(error);
@@ -167,6 +171,8 @@ export default class AuthScreen extends React.Component {
                         DropdownSingleton.get().alertWithType('error', 'Non confirmed E-Mail', 'Please confirm your E-Mail address before trying to authenticate.');
                     } else if (response.status === 404) {
                         DropdownSingleton.get().alertWithType('error', 'Invalid token', 'There is no such authentication token.');
+                    } else if (response.status === 423) {
+                        UserModel.logout(this.props.navigation);
                     } else {
                         DropdownSingleton.get().alertWithType('error', 'Unknow error', 'An error occurred during login challenge. Please contact support.');
                     }

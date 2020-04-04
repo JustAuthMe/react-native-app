@@ -25,6 +25,7 @@ import {EncryptionModel} from "../models/EncryptionModel";
 import * as SecureStore from "expo-secure-store";
 import {NavigationActions, StackActions} from "react-navigation";
 import NetworkLoader from "../components/NetworkLoader";
+import {UserModel} from "../models/UserModel";
 
 export default class UserScreen extends React.Component {
     static navigationOptions = {
@@ -157,6 +158,10 @@ export default class UserScreen extends React.Component {
             if (response.status === 200 ) {
                 await AsyncStorage.setItem('email', this.state.user.email);
                 hasEmailChanged = true;
+            } else if (response.status === 423) {
+                UserModel.logout(this.props.navigation);
+            } else if (response.status === 429) {
+                DropdownSingleton.get().alertWithType('error', 'E-Mail address is already registered', 'This E-Mail address is associated to another JustAuthMe account.');
             } else {
                 DropdownSingleton.get().alertWithType('error', 'Cannot update E-Mail address', 'Please contact support for further assistance.');
             }
@@ -208,6 +213,26 @@ export default class UserScreen extends React.Component {
                                     </View>
                                     <Image source={{uri: this.state.user.avatar}} style={styles.avatar} />
                                 </TouchableOpacity>
+                                <Text style={styles.textLabel}>E-Mail address:</Text>
+                                <TextInput
+                                    ref={"email"}
+                                    style={styles.textInput}
+                                    placeholder={"e.g. aiden@pearce.me"}
+                                    returnKeyType={"done"}
+                                    autoCorrect={false}
+                                    spellCheck={false}
+                                    autoCapitalize={"none"}
+                                    textContentType={"emailAddress"}
+                                    keyboardType={"email-address"}
+                                    clearButtonMode={"always"}
+                                    value={this.state.user.email}
+                                    onChangeText={(text) => this.setState({user:{...this.state.user, email:text}})}
+                                    onFocus={() => DropdownSingleton.get().alertWithType(
+                                        'info',
+                                        'Information',
+                                        'If you change your E-Mail address, you\'ll need to confirm your new address before continuing to use JustAuth.Me'
+                                    )}
+                                />
                                 <Text style={styles.textLabel}>Firstname:</Text>
                                 <TextInput
                                     ref={"firstname"}
@@ -246,7 +271,6 @@ export default class UserScreen extends React.Component {
                                         ref={'birthdateInput'}
                                         style={styles.textInput}
                                         placeholder={"e.g. 02/05/1974"}
-                                        placeholderTextColor={"rgba(255,255,255,.5)"}
                                         returnKeyType={"done"}
                                         autoCorrect={false}
                                         spellCheck={false}
@@ -256,26 +280,6 @@ export default class UserScreen extends React.Component {
                                         value={this.state.birthdateInputValue}
                                     />
                                 </TouchableOpacity>
-                                <Text style={styles.textLabel}>E-Mail address:</Text>
-                                <TextInput
-                                    ref={"email"}
-                                    style={styles.textInput}
-                                    placeholder={"e.g. aiden@pearce.me"}
-                                    returnKeyType={"done"}
-                                    autoCorrect={false}
-                                    spellCheck={false}
-                                    autoCapitalize={"none"}
-                                    textContentType={"emailAddress"}
-                                    keyboardType={"email-address"}
-                                    clearButtonMode={"always"}
-                                    value={this.state.user.email}
-                                    onChangeText={(text) => this.setState({user:{...this.state.user, email:text}})}
-                                    onFocus={() => DropdownSingleton.get().alertWithType(
-                                        'info',
-                                        'Information',
-                                        'If you change your E-Mail address, you\'ll need to confirm your new address before continuing to use JustAuth.Me'
-                                    )}
-                                />
                                 <ActionBtn btnText={"Save"} btnIcon={'md-checkmark'} onPress={() => this.updateInfos()}/>
                             </View>
                         </ScrollView>
@@ -300,7 +304,7 @@ const styles = StyleSheet.create({
     },
     textLabel: {
         width: '70%',
-        fontWeight: 700,
+        fontWeight: '700',
         marginTop: 20
     },
     textInput: {

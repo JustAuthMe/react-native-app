@@ -4,18 +4,19 @@ import {
     Text,
     View,
     TouchableOpacity,
-    Alert,
+    Linking,
+    Platform
 } from 'react-native';
 import Constants from 'expo-constants';
-import {DropdownSingleton} from "../models/DropdownSingleton";
 
 export default class LaunchFooter extends React.Component {
     render() {
+        const { manifest } = Constants;
         return (
             <View style={styles.footer}>
-                <Text style={styles.alreadyMember}>Are you already a JustAuth.Me member?</Text>
-                <TouchableOpacity onPress={this.props.onPress}>
-                    <Text style={styles.recover}>Recover your account</Text>
+                <Text style={styles.alreadyMember}>Having trouble using the app?</Text>
+                <TouchableOpacity onPress={() => Linking.openURL('mailto:support@justauth.me?subject=[Support] ' + Platform.OS + ' ' + manifest.version)}>
+                    <Text style={styles.recover}>Contact support</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -36,6 +37,6 @@ const styles = StyleSheet.create({
     recover: {
         color: '#A7CADD',
         textAlign: 'center',
-        marginTop: 15
+        marginTop: 5
     }
 });

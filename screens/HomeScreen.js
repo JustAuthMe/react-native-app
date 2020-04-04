@@ -29,6 +29,7 @@ import {DateModel} from "../models/DateModel";
 import {EncryptionModel} from "../models/EncryptionModel";
 import {DropdownSingleton} from "../models/DropdownSingleton";
 import * as Permissions from "expo-permissions";
+import {UserModel} from "../models/UserModel";
 
 export default class HomeScreen extends React.Component {
     static navigationOptions = {
@@ -149,6 +150,8 @@ export default class HomeScreen extends React.Component {
                     const newServices = {...this.state.services};
                     delete newServices[service.app_id];
                     this.setState({services: newServices});
+                } else if (response.status === 423) {
+                    UserModel.logout(this.props.navigation);
                 } else {
                     DropdownSingleton.get().alertWithType('error', 'Cannot delete service', 'Please contact support for further assistance.');
                 }
@@ -272,7 +275,7 @@ export default class HomeScreen extends React.Component {
                     }}>
                         <Text style={{
                             fontSize: 18,
-                            fontWeight: 600,
+                            fontWeight: '600',
                             paddingBottom: 5
                         }}>{this.state.alert.type === 'warning' ? 'Alert' : 'Information'}</Text>
                         <Text style={{

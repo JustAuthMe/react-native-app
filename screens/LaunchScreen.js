@@ -139,12 +139,12 @@ export default class LaunchScreen extends React.Component {
                     this.networkLoader.setState({visible: false});
 
                     if (response.status === 200) {
-                        DropdownSingleton.get().alertWithType(
+                        this.props.navigation.push('LaunchScreen', {step: 'login'});
+                        /*DropdownSingleton.get().alertWithType(
                             'info',
                             'Check your inbox!',
                             'We sent a Passcode to ' + this.state.user.email + '. Enter the received passcode below to recover your account.'
-                        );
-                        this.props.navigation.push('LaunchScreen', {step: 'login'});
+                        );*/
                     } else if (response.status === 400) {
                         DropdownSingleton.get().alertWithType('error', 'Invalid E-Mail', 'Please enter a valid E-Mail address.');
                     } else if (response.status === 404) {
@@ -459,6 +459,7 @@ export default class LaunchScreen extends React.Component {
                                     onChangeText={(text) => this.onInputChange('email', text)}
                                 />
                                 <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('email')} />
+                                <LaunchFooter />
                             </View>
                         )}
                     </KeyboardShift>
@@ -505,6 +506,7 @@ export default class LaunchScreen extends React.Component {
                                         useWebKit={true}
                                     />
                                 </View>
+                                <LaunchFooter />
                             </View>
                         )}
                     </KeyboardShift>
@@ -530,6 +532,7 @@ export default class LaunchScreen extends React.Component {
                                     onChangeText={(text) => this.onInputChange('firstname', text)}
                                 />
                                 <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('firstname', 'lastname')} />
+                                <LaunchFooter />
                             </ScrollView>
                         )}
                     </KeyboardShift>
@@ -555,6 +558,7 @@ export default class LaunchScreen extends React.Component {
                                     onChangeText={(text) => this.onInputChange('lastname', text)}
                                 />
                                 <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('lastname', 'birthdate')} />
+                                <LaunchFooter />
                             </View>
                         )}
                     </KeyboardShift>
@@ -588,6 +592,7 @@ export default class LaunchScreen extends React.Component {
                             />
                         </TouchableOpacity>
                         <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('birthdate', 'avatar')} />
+                        <LaunchFooter />
                     </View>
                 );
 
@@ -618,6 +623,7 @@ export default class LaunchScreen extends React.Component {
                         ])}>
                             <Text style={styles.avatarIgnore}>Ignore this step</Text>
                         </TouchableOpacity>
+                        <LaunchFooter />
                     </View>
                 );
 
@@ -653,7 +659,7 @@ export default class LaunchScreen extends React.Component {
                         <TouchableOpacity style={styles.startBtn} onPress={() => this.props.navigation.push('LaunchScreen', {step: 'explanation'})}>
                             <Ionicons name="ios-arrow-forward" size={56} color="white" style={styles.arrowIcon}/>
                         </TouchableOpacity>
-                        <LaunchFooter onPress={() => this.props.navigation.push('LaunchScreen', {step: 'email'})}/>
+                        <LaunchFooter />
                     </View>
                 );
         }

@@ -114,7 +114,7 @@ export default class ServiceScreen extends React.Component {
                             paddingRight: 15
                         }}>
                             <Text style={{
-                                fontWeight: 700
+                                fontWeight: '700'
                             }}>{Config.dataList[item.key]}</Text>
                             <View style={{
                                 flexDirection: 'row'
