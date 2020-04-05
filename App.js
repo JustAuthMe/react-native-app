@@ -11,6 +11,7 @@ import DropdownAlert from "react-native-dropdownalert";
 import {DropdownSingleton} from "./models/DropdownSingleton";
 import UniversalDatePicker from "./components/UniversalDatePicker";
 import {DatePickerSingleton} from "./models/DatePickerSingleton";
+import Translator from "./i18n/Translator";
 
 export default class App extends React.Component {
     state = {
@@ -40,6 +41,7 @@ export default class App extends React.Component {
     }
 
     _loadResourcesAsync = async () => {
+        Translator.init(); //TODO: move init somewhere more appropriate
         const sounds = AudioModel.load(AudioLibrary);
         return Promise.all([
             Font.loadAsync({

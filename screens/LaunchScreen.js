@@ -31,6 +31,7 @@ import {DatePickerSingleton} from "../models/DatePickerSingleton";
 import Swiper from 'react-native-swiper';
 import ExplanationTitle from "../components/ExplanationTitle";
 import NetworkLoader from "../components/NetworkLoader";
+import Translator from "../i18n/Translator";
 
 export default class LaunchScreen extends React.Component {
 
@@ -655,7 +656,7 @@ export default class LaunchScreen extends React.Component {
                     <View style={styles.container}>
                         <LightStatusBar/>
                         <Image style={styles.logo} source={this.logo}/>
-                        <Text style={styles.baseline}>Join the revolution</Text>
+                        <Text style={styles.baseline}>{Translator.t('join_revolution')}</Text>
                         <TouchableOpacity style={styles.startBtn} onPress={() => this.props.navigation.push('LaunchScreen', {step: 'explanation'})}>
                             <Ionicons name="ios-arrow-forward" size={56} color="white" style={styles.arrowIcon}/>
                         </TouchableOpacity>
