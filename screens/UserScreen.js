@@ -230,7 +230,7 @@ export default class UserScreen extends React.Component {
                                     onFocus={() => DropdownSingleton.get().alertWithType(
                                         'info',
                                         'Information',
-                                        'If you change your E-Mail address, you\'ll need to confirm your new address before continuing to use JustAuth.Me'
+                                        'If you change your E-Mail address, you\'ll need to confirm your new address before continuing to use JustAuthMe'
                                     )}
                                 />
                                 <Text style={styles.textLabel}>Firstname:</Text>

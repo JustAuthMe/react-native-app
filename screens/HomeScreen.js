@@ -168,7 +168,7 @@ export default class HomeScreen extends React.Component {
                 padding: 20
             }}>
                 You haven't logged to any of our partners website or app yet. Just click the
-                "Authenticate" button above to begin your JustAuth.Me experience.
+                "Authenticate" button above to begin your JustAuthMe experience.
             </Text>;
         } else {
             servicesList = <SwipeListView

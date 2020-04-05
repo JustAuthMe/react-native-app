@@ -257,7 +257,7 @@ export default class LaunchScreen extends React.Component {
             if (response.status === 400) {
                 DropdownSingleton.get().alertWithType('error', 'A HTTP 400 error occured', 'Please contact support at support@justauth.me mentionning the error code 400 at registration');
             } else if (response.status === 409) {
-                DropdownSingleton.get().alertWithType('error', 'Already member', 'You already have a JustAuth.Me account, please log in');
+                DropdownSingleton.get().alertWithType('error', 'Already member', 'You already have a JustAuthMe account, please log in');
                 step = 'login';
             } else if (response.status === 429) {
                 DropdownSingleton.get().alertWithType('error', 'Anti-spam', 'Please try again in 30 seconds, this is an anti-spam measure');
@@ -388,7 +388,7 @@ export default class LaunchScreen extends React.Component {
                                 <View style={styles.swipablePage}>
                                     <Image source={require('../assets/images/undraw/celebrating.png')} style={styles.pageImage}/>
                                     <Text style={styles.pageText}>
-                                        Welcome to JustAuth.Me! This app is meant to help you login to any website or
+                                        Welcome to JustAuthMe! This app is meant to help you login to any website or
                                         app with the "Sign in with JAM" button, without a single password.
                                     </Text>
                                 </View>
@@ -419,7 +419,7 @@ export default class LaunchScreen extends React.Component {
                                     <Text style={styles.pageText}>
                                         We assume that your phone is the best way to authenticate yourself. Never
                                         remember a single password or fill a boring register form again.{"\n"}This is
-                                        JustAuth.Me.
+                                        JustAuthMe.
                                     </Text>
                                 </View>
                             </Swiper>
@@ -635,8 +635,8 @@ export default class LaunchScreen extends React.Component {
                         <Text style={styles.baseline}>{this.state.congratsTitle /*Congratulations!*/}</Text>
                         <View style={{...styles.warningTextContainer, display: this.state.displayCongrats ? 'flex' : 'none'}}>
                             <Text style={styles.warningText}>
-                                You successfully registered into JustAuth.Me! You can now login on any website or app which
-                                provide the "Login with JustAuth.Me" button.
+                                You successfully registered into JustAuthMe! You can now login on any website or app which
+                                provide the "Login with JustAuthMe" button.
                             </Text>
                         </View>
                         <ContinueButton text={'Got it!'} ref={ref => this.continueBtn = ref} disabled={true} onPress={this.finish} marginTop={30} />

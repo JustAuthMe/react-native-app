@@ -2,7 +2,8 @@ import React from 'react';
 import {
     View,
     StyleSheet,
-    ActivityIndicator
+    ActivityIndicator,
+    Platform
 } from 'react-native';
 
 export default class NetworkLoader extends React.Component {
