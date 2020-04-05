@@ -11,16 +11,33 @@ export default class NetworkLoader extends React.Component {
     };
 
     render() {
-        return (
+        let render =
             <View style={{
                 ...styles.overlay,
                 display: this.state.visible ? 'flex' : 'none'
             }}>
-                  <View style={styles.container}>
-                      <ActivityIndicator size={'large'} color={'#555'} />
-                  </View>
+                <View style={styles.container}>
+                    <ActivityIndicator size={'large'} color={'#555'} />
+                </View>
             </View>
-        );
+        ;
+        if (Platform.OS === 'android') {
+            render =
+                <View style={{
+                    width: '100%',
+                    height: '100%',
+                    display: this.state.visible ? 'flex' : 'none'
+                }}>
+                    <View style={styles.overlay}>
+                        <View style={styles.container}>
+                            <ActivityIndicator size={'large'} color={'#555'} />
+                        </View>
+                    </View>
+                </View>
+            ;
+        }
+
+        return render;
     }
 }
 
