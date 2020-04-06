@@ -116,7 +116,7 @@ export default class ServiceScreen extends React.Component {
                             <Text style={{
                                 fontWeight: '700'
                             }}>{Config.dataList[item.key]}</Text>
-                            <View style={{
+                            {item.key !== 'avatar' && <View style={{
                                 flexDirection: 'row'
                             }}>
                                 <Icon.Ionicons
@@ -133,7 +133,7 @@ export default class ServiceScreen extends React.Component {
                                     fontSize: 18,
                                     color: '#666'
                                 }}>{item.value}</Text>
-                            </View>
+                            </View>}
                         </View>
                     }
                 />

@@ -52,7 +52,7 @@ export default class SettingsScreen extends React.Component {
                 DropdownSingleton.get().alertWithType(
                     'error',
                     'Unknow E-Mail',
-                    'Your E-Mail address is nowhere near our databases. Are you sure that your E-Mail address isn\'t already validated? If it isn\'t, please contact support@justauth.me'
+                    'Are you sure that your E-Mail address isn\'t already validated? If it isn\'t, please contact support@justauth.me'
                 );
             } else if (response.status === 429) {
                 DropdownSingleton.get().alertWithType(

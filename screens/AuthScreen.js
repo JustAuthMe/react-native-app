@@ -19,6 +19,7 @@ import {NavigationActions, StackActions} from "react-navigation";
 import {ServicesModel} from "../models/ServicesModel";
 import AndroidBiometricPrompt from "../components/AndroidBiometricPrompt";
 import {UserModel} from "../models/UserModel";
+import NetworkLoader from "../components/NetworkLoader";
 
 export default class AuthScreen extends React.Component {
     static navigationOptions = {
@@ -126,6 +127,7 @@ export default class AuthScreen extends React.Component {
             const sign = await enc.sign(plain);
 
             try {
+                this.networkLoader.setState({visible: true});
                 const response = await fetch(
                     endpointUrl,
                     {
@@ -142,6 +144,7 @@ export default class AuthScreen extends React.Component {
                 );
 
                 const responseJson = await response.json();
+                this.networkLoader.setState({visible: false});
 
                 if (responseJson.status === 'success') {
                     let dataToStore = {};
@@ -232,6 +235,7 @@ export default class AuthScreen extends React.Component {
         return (
             <View style={styles.container}>
                 <DarkStatusBar/>
+                <NetworkLoader ref={ref => this.networkLoader = ref} />
                 <AndroidBiometricPrompt ref={ref => this.androidPrompt = ref}/>
                 {content}
             </View>

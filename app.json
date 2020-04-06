@@ -9,7 +9,7 @@
       "ios",
       "android"
     ],
-    "version": "0.10.0",
+    "version": "0.10.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "splash": {
@@ -27,7 +27,7 @@
       "bundleIdentifier": "me.justauth.app.ios",
       "supportsTablet": true,
       "infoPlist": {
-        "NSFaceIDUsageDescription": "We use FaceID in order to authenticate the user before loging them into the selected website or service"
+        "NSFaceIDUsageDescription": "We use FaceID in order to authenticate the user before logging them into the selected website"
       }
     },
     "android": {
