@@ -3,6 +3,7 @@ import {
     Text,
     TouchableOpacity,
 } from 'react-native';
+import Translator from "../i18n/Translator";
 
 export default class ContinueButton extends React.Component {
 
@@ -19,7 +20,7 @@ export default class ContinueButton extends React.Component {
 
     state = {
         disabled: this.props.disabled,
-        text: this.props.text ? this.props.text : 'Continue'
+        text: this.props.text ? this.props.text : Translator.t('continue')
     };
 
     render() {

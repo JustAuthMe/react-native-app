@@ -9,7 +9,7 @@ export default class {
         i18n.locale = Localization.locale;
     }
 
-    static t(str){
-        return i18n.t(str);
+    static t(key, options = {}){
+        return i18n.t(key, options);
     }
 }

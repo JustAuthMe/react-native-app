@@ -43,10 +43,10 @@ export default class LaunchScreen extends React.Component {
         step: this.props.navigation.getParam('step') ? this.props.navigation.state.params.step : 'launch',
         currentBirthdate: new Date(),
         birthdateInputValue: '',
-        generationStatus: 'Generating...',
+        generationStatus: Translator.t('launch.generating')+'...',
         avatar: null,
-        explanationTitle: 'Welcome',
-        congratsTitle: 'Please wait...',
+        explanationTitle: Translator.t('welcome'),
+        congratsTitle: Translator.t('wait')+'...',
         displayCongrats: false,
     };
 
@@ -58,11 +58,11 @@ export default class LaunchScreen extends React.Component {
         this.passcode = '';
         this.logo = require('../assets/images/logo-new.png');
         this.explanationTitles = [
-            'Welcome',
-            'How it works?',
-            'Biometrics rocks',
-            'Privacy matters',
-            'Ready to go!'
+            Translator.t('welcome'),
+            Translator.t('how_it_works'),
+            Translator.t('biometrics_rocks'),
+            Translator.t('privacy_matters'),
+            Translator.t('ready_go')
         ];
 
         this.isLoggedIn().then(loggedIn => {
@@ -147,21 +147,24 @@ export default class LaunchScreen extends React.Component {
                             'We sent a Passcode to ' + this.state.user.email + '. Enter the received passcode below to recover your account.'
                         );*/
                     } else if (response.status === 400) {
-                        DropdownSingleton.get().alertWithType('error', 'Invalid E-Mail', 'Please enter a valid E-Mail address.');
+                        DropdownSingleton.get().alertWithType('error',  Translator.t('launch.error.invalid_email'),  Translator.t('launch.error.enter_valid_email'));
                     } else if (response.status === 404) {
                         this.props.navigation.push('LaunchScreen', {step: 'firstname'});
                     } else if (response.status === 429) {
                         const responseJson = await response.json();
                         if (responseJson.message.match(/code/)) {
-                            DropdownSingleton.get().alertWithType('error', 'Anti-Spam', 'Please wait at least 2 minutes before asking for another code.');
+                            DropdownSingleton.get().alertWithType('error', Translator.t('launch.error.anti_spam'),  Translator.t('launch.error.anti_spam_message.email_code'));
                         } else {
-                            DropdownSingleton.get().alertWithType('error', 'Anti-Spam', 'You have tried to many times. Please wait a few minutes.');
+                            DropdownSingleton.get().alertWithType('error', Translator.t('launch.error.anti_spam'),  Translator.t('launch.error.anti_spam.email'));
                         }
                     } else {
                         DropdownSingleton.get().alertWithType(
                             'error',
-                            'Unknow',
-                            'An unknow error occured. Please contact support mentionning that an HTTP ' + response.status + ' appeared during email check.');
+                            Translator.t('launch.error.unknown'),
+                            Translator.t('launch.error.unknown_message', {
+                                code: response.status,
+                                action: Translator.t('launch.action.email_check')
+                            }));
                     }
                 });
             } else {
@@ -199,7 +202,7 @@ export default class LaunchScreen extends React.Component {
         this.register().then(registered => {
             if (registered) {
                 this.setState({
-                    congratsTitle: 'Congratulations!',
+                    congratsTitle: Translator.t('congratulations'),
                     displayCongrats: true
                 });
                 this.continueBtn.setState({disabled: false});
@@ -256,12 +259,12 @@ export default class LaunchScreen extends React.Component {
 
             let step  = '';
             if (response.status === 400) {
-                DropdownSingleton.get().alertWithType('error', 'A HTTP 400 error occured', 'Please contact support at support@justauth.me mentionning the error code 400 at registration');
+                DropdownSingleton.get().alertWithType('error', Translator.t('launch.error.http', {code:400}), Translator.t('launch.error.http_message', {code:400}));
             } else if (response.status === 409) {
-                DropdownSingleton.get().alertWithType('error', 'Already member', 'You already have a JustAuthMe account, please log in');
+                DropdownSingleton.get().alertWithType('error', Translator.t('launch.error.already_member'), Translator.t('launch.error.account_already_existing'));
                 step = 'login';
             } else if (response.status === 429) {
-                DropdownSingleton.get().alertWithType('error', 'Anti-spam', 'Please try again in 30 seconds, this is an anti-spam measure');
+                DropdownSingleton.get().alertWithType('error', Translator.t('launch.error.anti_spam'), Translator.t('launch.error.anti_spam_message'));
             }
 
             const resetAction = StackActions.reset({
@@ -321,14 +324,18 @@ export default class LaunchScreen extends React.Component {
                 }
             });
         } else if (response.status === 403) {
-            DropdownSingleton.get().alertWithType('error', 'Wrong passcode', 'Please try again.');
+            DropdownSingleton.get().alertWithType('error', Translator.t('launch.error.wrong_passcode'), Translator.t('try_again'));
         } else if (response.status === 429) {
-            DropdownSingleton.get().alertWithType('error', 'Anti-Spam', 'You have tried to many times. Please wait a few minutes.');
+            DropdownSingleton.get().alertWithType('error', Translator.t('launch.error.anti_spam'), Translator.t('launch.error.anti_spam_message.login'));
         } else {
             DropdownSingleton.get().alertWithType(
                 'error',
-                'Unknow',
-                'An unknow error occured. Please contact support mentionning that an HTTP ' + response.status + ' appeared during applogin challenge.');
+                Translator.t('launch.error.unknown'),
+                Translator.t('launch.error.unknown_message', {
+                    code: response.status,
+                    action: Translator.t('launch.action.applogin_challenge')
+                })
+            );
         }
     };
 
@@ -346,7 +353,7 @@ export default class LaunchScreen extends React.Component {
         if (Constants.platform.ios) {
             const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
             if (status !== 'granted') {
-                DropdownSingleton.get().alertWithType('error', 'Permission required', 'Sorry, you need to grant Camera roll permission to chose your avatar!');
+                DropdownSingleton.get().alertWithType('error', Translator.t('permission_required'), Translator.t('permission.camera_roll'));
                 return;
             }
         }
@@ -389,50 +396,43 @@ export default class LaunchScreen extends React.Component {
                                 <View style={styles.swipablePage}>
                                     <Image source={require('../assets/images/undraw/celebrating.png')} style={styles.pageImage}/>
                                     <Text style={styles.pageText}>
-                                        Welcome to JustAuthMe! This app is meant to help you login to any website or
-                                        app with the "Sign in with JAM" button, without a single password.
+                                        {Translator.t('launch.explanation1')}
                                     </Text>
                                 </View>
                                 <View style={styles.swipablePage}>
                                     <Image source={require('../assets/images/undraw/accept_terms.png')} style={styles.pageImage}/>
                                     <Text style={styles.pageText}>
-                                        To login to apps or websites, just to click the "Sign in with JAM" button and
-                                        accept the login from the App, where you can check which informations you want
-                                        to share.
+                                        {Translator.t('launch.explanation2')}
                                     </Text>
                                 </View>
                                 <View style={styles.swipablePage}>
                                     <Image source={require('../assets/images/undraw/confirmed.png')} style={styles.pageImage}/>
                                     <Text style={styles.pageText}>
-                                        From there, you will be prompt to check your biometrical print (if your device
-                                        is equiped) and the informations needed to log you will be automatically sent.
+                                        {Translator.t('launch.explanation3')}
                                     </Text>
                                 </View>
                                 <View style={styles.swipablePage}>
                                     <Image source={require('../assets/images/undraw/privacy.png')} style={styles.pageImage}/>
                                     <Text style={styles.pageText}>
-                                        Your personal informations are stored only on your device and will never be
-                                        stored on our servers. If we can't access them, we can't sell them to anyone.
+                                        {Translator.t('launch.explanation4')}
                                     </Text>
                                 </View>
                                 <View style={styles.swipablePage}>
                                     <Image source={require('../assets/images/undraw/done.png')} style={styles.pageImage}/>
                                     <Text style={styles.pageText}>
-                                        We assume that your phone is the best way to authenticate yourself. Never
-                                        remember a single password or fill a boring register form again.{"\n"}This is
-                                        JustAuthMe.
+                                        {Translator.t('launch.explanation5')}
                                     </Text>
                                 </View>
                             </Swiper>
                         </View>
                         <ContinueButton
-                            text={'Let\'s go!'}
+                            text={Translator.t('lets_go')}
                             ref={ref => this.continueBtn = ref}
                             onPress={() => this.props.navigation.push('LaunchScreen', {step: 'email'})}
                             marginTop={30}
                         />
                         <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
-                            <Text style={styles.swipeBack}>Not now</Text>
+                            <Text style={styles.swipeBack}>{Translator.t('not_now')}</Text>
                         </TouchableOpacity>
                     </View>
                 );
@@ -445,7 +445,7 @@ export default class LaunchScreen extends React.Component {
                                 <LightStatusBar/>
                                 <NetworkLoader ref={ref => this.networkLoader = ref} />
                                 <Image style={styles.logo} source={this.logo}/>
-                                <Text style={styles.baseline}>Let's begin with your E-Mail</Text>
+                                <Text style={styles.baseline}>{Translator.t('launch.email')}</Text>
                                 <TextInput
                                     style={styles.textInput}
                                     placeholder={"e.g. aiden@pearce.me"}
@@ -474,7 +474,7 @@ export default class LaunchScreen extends React.Component {
                                 <LightStatusBar/>
                                 <NetworkLoader ref={ref => this.networkLoader = ref} />
                                 <Image style={styles.logo} source={this.logo}/>
-                                <Text style={styles.baseline}>Enter the passcode you just received by E-Mail</Text>
+                                <Text style={styles.baseline}>{Translator.t('launch.enter_code')}</Text>
                                 <TextInput
                                     style={{
                                         ...styles.textInput,
@@ -520,7 +520,7 @@ export default class LaunchScreen extends React.Component {
                             <ScrollView style={styles.scrollView} contentContainerStyle={styles.container}>
                                 <LightStatusBar/>
                                 <Image style={styles.logo} source={this.logo}/>
-                                <Text style={styles.baseline}>What's your firstname?</Text>
+                                <Text style={styles.baseline}>{Translator.t('launch.firstname')}</Text>
                                 <TextInput
                                     style={styles.textInput}
                                     placeholder={"e.g. Aiden"}
@@ -546,7 +546,7 @@ export default class LaunchScreen extends React.Component {
                             <View style={styles.container}>
                                 <LightStatusBar/>
                                 <Image style={styles.logo} source={this.logo}/>
-                                <Text style={styles.baseline}>And your lastname?</Text>
+                                <Text style={styles.baseline}>{Translator.t('launch.lastname')}</Text>
                                 <TextInput
                                     style={styles.textInput}
                                     placeholder={"e.g. Pearce"}
@@ -570,7 +570,7 @@ export default class LaunchScreen extends React.Component {
                     <View style={styles.container}>
                         <LightStatusBar/>
                         <Image style={styles.logo} source={this.logo}/>
-                        <Text style={styles.baseline}>What about your birthdate?</Text>
+                        <Text style={styles.baseline}>{Translator.t('launch.birthdate')}</Text>
                         <TouchableOpacity activeOpacity={.5} style={styles.inputTouchable} onPress={() => {
                             DatePickerSingleton.get().open({
                                 date: this.state.currentBirthdate,
@@ -602,7 +602,7 @@ export default class LaunchScreen extends React.Component {
                     <View style={styles.container}>
                         <LightStatusBar/>
                         <Image style={styles.logo} source={this.logo}/>
-                        <Text style={styles.baseline}>Finally, chose an avatar</Text>
+                        <Text style={styles.baseline}>{Translator.t('launch.avatar')}</Text>
                         <TouchableOpacity onPress={() => this._pickImage()} style={styles.avatarContainer}>
                             <Image source={{uri: this.state.avatar !== null ? this.state.avatar : '../assets/images/user.png'}} style={{
                                 ...styles.avatar,
@@ -618,11 +618,11 @@ export default class LaunchScreen extends React.Component {
                             />
                         </TouchableOpacity>
                         <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('avatar', 'done')} marginTop={20} />
-                        <TouchableOpacity onPress={() => Alert.alert('Are you sure? You still could update your avatar later.', '', [
-                            {text: 'Cancel', onPress: () => {}, style:'cancel'},
-                            {text: 'OK', onPress: () => this.storeValue('avatar', 'done')}
+                        <TouchableOpacity onPress={() => Alert.alert(Translator.t('launch.avatar_confirm'), '', [
+                            {text: Translator.t('cancel'), onPress: () => {}, style:'cancel'},
+                            {text: Translator.t('ok'), onPress: () => this.storeValue('avatar', 'done')}
                         ])}>
-                            <Text style={styles.avatarIgnore}>Ignore this step</Text>
+                            <Text style={styles.avatarIgnore}>{Translator.t('ignore_step')}</Text>
                         </TouchableOpacity>
                         <LaunchFooter />
                     </View>
@@ -636,8 +636,7 @@ export default class LaunchScreen extends React.Component {
                         <Text style={styles.baseline}>{this.state.congratsTitle /*Congratulations!*/}</Text>
                         <View style={{...styles.warningTextContainer, display: this.state.displayCongrats ? 'flex' : 'none'}}>
                             <Text style={styles.warningText}>
-                                You successfully registered into JustAuthMe! You can now login on any website or app which
-                                provide the "Login with JustAuthMe" button.
+                                {Translator.t('launch.success')}
                             </Text>
                         </View>
                         <ContinueButton text={'Got it!'} ref={ref => this.continueBtn = ref} disabled={true} onPress={this.finish} marginTop={30} />
