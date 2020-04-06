@@ -27,7 +27,6 @@
       "buildNumber": "0.10.1",
       "bundleIdentifier": "me.justauth.app.ios",
       "supportsTablet": true,
-      "usesNonExemptEncryption": false,
       "infoPlist": {
         "NSFaceIDUsageDescription": "We use FaceID in order to authenticate the user before logging them into the selected website"
       }
