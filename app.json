@@ -9,7 +9,7 @@
       "ios",
       "android"
     ],
-    "version": "0.10.2",
+    "version": "0.10.3",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "splash": {
@@ -27,7 +27,9 @@
       "bundleIdentifier": "me.justauth.app.ios",
       "supportsTablet": true,
       "infoPlist": {
-        "NSFaceIDUsageDescription": "We use FaceID in order to authenticate the user before logging them into the selected website"
+        "NSPhotoLibraryUsageDescription": "We use Photo Library in order to update your profile picture",
+        "NSCameraUsageDescription": "We use the rear Camera to scan our QR Codes to log you into selected websites",
+        "NSFaceIDUsageDescription": "We use FaceID to authenticate you before logging you into selected websites"
       }
     },
     "android": {

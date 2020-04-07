@@ -51,8 +51,6 @@ export default class HomeScreen extends React.Component {
     }
 
     async _bootstrapAsync() {
-        await Permissions.askAsync(Permissions.CAMERA);
-
         this.user = {
             firstname: await AsyncStorage.getItem('firstname'),
             lastname: await AsyncStorage.getItem('lastname'),
@@ -76,14 +74,6 @@ export default class HomeScreen extends React.Component {
     };
 
     componentDidMount() {
-        /**
-         * USED TO RESET SERVICES LIST AT LAUNCH, DO NOT UNCOMMENT
-         */
-        //AsyncStorage.setItem(Config.servicesKey, JSON.stringify({}), () => {});
-        /**
-         * USED TO RESET SERVICES LIST AT LAUNCH, DO NOT UNCOMMENT
-         */
-
         Linking.addEventListener('url', this._handleDeepLinkEvent);
         Linking.getInitialURL().then(url => {
             this._handleDeepLinkEvent({url: url});
@@ -313,7 +303,14 @@ export default class HomeScreen extends React.Component {
                         <Image source={{uri: this.state.user.avatar}} style={styles.userAvatar} />
                         <Text style={styles.userIdentity}>{this.state.user.firstname + ' ' + this.state.user.lastname}</Text>
                         <ActionBtn
-                            onPress={() => this.props.navigation.navigate('Scanner')}
+                            onPress={async () => {
+                                const permissionResponse = await Permissions.askAsync(Permissions.CAMERA);
+                                if (permissionResponse.status !== 'granted') {
+                                    DropdownSingleton.get().alertWithType('error', 'Permission required', 'You need camera permission to be able to scan QR Codes.');
+                                } else {
+                                    this.props.navigation.navigate('Scanner');
+                                }
+                            }}
                             btnIcon={'ios-qr-scanner'}
                             btnText={'Authenticate'}
                         />
