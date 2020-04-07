@@ -9,7 +9,7 @@
       "ios",
       "android"
     ],
-    "version": "0.10.1",
+    "version": "0.10.2",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "splash": {
@@ -24,7 +24,6 @@
       "**/*"
     ],
     "ios": {
-      "buildNumber": "0.10.1",
       "bundleIdentifier": "me.justauth.app.ios",
       "supportsTablet": true,
       "infoPlist": {

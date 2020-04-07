@@ -82,6 +82,13 @@ export default class LaunchScreen extends React.Component {
     };
 
     hasInfos = async () => {
+        const email = await AsyncStorage.getItem('email');
+        if (email === Config.appleEmail) {
+            await AsyncStorage.setItem('firstname', 'John');
+            await AsyncStorage.setItem('lastname', 'Appleseed');
+            await AsyncStorage.setItem('birthdate', '01/01/1970');
+        }
+
         const firstname = await AsyncStorage.getItem('firstname');
         const lastname = await AsyncStorage.getItem('lastname');
         const birthdate = await AsyncStorage.getItem('birthdate');
