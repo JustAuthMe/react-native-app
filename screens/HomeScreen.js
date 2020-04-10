@@ -30,6 +30,7 @@ import {EncryptionModel} from "../models/EncryptionModel";
 import {DropdownSingleton} from "../models/DropdownSingleton";
 import * as Permissions from "expo-permissions";
 import {UserModel} from "../models/UserModel";
+import NetworkLoader from "../components/NetworkLoader";
 
 export default class HomeScreen extends React.Component {
     static navigationOptions = {
@@ -50,8 +51,6 @@ export default class HomeScreen extends React.Component {
     }
 
     async _bootstrapAsync() {
-        await Permissions.askAsync(Permissions.CAMERA);
-
         this.user = {
             firstname: await AsyncStorage.getItem('firstname'),
             lastname: await AsyncStorage.getItem('lastname'),
@@ -75,14 +74,6 @@ export default class HomeScreen extends React.Component {
     };
 
     componentDidMount() {
-        /**
-         * USED TO RESET SERVICES LIST AT LAUNCH, DO NOT UNCOMMENT
-         */
-        //AsyncStorage.setItem(Config.servicesKey, JSON.stringify({}), () => {});
-        /**
-         * USED TO RESET SERVICES LIST AT LAUNCH, DO NOT UNCOMMENT
-         */
-
         Linking.addEventListener('url', this._handleDeepLinkEvent);
         Linking.getInitialURL().then(url => {
             this._handleDeepLinkEvent({url: url});
@@ -129,6 +120,8 @@ export default class HomeScreen extends React.Component {
                     jam_id: await SecureStore.getItemAsync(Config.storageKeys.jamID),
                     timestamp: dateModel.getUnixTimestamp()
                 };
+
+                this.networkLoader.setState({visible: true});
                 const sign = await enc.sign(enc.urlencode(enc.json_encode(dataToSend)));
                 const response = await fetch(
                     Config.apiUrl + 'user_login',
@@ -144,6 +137,7 @@ export default class HomeScreen extends React.Component {
                         })
                     }
                 );
+                this.networkLoader.setState({visible: false});
 
                 if (response.status === 200 || response.status === 404) {
                     await ServicesModel.removeService(service.app_id);
@@ -289,6 +283,7 @@ export default class HomeScreen extends React.Component {
         return (
             <View style={styles.container}>
                 <LightStatusBar/>
+                <NetworkLoader ref={ref => this.networkLoader = ref} />
                 <View style={styles.container}>
                     <View style={styles.userHeader}>
                         <TouchableOpacity style={styles.switchIcon} onPress={() => this.props.navigation.navigate('Settings')}>
@@ -308,7 +303,14 @@ export default class HomeScreen extends React.Component {
                         <Image source={{uri: this.state.user.avatar}} style={styles.userAvatar} />
                         <Text style={styles.userIdentity}>{this.state.user.firstname + ' ' + this.state.user.lastname}</Text>
                         <ActionBtn
-                            onPress={() => this.props.navigation.navigate('Scanner')}
+                            onPress={async () => {
+                                const permissionResponse = await Permissions.askAsync(Permissions.CAMERA);
+                                if (permissionResponse.status !== 'granted') {
+                                    DropdownSingleton.get().alertWithType('error', 'Permission required', 'You need camera permission to be able to scan QR Codes.');
+                                } else {
+                                    this.props.navigation.navigate('Scanner');
+                                }
+                            }}
                             btnIcon={'ios-qr-scanner'}
                             btnText={'Authenticate'}
                         />
