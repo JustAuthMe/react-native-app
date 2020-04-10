@@ -214,7 +214,7 @@ export default class AuthScreen extends React.Component {
             }
 
             content =
-                <ScrollView style={styles.container}>
+                <ScrollView style={styles.scrollViewContainer}>
                     <View style={styles.authHeader}>
                         <Image source={{uri: this.state.auth.client_app.logo}} style={styles.appIcon} />
                         <Text style={styles.logInto}>You're about to log into</Text>
@@ -247,7 +247,9 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
-        marginBottom: 30
+    },
+    scrollViewContainer: {
+        flex: 1,
     },
     loadingText: {
         textAlign: 'center'
@@ -255,6 +257,7 @@ const styles = StyleSheet.create({
     data: {
         paddingLeft: 70,
         paddingRight: 70,
+        paddingBottom: 30,
         marginTop: 20,
         alignItems: 'center'
     },
