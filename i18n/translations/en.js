@@ -1,4 +1,3 @@
-import {Text} from "react-native";
 import React from "react";
 
 export default {
@@ -17,11 +16,16 @@ export default {
     ignore_step: 'Ignore this step',
     permission_required: 'Permission required',
     permission: {
-        camera_roll: 'Sorry, you need to grant Camera roll permission to chose your avatar!'
+        camera_roll: 'Sorry, you need to grant Camera roll permission to chose your avatar!',
+        camera: 'You need camera permission to be able to scan QR Codes.'
     },
     try_again: 'Please try again',
     wait: 'Please wait',
     congratulations: 'Congratulations!',
+    alert:{
+        information:'Information',
+        alert:'Alert'
+    },
     launch:{
         explanation1: 'Welcome to JustAuthMe! This app is meant to help you login to any website or app with the "Sign in with JAM" button, without a single password.',
         explanation2: 'To login to apps or websites, just to click the "Sign in with JAM" button and accept the login from the App, where you can check which informations you want to share.',
@@ -69,6 +73,15 @@ export default {
             already_member: 'Already member',
             account_already_existing: 'You already have a JustAuthMe account, please log in',
         }
+    },
+    home:{
+        delete_service_confirm:'Delete the %{name} service?',
+        delete_service_confirm_message:'This will NOT remove your %{domain} account, it will only remove the service from your login history.',
+        error_delete: 'Cannot delete service',
+        error_delete_message: 'Please contact support for further assistance.',
+        no_services_yet: 'You haven\'t logged to any of our partners website or app yet. Just click the "Authenticate" button above to begin your JustAuthMe experience.',
+        authenticate: 'Authenticate',
+        services: 'Services'
     },
     continue: 'Continue'
 

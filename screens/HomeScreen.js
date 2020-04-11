@@ -31,6 +31,7 @@ import {DropdownSingleton} from "../models/DropdownSingleton";
 import * as Permissions from "expo-permissions";
 import {UserModel} from "../models/UserModel";
 import NetworkLoader from "../components/NetworkLoader";
+import Translator from "../i18n/Translator";
 
 export default class HomeScreen extends React.Component {
     static navigationOptions = {
@@ -107,11 +108,11 @@ export default class HomeScreen extends React.Component {
     };
 
     deletePopupAlert = service => {
-        Alert.alert('Delete the ' + service.name + ' service?', 'This will NOT remove your ' + service.domain + ' account, it will only remove the service from your login history.', [
-            {text: 'Cancel', onPress: () => {
+        Alert.alert(Translator.t('home.delete_service_confirm', {name:service.name}), Translator.t('home.delete_service_confirm_message', {domain:service.domain}), [
+            {text: Translator.t('cancel'), onPress: () => {
                     this.isSwipeToDeleteEnabled = true;
                 }, style:'cancel'},
-            {text: 'OK', onPress: async () => {
+            {text: Translator.t('ok'), onPress: async () => {
                 this.isSwipeToDeleteEnabled = true;
                 const dateModel = new DateModel();
                 const enc = new EncryptionModel();
@@ -147,7 +148,7 @@ export default class HomeScreen extends React.Component {
                 } else if (response.status === 423) {
                     UserModel.logout(this.props.navigation);
                 } else {
-                    DropdownSingleton.get().alertWithType('error', 'Cannot delete service', 'Please contact support for further assistance.');
+                    DropdownSingleton.get().alertWithType('error', Translator.t('home.error_delete'), Translator.t('home.error_delete_message'));
                 }
             }}
         ]);
@@ -161,8 +162,7 @@ export default class HomeScreen extends React.Component {
                 marginTop: 30,
                 padding: 20
             }}>
-                You haven't logged to any of our partners website or app yet. Just click the
-                "Authenticate" button above to begin your JustAuthMe experience.
+                {Translator.t('home.no_service_yet')}
             </Text>;
         } else {
             servicesList = <SwipeListView
@@ -271,7 +271,7 @@ export default class HomeScreen extends React.Component {
                             fontSize: 18,
                             fontWeight: '600',
                             paddingBottom: 5
-                        }}>{this.state.alert.type === 'warning' ? 'Alert' : 'Information'}</Text>
+                        }}>{this.state.alert.type === 'warning' ? Translator.t('alert.alert') : Translator.t('alert.information')}</Text>
                         <Text style={{
                             flexWrap: 'wrap'
                         }}>{this.state.alert.text}</Text>
@@ -306,17 +306,17 @@ export default class HomeScreen extends React.Component {
                             onPress={async () => {
                                 const permissionResponse = await Permissions.askAsync(Permissions.CAMERA);
                                 if (permissionResponse.status !== 'granted') {
-                                    DropdownSingleton.get().alertWithType('error', 'Permission required', 'You need camera permission to be able to scan QR Codes.');
+                                    DropdownSingleton.get().alertWithType('error', Translator.t('permission_required'), Translator.t('permission.camera'));
                                 } else {
                                     this.props.navigation.navigate('Scanner');
                                 }
                             }}
                             btnIcon={'ios-qr-scanner'}
-                            btnText={'Authenticate'}
+                            btnText={Translator.t('home.authenticate')}
                         />
                     </View>
                     {alert}
-                    <Text style={styles.servicesTitle}>Services</Text>
+                    <Text style={styles.servicesTitle}>{Translator.t('home.services')}</Text>
                     {servicesList}
                 </View>
             </View>
