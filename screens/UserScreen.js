@@ -5,7 +5,6 @@ import {
     StyleSheet,
     TextInput,
     AsyncStorage,
-    StatusBar,
     TouchableOpacity,
     Image,
     Text
@@ -26,6 +25,7 @@ import * as SecureStore from "expo-secure-store";
 import {NavigationActions, StackActions} from "react-navigation";
 import NetworkLoader from "../components/NetworkLoader";
 import {UserModel} from "../models/UserModel";
+import DarkStatusBar from "../components/DarkStatusBar";
 
 export default class UserScreen extends React.Component {
     static navigationOptions = {
@@ -66,7 +66,6 @@ export default class UserScreen extends React.Component {
             currentBirthdate: splitDate.length === 3 ? new Date(splitDate[1] + '/' + splitDate[0] + '/' + splitDate[2]) : new Date(),
             isLogin: this.props.navigation.getParam('login')
         });
-        StatusBar.setBarStyle('dark-content');
     };
 
     componentDidMount() {
@@ -181,20 +180,25 @@ export default class UserScreen extends React.Component {
             this.props.navigation.dispatch(resetAction);
         }
 
+        /*
+        We add a small delay so that the correct screen is showing when showing the alert,
+        This fixes a glitch with the statusbar being updated to the alert color and reverted to thw old screen status bar color
+         */
         if (hasEmailChanged) {
-            DropdownSingleton.get().alertWithType(
+            setTimeout(() => DropdownSingleton.get().alertWithType(
                 'info',
                 'Check your inbox!',
                 'We sent you a confirmation E-Mail to ' + this.state.user.email + '. Click on the link to confirm your new E-Mail address.'
-            );
+            ), 300);
         } else {
-            DropdownSingleton.get().alertWithType('success', 'My infos', 'Saved successfully');
+            setTimeout(() => DropdownSingleton.get().alertWithType('success', 'My infos', 'Saved successfully'), 300);
         }
     }
 
     render() {
         return (
             <View style={styles.container}>
+                <DarkStatusBar />
                 <NetworkLoader ref={ref => this.networkLoader = ref} />
                 <KeyboardShift>
                     {() => (

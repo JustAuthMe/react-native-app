@@ -26,11 +26,11 @@ import Config from "../constants/Config";
 import LightStatusBar from "../components/LightStatusBar";
 import { StackActions, NavigationActions } from 'react-navigation';
 import {DropdownSingleton} from "../models/DropdownSingleton";
-import KeyboardShift from "../components/KeyboardShift";
 import {DatePickerSingleton} from "../models/DatePickerSingleton";
 import Swiper from 'react-native-swiper';
 import ExplanationTitle from "../components/ExplanationTitle";
 import NetworkLoader from "../components/NetworkLoader";
+import KeyboardShift from "../components/KeyboardShift";
 
 export default class LaunchScreen extends React.Component {
 
@@ -464,6 +464,7 @@ export default class LaunchScreen extends React.Component {
                                     keyboardType={"email-address"}
                                     clearButtonMode={"always"}
                                     onChangeText={(text) => this.onInputChange('email', text)}
+
                                 />
                                 <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('email')} />
                                 <LaunchFooter />
@@ -486,7 +487,8 @@ export default class LaunchScreen extends React.Component {
                                         ...styles.textInput,
                                         fontSize: 36,
                                         textAlign: 'center',
-                                        letterSpacing: 50
+                                        letterSpacing: 3,
+                                        marginTop:20
                                     }}
                                     placeholder={"123456"}
                                     placeholderTextColor={"rgba(255,255,255,.5)"}
@@ -681,8 +683,9 @@ const styles = StyleSheet.create({
     container: {
         backgroundColor: '#3598DB',
         width: '100%',
-        height: '100%',
-        alignItems: 'center'
+        height: Dimensions.get('screen').height,
+        alignItems: 'center',
+        paddingTop: Constants.statusBarHeight
     },
     logo: {
         marginTop: isBorderless ? 100 : (isZoomed ? 50 : 80),

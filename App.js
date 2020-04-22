@@ -32,8 +32,8 @@ export default class App extends React.Component {
 
         return (
             <View style={styles.container}>
+                <DropdownAlert ref={ref => DropdownSingleton.set(ref)} updateStatusBar={true} translucent={true} zIndex={100}/>
                 <AppNavigator/>
-                <DropdownAlert ref={ref => DropdownSingleton.set(ref)} />
                 <UniversalDatePicker ref={ref => DatePickerSingleton.set(ref)} />
             </View>
         );

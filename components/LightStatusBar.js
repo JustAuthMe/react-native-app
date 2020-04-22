@@ -6,7 +6,7 @@ import {
 export default class LightStatusBar extends React.Component {
     render() {
         return (
-            <StatusBar barStyle="light-content" animated={true} />
+            <StatusBar barStyle="light-content"  animated={true} translucent backgroundColor={"#3498DB"} />
         );
     }
 }

@@ -1,6 +1,6 @@
 export default {
     urlScheme: 'jam://',
-    apiUrl: 'https://beta.justauth.me/api/',
+    apiUrl: 'https://core.justauth.me/api/',
     storageKeys: {
         publicKey: 'pubkey',
         privateKey: 'privkey',
