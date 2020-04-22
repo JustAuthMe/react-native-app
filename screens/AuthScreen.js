@@ -111,11 +111,29 @@ export default class AuthScreen extends React.Component {
                 this.androidPrompt.setState({visible: true});
             }
 
-            const localAuth = await LocalAuthentication.authenticateAsync({promptMessage: 'Confirm login attempt'});
+            let localAuth = await LocalAuthentication.authenticateAsync({promptMessage: 'Confirm login attempt'});
             canLogin = localAuth.success;
 
             if (Platform.OS === 'android') {
-                this.androidPrompt.setState({status: localAuth.success ? 'success' : 'error'});
+                let i = 0;
+                do {
+                    this.androidPrompt.setState({status: canLogin ? 'success' : 'error'});
+
+                    if (!canLogin) {
+                        localAuth = await LocalAuthentication.authenticateAsync({promptMessage: 'Confirm login attempt'});
+                        canLogin = localAuth.success;
+                        i++;
+                    }
+                } while (i < 5 && !canLogin && this.androidPrompt.state.visible);
+
+                if (!canLogin) {
+                    this.androidPrompt.setState({visible: false});
+                    DropdownSingleton.get().alertWithType(
+                        'error',
+                        'Biometric rejection',
+                        'Your system cannot recognize your fingerprint. Please lock your phone and enter your passcode to reactivate it.'
+                    );
+                }
             }
         }
 

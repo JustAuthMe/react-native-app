@@ -6,7 +6,7 @@ import {
 export default class DarkStatusBar extends React.Component {
     render() {
         return (
-            <StatusBar barStyle="dark-content" animated={true} />
+            <StatusBar barStyle="dark-content" animated={true} translucent backgroundColor={"#ffffff"} />
         );
     }
 }

@@ -9,6 +9,7 @@ import * as SecureStore from "expo-secure-store";
 import {UserModel} from "../models/UserModel";
 import {DropdownSingleton} from "../models/DropdownSingleton";
 import NetworkLoader from "../components/NetworkLoader";
+import DarkStatusBar from "../components/DarkStatusBar";
 
 export default class SettingsScreen extends React.Component {
     static navigationOptions = {
@@ -21,7 +22,6 @@ export default class SettingsScreen extends React.Component {
     }
 
     async _bootstrapAsync() {
-        StatusBar.setBarStyle('dark-content');
     }
 
     confirmEmail = async () => {
@@ -82,6 +82,7 @@ export default class SettingsScreen extends React.Component {
     render() {
         return (
             <View style={styles.container}>
+                <DarkStatusBar />
                 <NetworkLoader ref={ref => this.networkLoader = ref} />
                 <JamConfigView onLogout={() => this.logout()} onConfirmEmail={() => this.confirmEmail()} />
             </View>

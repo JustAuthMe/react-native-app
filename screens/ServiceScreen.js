@@ -10,6 +10,7 @@ import {
 import {DropdownSingleton} from "../models/DropdownSingleton";
 import Config from "../constants/Config";
 import * as Icon from '@expo/vector-icons';
+import DarkStatusBar from "../components/DarkStatusBar";
 
 export default class ServiceScreen extends React.Component {
     static navigationOptions = ({ navigation }) => {
@@ -35,7 +36,6 @@ export default class ServiceScreen extends React.Component {
     }
 
     async _bootstrapAsync() {
-        StatusBar.setBarStyle('dark-content');
     }
 
     componentDidMount() {
@@ -66,6 +66,7 @@ export default class ServiceScreen extends React.Component {
 
         return (
             <View style={styles.content}>
+                <DarkStatusBar />
                 <View style={{
                     width: '100%',
                     height: 190,
