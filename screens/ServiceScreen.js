@@ -89,18 +89,19 @@ export default class ServiceScreen extends React.Component {
                         paddingTop: 20
                     }}>{this.state.service.name}</Text>
                 </View>
-                <Text style={{
+
+                {this.state.service.created_at && <Text style={{
                     textAlign: 'center',
                     fontSize: 14,
                     paddingTop: 10,
                     paddingBottom: 5,
                     color: '#888'
-                }}>First login at: {dateModel.getFullDate(new Date(this.state.service.created_at))}</Text>
-                <Text style={{
+                }}>First login at: {dateModel.getFullDate(new Date(this.state.service.created_at))}</Text>}
+                {this.state.service.updated_at && <Text style={{
                     textAlign: 'center',
                     fontSize: 14,
                     color: '#888'
-                }}>Last login at: {dateModel.getFullDate(new Date(this.state.service.updated_at))}</Text>
+                }}>Last login at: {dateModel.getFullDate(new Date(this.state.service.updated_at))}</Text>}
                 <Text style={{
                     width: '100%',
                     textAlign: 'center',
