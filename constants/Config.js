@@ -1,6 +1,7 @@
 export default {
     urlScheme: 'jam://',
     apiUrl: 'https://core.justauth.me/api/',
+    alertUrl: 'https://alert.justauth.me/',
     storageKeys: {
         publicKey: 'pubkey',
         privateKey: 'privkey',
