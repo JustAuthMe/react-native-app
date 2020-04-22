@@ -8,7 +8,7 @@ import {
 
 export default class NetworkLoader extends React.Component {
     state = {
-        visible: false
+        visible: this.props.visible || false
     };
 
     render() {

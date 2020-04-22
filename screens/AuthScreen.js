@@ -20,6 +20,7 @@ import {ServicesModel} from "../models/ServicesModel";
 import AndroidBiometricPrompt from "../components/AndroidBiometricPrompt";
 import {UserModel} from "../models/UserModel";
 import NetworkLoader from "../components/NetworkLoader";
+import {DateModel} from "../models/DateModel";
 
 export default class AuthScreen extends React.Component {
     static navigationOptions = {
@@ -141,6 +142,7 @@ export default class AuthScreen extends React.Component {
             const endpointUrl = Config.apiUrl + 'login';
             const data = await this.getUserDataFromDataset();
             const enc = new EncryptionModel();
+            const dateModel = new DateModel();
             const plain = enc.urlencode(enc.json_encode(data));
             const sign = await enc.sign(plain);
 
@@ -173,17 +175,26 @@ export default class AuthScreen extends React.Component {
                         }
                     }
 
+                    const currentTime = (new Date()).getTime();
+                    let service = {};
+
                     if (this.state.isFirstLogin) {
-                        const service = {
+                        service = {
                             app_id: this.state.auth.client_app.app_id,
                             name: this.state.auth.client_app.name,
                             logo: this.state.auth.client_app.logo,
                             domain: this.state.auth.client_app.domain,
-                            data: dataToStore
+                            data: dataToStore,
+                            created_at: currentTime,
+                            updated_at: currentTime
                         };
 
-                        await ServicesModel.addService(this.state.auth.client_app.app_id, service);
+                    } else {
+                        service = this.services[this.state.auth.client_app.app_id];
+                        service.updated_at = currentTime;
                     }
+
+                    await ServicesModel.saveService(this.state.auth.client_app.app_id, service);
                     this.props.navigation.navigate('Success');
                 } else {
                     if (response.status === 401) {
@@ -217,7 +228,7 @@ export default class AuthScreen extends React.Component {
     render() {
         let content;
         if (this.state.auth === null) {
-            content = <Text style={styles.loadingText}>Loading authentication details...</Text>;
+            content = <NetworkLoader visible={true} />;
         } else {
             let data = [];
 

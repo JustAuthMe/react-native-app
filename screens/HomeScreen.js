@@ -103,6 +103,18 @@ export default class HomeScreen extends React.Component {
             });
         }
 
+        items.sort((a, b) => {
+            if (this.state.services[a.key].updated_at < this.state.services[b.key].updated_at) {
+                return 1;
+            }
+
+            if (this.state.services[a.key].updated_at > this.state.services[b.key].updated_at) {
+                return -1;
+            }
+
+            return 0;
+        });
+
         return items;
     };
 
@@ -153,6 +165,29 @@ export default class HomeScreen extends React.Component {
         ]);
     };
 
+    getRenderItem(key, isLast) {
+        return (
+            <TouchableHighlight
+                onPress={() => {
+                    this.props.navigation.navigate('Service', {
+                        service: this.state.services[key]
+                    });
+                }}
+            >
+                <View style={[styles.serviceContainer, isLast && {borderBottomWidth: 1}]}>
+                    <Image source={{uri: this.state.services[key].logo}} style={styles.serviceIcon}/>
+                    <Text style={styles.serviceName}>{this.state.services[key].name}</Text>
+                    <Icon.Ionicons
+                        name={'ios-arrow-forward'}
+                        size={28}
+                        color={'#ccc'}
+                        style={styles.serviceArrow}
+                    />
+                </View>
+            </TouchableHighlight>
+        )
+    }
+
     render() {
         let servicesList = <View></View>;
         if (this.state.services === null || Object.keys(this.state.services).length === 0) {
@@ -165,30 +200,12 @@ export default class HomeScreen extends React.Component {
                 "Authenticate" button above to begin your JustAuthMe experience.
             </Text>;
         } else {
+            const dataToList = this.parseServices();
             servicesList = <SwipeListView
                 style={styles.servicesList}
-                data={this.parseServices()}
+                data={dataToList}
                 renderItem={item => {
-                    return (
-                        <TouchableHighlight
-                            onPress={() => {
-                                this.props.navigation.navigate('Service', {
-                                    service: this.state.services[item.item.key]
-                                });
-                            }}
-                        >
-                            <View style={styles.serviceContainer}>
-                                <Image source={{uri: this.state.services[item.item.key].logo}} style={styles.serviceIcon}/>
-                                <Text style={styles.serviceName}>{this.state.services[item.item.key].name}</Text>
-                                <Icon.Ionicons
-                                    name={'ios-arrow-forward'}
-                                    size={28}
-                                    color={'#ccc'}
-                                    style={styles.serviceArrow}
-                                />
-                            </View>
-                        </TouchableHighlight>
-                    );
+                    return this.getRenderItem(item.item.key, item.index >= dataToList.length - 1);
                 }}
                 renderHiddenItem={item => {
                     return (
@@ -389,11 +406,13 @@ const styles = StyleSheet.create({
         height: 70,
         width: '100%',
         borderTopWidth: 1,
-        borderBottomWidth: 1,
         borderColor: '#eee',
         borderStyle: 'solid',
         paddingLeft: 15,
         paddingRight: 15
+    },
+    serviceContainerLast: {
+        borderBottomWidth: 1
     },
     serviceIcon: {
         width: 35,
