@@ -191,6 +191,9 @@ export default class AuthScreen extends React.Component {
 
                     } else {
                         service = this.services[this.state.auth.client_app.app_id];
+                        service.name = this.state.auth.client_app.name;
+                        service.logo = this.state.auth.client_app.logo;
+                        service.domain = this.state.auth.client_app.domain;
                         service.updated_at = currentTime;
                     }
 
