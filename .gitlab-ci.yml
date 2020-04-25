@@ -1,0 +1,133 @@
+image: node:alpine
+
+before_script:
+  - chmod u+x ./deploy.sh
+
+stages:
+  - export-bundle-staging
+  - deploy-bundle-staging
+  - export-bundle-prod
+  - deploy-bundle-prod
+  - build-apps
+  - deploy-apps
+
+export-bundle-staging:
+  tags:
+    - macos
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - ~/.npm
+      - node_modules/
+  stage: export-bundle-staging
+  script:
+    - npm ci
+    - npx expo export -p $STAGING_CDN_URL --output-dir dist/bundle-staging -q
+    - tar -czvf dist/bundle.staging.tar.gz -C ./dist/bundle-staging/ .
+  artifacts:
+    paths:
+      - dist/bundle.staging.tar.gz
+  only:
+    - tags
+
+deploy-bundle-staging:
+  tags:
+    - macos
+  stage: deploy-bundle-staging
+  variables:
+    HOST: "$STAGING_CDN_HOST"
+    ROOT_PATH: "/var/www/$STAGING_CDN_ROOT_PATH"
+    ENV_NAME: "staging"
+  script:
+    - chmod 600 $STAGING_CDN_PK
+    - echo Uploading bundle to cdn...
+    - PK_PATH="$STAGING_CDN_PK" ./deploy.sh
+    - rm $STAGING_CDN_PK
+  only:
+    - tags
+
+export-bundle-prod:
+  tags:
+    - macos
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - ~/.npm
+      - node_modules/
+  stage: export-bundle-prod
+  script:
+    - npm ci
+    - npx expo export -p $PROD_CDN_URL --output-dir dist/bundle-prod -q
+    - tar -czvf dist/bundle.prod.tar.gz -C ./dist/bundle-prod/ .
+  artifacts:
+    paths:
+      - dist/bundle.prod.tar.gz
+  only:
+    - tags
+
+deploy-bundle-prod:
+  stage: deploy-bundle-prod
+  tags:
+    - private-network
+  variables:
+    HOST: "$PROD_CDN_HOST"
+    ROOT_PATH: "/var/www/$PROD_CDN_ROOT_PATH"
+    ENV_NAME: "prod"
+  script:
+    - chmod 600 $PROD_CDN_PK
+    - echo Uploading bundle to cdn...
+    - PK_PATH="$PROD_CDN_PK" ./deploy.sh
+    - rm $PROD_CDN_PK
+  when: manual
+  only:
+    - tags
+
+build-android:
+  tags:
+    - macos
+  stage: build-apps
+  script:
+    - turtle build:android --keystore-path /Users/ci/Documents/key0.jks --keystore-alias key0 --public-url $PROD_CDN_URL/android-index.json -t apk --output dist/app.apk
+    - turtle build:android --keystore-path /Users/ci/Documents/key0.jks --keystore-alias key0 --public-url $PROD_CDN_URL/android-index.json -t aab --output dist/app.aab
+  artifacts:
+    paths:
+      - dist/app.apk
+      - dist/app.aab
+  when: manual
+  only:
+    - tags
+
+build-ios:
+  tags:
+    - macos
+  stage: build-apps
+  script:
+    - turtle build:ios --team-id Z2HF8PJ3F7 --dist-p12-path /Users/ci/Documents/Certificates.p12 --provisioning-profile-path /Users/ci/Documents/JAMDistrib.mobileprovision --public-url $PROD_CDN_URL/ios-index.json --output dist/app.ipa
+  artifacts:
+    paths:
+      - dist/app.ipa
+  when: manual
+  only:
+    - tags
+
+deploy-android:
+  tags:
+    - macos
+  stage: deploy-apps
+  script:
+    - echo Deploying Android
+    - ls -al dist
+  when: manual
+  only:
+    - tags
+
+deploy-ios:
+  tags:
+    - macos
+  stage: deploy-apps
+  script:
+    - echo Deploying iOS
+    - ls -al dist
+  when: manual
+  only:
+    - tags
