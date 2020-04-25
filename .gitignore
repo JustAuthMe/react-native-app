@@ -9,4 +9,5 @@ npm-debug.*
 false/
 dist/
 *.sh
+!deploy.sh
 .DS_Store
