@@ -9,7 +9,7 @@
       "ios",
       "android"
     ],
-    "version": "0.10.3",
+    "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "splash": {
@@ -34,6 +34,9 @@
     },
     "android": {
       "package": "me.justauth.app.android"
+    },
+    "androidStatusBar": {
+      "translucent": false
     }
   }
 }

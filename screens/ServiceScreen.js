@@ -10,6 +10,8 @@ import {
 import {DropdownSingleton} from "../models/DropdownSingleton";
 import Config from "../constants/Config";
 import * as Icon from '@expo/vector-icons';
+import DarkStatusBar from "../components/DarkStatusBar";
+import {DateModel} from "../models/DateModel";
 
 export default class ServiceScreen extends React.Component {
     static navigationOptions = ({ navigation }) => {
@@ -35,7 +37,6 @@ export default class ServiceScreen extends React.Component {
     }
 
     async _bootstrapAsync() {
-        StatusBar.setBarStyle('dark-content');
     }
 
     componentDidMount() {
@@ -64,8 +65,11 @@ export default class ServiceScreen extends React.Component {
             });
         }
 
+        const dateModel = new DateModel();
+
         return (
             <View style={styles.content}>
+                <DarkStatusBar />
                 <View style={{
                     width: '100%',
                     height: 190,
@@ -85,12 +89,25 @@ export default class ServiceScreen extends React.Component {
                         paddingTop: 20
                     }}>{this.state.service.name}</Text>
                 </View>
+
+                {this.state.service.created_at && <Text style={{
+                    textAlign: 'center',
+                    fontSize: 14,
+                    paddingTop: 10,
+                    paddingBottom: 5,
+                    color: '#888'
+                }}>First login at: {dateModel.getFullDate(new Date(this.state.service.created_at))}</Text>}
+                {this.state.service.updated_at && <Text style={{
+                    textAlign: 'center',
+                    fontSize: 14,
+                    color: '#888'
+                }}>Last login at: {dateModel.getFullDate(new Date(this.state.service.updated_at))}</Text>}
                 <Text style={{
                     width: '100%',
                     textAlign: 'center',
                     fontWeight: '600',
                     fontSize: 20,
-                    marginTop: 20
+                    marginTop: 15
                 }}>{this.state.service.domain}</Text>
                 <Text style={{
                     width: '100%',
@@ -114,23 +131,15 @@ export default class ServiceScreen extends React.Component {
                             paddingRight: 15
                         }}>
                             <Text style={{
-                                fontWeight: '700'
-                            }}>{Config.dataList[item.key]}</Text>
+                                fontWeight: '700',
+                                fontSize: 18
+                            }}>&rarr; {Config.dataList[item.key]}</Text>
                             {item.key !== 'avatar' && <View style={{
                                 flexDirection: 'row'
                             }}>
-                                <Icon.Ionicons
-                                    name={'ios-arrow-forward'}
-                                    size={22}
-                                    color={'#666'}
-                                    style={{
-                                        paddingTop: 6
-                                    }}
-                                />
                                 <Text style={{
                                     paddingTop: 5,
-                                    paddingLeft: 10,
-                                    fontSize: 18,
+                                    fontSize: 14,
                                     color: '#666'
                                 }}>{item.value}</Text>
                             </View>}

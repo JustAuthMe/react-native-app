@@ -3,7 +3,7 @@ import {AsyncStorage} from "react-native";
 
 export class AlertModel {
     static async getAlert() {
-        const response = await fetch(Config.apiUrl + 'alert');
+        const response = await fetch(Config.alertUrl);
         const responseJson = await response.json();
 
         if (responseJson.status === 'success') {

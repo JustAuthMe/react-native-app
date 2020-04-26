@@ -10,7 +10,7 @@ export class ServicesModel {
         return JSON.parse(services);
     }
 
-    static async addService(key, service) {
+    static async saveService(key, service) {
         const services = await this.getServices();
         services[key] = {};
         for (let i in service) {

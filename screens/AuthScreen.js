@@ -20,6 +20,7 @@ import {ServicesModel} from "../models/ServicesModel";
 import AndroidBiometricPrompt from "../components/AndroidBiometricPrompt";
 import {UserModel} from "../models/UserModel";
 import NetworkLoader from "../components/NetworkLoader";
+import {DateModel} from "../models/DateModel";
 
 export default class AuthScreen extends React.Component {
     static navigationOptions = {
@@ -111,11 +112,29 @@ export default class AuthScreen extends React.Component {
                 this.androidPrompt.setState({visible: true});
             }
 
-            const localAuth = await LocalAuthentication.authenticateAsync({promptMessage: 'Confirm login attempt'});
+            let localAuth = await LocalAuthentication.authenticateAsync({promptMessage: 'Confirm login attempt'});
             canLogin = localAuth.success;
 
             if (Platform.OS === 'android') {
-                this.androidPrompt.setState({status: localAuth.success ? 'success' : 'error'});
+                let i = 0;
+                do {
+                    this.androidPrompt.setState({status: canLogin ? 'success' : 'error'});
+
+                    if (!canLogin) {
+                        localAuth = await LocalAuthentication.authenticateAsync({promptMessage: 'Confirm login attempt'});
+                        canLogin = localAuth.success;
+                        i++;
+                    }
+                } while (i < 5 && !canLogin && this.androidPrompt.state.visible);
+
+                if (!canLogin) {
+                    this.androidPrompt.setState({visible: false});
+                    DropdownSingleton.get().alertWithType(
+                        'error',
+                        'Biometric rejection',
+                        'Your system cannot recognize your fingerprint. Please lock your phone and enter your passcode to reactivate it.'
+                    );
+                }
             }
         }
 
@@ -123,6 +142,7 @@ export default class AuthScreen extends React.Component {
             const endpointUrl = Config.apiUrl + 'login';
             const data = await this.getUserDataFromDataset();
             const enc = new EncryptionModel();
+            const dateModel = new DateModel();
             const plain = enc.urlencode(enc.json_encode(data));
             const sign = await enc.sign(plain);
 
@@ -155,17 +175,29 @@ export default class AuthScreen extends React.Component {
                         }
                     }
 
+                    const currentTime = (new Date()).getTime();
+                    let service = {};
+
                     if (this.state.isFirstLogin) {
-                        const service = {
+                        service = {
                             app_id: this.state.auth.client_app.app_id,
                             name: this.state.auth.client_app.name,
                             logo: this.state.auth.client_app.logo,
                             domain: this.state.auth.client_app.domain,
-                            data: dataToStore
+                            data: dataToStore,
+                            created_at: currentTime,
+                            updated_at: currentTime
                         };
 
-                        await ServicesModel.addService(this.state.auth.client_app.app_id, service);
+                    } else {
+                        service = this.services[this.state.auth.client_app.app_id];
+                        service.name = this.state.auth.client_app.name;
+                        service.logo = this.state.auth.client_app.logo;
+                        service.domain = this.state.auth.client_app.domain;
+                        service.updated_at = currentTime;
                     }
+
+                    await ServicesModel.saveService(this.state.auth.client_app.app_id, service);
                     this.props.navigation.navigate('Success');
                 } else {
                     if (response.status === 401) {
@@ -199,7 +231,7 @@ export default class AuthScreen extends React.Component {
     render() {
         let content;
         if (this.state.auth === null) {
-            content = <Text style={styles.loadingText}>Loading authentication details...</Text>;
+            content = <NetworkLoader visible={true} />;
         } else {
             let data = [];
 
