@@ -15,8 +15,7 @@ stages:
 tests:
   stage: tests
   tags:
-    - private-network
-    # no need to bother the mac
+    - macos
   script:
     - npm run check-translations
 
