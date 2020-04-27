@@ -14,7 +14,7 @@ exports.default =  {
     ignore_step: 'Ignore this step',
     permission_required: 'Permission required',
     delete: 'Delete',
-    permission: {
+    permi_ssion: {
         camera_roll: 'Sorry, you need to grant Camera roll permission to chose your avatar!',
         camera: 'You need camera permission to be able to scan QR Codes.'
     },
