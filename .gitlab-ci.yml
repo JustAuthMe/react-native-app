@@ -13,6 +13,7 @@ stages:
   - deploy-apps
 
 tests:
+  stage: tests
   tags:
     - private-network
     # no need to bother the mac
