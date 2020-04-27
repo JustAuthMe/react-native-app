@@ -6,7 +6,7 @@
     "ios": "expo start --ios",
     "eject": "expo eject",
     "test": "node ./node_modules/jest/bin/jest.js --watchAll",
-    "check-translation": "node scripts/check_translations.js"
+    "check-translations": "node scripts/check_translations.js"
   },
   "jest": {
     "preset": "jest-expo"
