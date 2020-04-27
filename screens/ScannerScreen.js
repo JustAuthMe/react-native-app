@@ -11,7 +11,7 @@ import {DropdownSingleton} from "../models/DropdownSingleton";
 
 export default class ScannerScreen extends React.Component {
     static navigationOptions = {
-        title: 'QR Scanner',
+        title: Translator.t('scanner.title'),
     };
 
     state = {
@@ -26,7 +26,7 @@ export default class ScannerScreen extends React.Component {
         const permissionResponse = await Permissions.askAsync(Permissions.CAMERA);
         if (permissionResponse.status !== 'granted') {
             this.props.navigation.goBack();
-            DropdownSingleton.get().alertWithType('error', 'Permission required', 'You need camera permission to be able to scan QR Codes.');
+            DropdownSingleton.get().alertWithType('error', Translator.t('permission_required'), Translator.t('permission.camera'));
             return;
         }
 

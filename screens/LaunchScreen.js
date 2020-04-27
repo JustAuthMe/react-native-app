@@ -162,7 +162,7 @@ export default class LaunchScreen extends React.Component {
                         if (responseJson.message.match(/code/)) {
                             DropdownSingleton.get().alertWithType('error', Translator.t('launch.error.anti_spam'),  Translator.t('launch.error.anti_spam_message.email_code'));
                         } else {
-                            DropdownSingleton.get().alertWithType('error', Translator.t('launch.error.anti_spam'),  Translator.t('launch.error.anti_spam.email'));
+                            DropdownSingleton.get().alertWithType('error', Translator.t('launch.error.anti_spam'),  Translator.t('launch.error.anti_spam_message.email'));
                         }
                     } else {
                         DropdownSingleton.get().alertWithType(
@@ -271,7 +271,7 @@ export default class LaunchScreen extends React.Component {
                 DropdownSingleton.get().alertWithType('error', Translator.t('launch.error.already_member'), Translator.t('launch.error.account_already_existing'));
                 step = 'login';
             } else if (response.status === 429) {
-                DropdownSingleton.get().alertWithType('error', Translator.t('launch.error.anti_spam'), Translator.t('launch.error.anti_spam_message'));
+                DropdownSingleton.get().alertWithType('error', Translator.t('launch.error.anti_spam'), Translator.t('launch.error.anti_spam_message.register'));
             }
 
             const resetAction = StackActions.reset({

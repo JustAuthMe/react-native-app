@@ -1,6 +1,4 @@
-import React from "react";
-
-export default {
+exports.default =  {
     join_revolution: 'Join the revolution',
     welcome: 'Welcome',
     how_it_works: 'How it works?',
@@ -15,6 +13,7 @@ export default {
     ok: 'OK',
     ignore_step: 'Ignore this step',
     permission_required: 'Permission required',
+    delete: 'Delete',
     permission: {
         camera_roll: 'Sorry, you need to grant Camera roll permission to chose your avatar!',
         camera: 'You need camera permission to be able to scan QR Codes.'
@@ -82,6 +81,31 @@ export default {
         no_services_yet: 'You haven\'t logged to any of our partners website or app yet. Just click the "Authenticate" button above to begin your JustAuthMe experience.',
         authenticate: 'Authenticate',
         services: 'Services'
+    },
+    scanner:{
+        title: "QR Scanner"
+    },
+    auth:{
+        title:'Authentication',
+        confirm_login: 'Confirm login attempt',
+
+        invalid_token: 'Invalid Token',
+        invalid_token_message: 'An error occurred while attempting to retrieve authentication details. Please try again or contact support.',
+
+        biometric_error: 'Biometric rejection',
+        biometric_error_message: 'Your system cannot recognize your fingerprint. Please lock your phone and enter your passcode to reactivate it.',
+
+        unauthorized_login: 'Unauthorized login',
+        unauthorized_login_message: 'A wrong authentication attempt has been detected.',
+
+        non_confirmed_email:'Non confirmed E-Mail',
+        non_confirmed_email_message:'Please confirm your E-Mail address before trying to authenticate.',
+
+        token_not_found: 'There is no such authentication token.',
+        unknown_error: 'Unknown error',
+        error_login: 'An error occurred during login challenge. Please contact support.',
+
+        about_to_log: 'You\'re about to log into',
     },
     continue: 'Continue'
 

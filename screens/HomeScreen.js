@@ -197,7 +197,7 @@ export default class HomeScreen extends React.Component {
                 marginTop: 30,
                 padding: 20
             }}>
-                {Translator.t('home.no_service_yet')}
+                {Translator.t('home.no_services_yet')}
             </Text>;
         } else {
             const dataToList = this.parseServices();
@@ -220,7 +220,7 @@ export default class HomeScreen extends React.Component {
                                     color={'#fff'}
                                     style={{marginTop:3}}
                                 />
-                                <Text style={styles.backTextWhite}>Delete</Text>
+                                <Text style={styles.backTextWhite}>{Translator.t('delete')}</Text>
                             </TouchableOpacity>
                         </View>
                     );

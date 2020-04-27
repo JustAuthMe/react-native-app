@@ -24,7 +24,7 @@ import {DateModel} from "../models/DateModel";
 
 export default class AuthScreen extends React.Component {
     static navigationOptions = {
-        title: 'Authentication',
+        title: Translator.t('auth.title'),
     };
 
     state = {
@@ -67,8 +67,8 @@ export default class AuthScreen extends React.Component {
                 this.props.navigation.dispatch(resetAction);
                 DropdownSingleton.get().alertWithType(
                     'error',
-                    'Invalid token',
-                    'An error occurred while attempting to retrieve authentication details. Please try again or contact support.'
+                    Translator.t('auth.invalid_token'),
+                    Translator.t('auth.invalid_token_message')
                 );
             }
         } catch (error) {
@@ -112,7 +112,7 @@ export default class AuthScreen extends React.Component {
                 this.androidPrompt.setState({visible: true});
             }
 
-            let localAuth = await LocalAuthentication.authenticateAsync({promptMessage: 'Confirm login attempt'});
+            let localAuth = await LocalAuthentication.authenticateAsync({promptMessage: Translator.t('auth.confirm_login')});
             canLogin = localAuth.success;
 
             if (Platform.OS === 'android') {
@@ -121,7 +121,7 @@ export default class AuthScreen extends React.Component {
                     this.androidPrompt.setState({status: canLogin ? 'success' : 'error'});
 
                     if (!canLogin) {
-                        localAuth = await LocalAuthentication.authenticateAsync({promptMessage: 'Confirm login attempt'});
+                        localAuth = await LocalAuthentication.authenticateAsync({promptMessage: Translator.t('auth.confirm_login')});
                         canLogin = localAuth.success;
                         i++;
                     }
@@ -131,8 +131,8 @@ export default class AuthScreen extends React.Component {
                     this.androidPrompt.setState({visible: false});
                     DropdownSingleton.get().alertWithType(
                         'error',
-                        'Biometric rejection',
-                        'Your system cannot recognize your fingerprint. Please lock your phone and enter your passcode to reactivate it.'
+                        Translator.t('auth.biometric_error'),
+                        Translator.t('auth.biometric_error_message')
                     );
                 }
             }
@@ -201,15 +201,15 @@ export default class AuthScreen extends React.Component {
                     this.props.navigation.navigate('Success');
                 } else {
                     if (response.status === 401) {
-                        DropdownSingleton.get().alertWithType('error', 'Unauthorized login', 'A wrong authentication attempt has been detected.');
+                        DropdownSingleton.get().alertWithType('error', Translator.t('auth.unauthorized_login'), Translator.t('auth.unauthorized_login_message'));
                     } else if (response.status === 403) {
-                        DropdownSingleton.get().alertWithType('error', 'Non confirmed E-Mail', 'Please confirm your E-Mail address before trying to authenticate.');
+                        DropdownSingleton.get().alertWithType('error', Translator.t('auth.non_confirmed_email'), Translator.t('auth.non_confirmed_email_message'));
                     } else if (response.status === 404) {
-                        DropdownSingleton.get().alertWithType('error', 'Invalid token', 'There is no such authentication token.');
+                        DropdownSingleton.get().alertWithType('error', Translator.t('auth.invalid_token'), Translator.t('auth.token_not_found'));
                     } else if (response.status === 423) {
                         UserModel.logout(this.props.navigation);
                     } else {
-                        DropdownSingleton.get().alertWithType('error', 'Unknow error', 'An error occurred during login challenge. Please contact support.');
+                        DropdownSingleton.get().alertWithType('error', Translator.t('auth.unknown_error'), Translator.t('auth.error_login'));
                     }
 
                     const resetAction = StackActions.reset({
@@ -249,7 +249,7 @@ export default class AuthScreen extends React.Component {
                 <ScrollView style={styles.scrollViewContainer}>
                     <View style={styles.authHeader}>
                         <Image source={{uri: this.state.auth.client_app.logo}} style={styles.appIcon} />
-                        <Text style={styles.logInto}>You're about to log into</Text>
+                        <Text style={styles.logInto}>{Translator.t('auth.about_to_log')}</Text>
                         <Text style={styles.appName}>{this.state.auth.client_app.name}</Text>
                     </View>
                     <AuthDataList

@@ -4,12 +4,20 @@ before_script:
   - chmod u+x ./deploy.sh
 
 stages:
+  - tests
   - export-bundle-staging
   - deploy-bundle-staging
   - export-bundle-prod
   - deploy-bundle-prod
   - build-apps
   - deploy-apps
+
+tests:
+  tags:
+    - private-network
+    # no need to bother the mac
+  script:
+    - npm run check-translations
 
 export-bundle-staging:
   tags:
