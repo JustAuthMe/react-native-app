@@ -1,4 +1,4 @@
-exports.default =  {
+export default {
     join_revolution: 'Join the revolution',
     welcome: 'Welcome',
     how_it_works: 'How it works?',

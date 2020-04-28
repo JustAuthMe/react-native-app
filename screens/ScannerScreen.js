@@ -8,11 +8,12 @@ import {AuthSingleton} from "../models/AuthSingleton";
 import DarkStatusBar from "../components/DarkStatusBar";
 import * as Permissions from 'expo-permissions';
 import {DropdownSingleton} from "../models/DropdownSingleton";
+import Translator from "../i18n/Translator";
 
 export default class ScannerScreen extends React.Component {
-    static navigationOptions = {
+    static navigationOptions = () => ({
         title: Translator.t('scanner.title'),
-    };
+    });
 
     state = {
         hasCameraPermission: false
