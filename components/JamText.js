@@ -1,7 +1,8 @@
 import React from 'react';
 import {
     Text,
-    StyleSheet
+    StyleSheet,
+    Platform
 } from 'react-native';
 
 export default class extends React.Component {

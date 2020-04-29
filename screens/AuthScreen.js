@@ -19,7 +19,6 @@ import {ServicesModel} from "../models/ServicesModel";
 import AndroidBiometricPrompt from "../components/AndroidBiometricPrompt";
 import {UserModel} from "../models/UserModel";
 import NetworkLoader from "../components/NetworkLoader";
-import {DateModel} from "../models/DateModel";
 import Translator from "../i18n/Translator";
 import Text from '../components/JamText'
 
@@ -108,6 +107,8 @@ export default class AuthScreen extends React.Component {
         const isEnrolled = await LocalAuthentication.isEnrolledAsync();
 
         let canLogin = true;
+        let isUserBigFatFingersFault = false;
+        let isThereEvenAMessageOrSomething = false;
         if (hasHardware && isEnrolled) {
             if (Platform.OS === 'android') {
                 this.androidPrompt.setState({visible: true});
@@ -115,25 +116,37 @@ export default class AuthScreen extends React.Component {
 
             let localAuth = await LocalAuthentication.authenticateAsync({promptMessage: Translator.t('auth.confirm_login')});
             canLogin = localAuth.success;
+            isUserBigFatFingersFault = localAuth.message === 'authentication_failed';
+            isThereEvenAMessageOrSomething = localAuth.message && localAuth.message !== '';
 
             if (Platform.OS === 'android') {
-                let i = 0;
                 do {
-                    this.androidPrompt.setState({status: canLogin ? 'success' : 'error'});
+                    if (canLogin || isUserBigFatFingersFault) {
+                        this.androidPrompt.setState({status: canLogin ? 'success' : 'error'});
+                    }
 
                     if (!canLogin) {
                         localAuth = await LocalAuthentication.authenticateAsync({promptMessage: Translator.t('auth.confirm_login')});
                         canLogin = localAuth.success;
-                        i++;
+                        isUserBigFatFingersFault = localAuth.message === 'authentication_failed';
+                        isThereEvenAMessageOrSomething = localAuth.message && localAuth.message !== '';
                     }
-                } while (i < 5 && !canLogin && this.androidPrompt.state.visible);
+                } while (
+                    !canLogin &&
+                    this.androidPrompt.state.visible && (
+                    isUserBigFatFingersFault || (
+                            localAuth.error === 'unknown' && !isThereEvenAMessageOrSomething
+                        )
+                    )
+                );
 
                 if (!canLogin) {
+                    await LocalAuthentication.cancelAuthenticate();
                     this.androidPrompt.setState({visible: false});
                     DropdownSingleton.get().alertWithType(
                         'error',
                         Translator.t('auth.biometric_error'),
-                        Translator.t('auth.biometric_error_message')
+                        isThereEvenAMessageOrSomething ? localAuth.message : Translator.t('auth.biometric_error_message')
                     );
                 }
             }
@@ -143,7 +156,6 @@ export default class AuthScreen extends React.Component {
             const endpointUrl = Config.apiUrl + 'login';
             const data = await this.getUserDataFromDataset();
             const enc = new EncryptionModel();
-            const dateModel = new DateModel();
             const plain = enc.urlencode(enc.json_encode(data));
             const sign = await enc.sign(plain);
 

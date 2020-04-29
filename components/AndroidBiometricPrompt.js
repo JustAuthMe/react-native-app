@@ -6,6 +6,7 @@ import {
     Button
 } from 'react-native';
 import * as Icon from '@expo/vector-icons';
+import * as LocalAuthentication from 'expo-local-authentication';
 
 export default class AndroidBiometricPrompt extends React.Component {
     state = {
@@ -37,7 +38,10 @@ export default class AndroidBiometricPrompt extends React.Component {
                         <Button
                             title={'Cancel'}
                             color={'#1565c0'}
-                            onPress={() => this.setState({visible: false})}
+                            onPress={async () => {
+                                await LocalAuthentication.cancelAuthenticate();
+                                this.setState({visible: false})
+                            }}
                         />
                         {/*<Button
                             title={'Use passcode'}

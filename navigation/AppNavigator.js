@@ -1,5 +1,6 @@
 import React from 'react';
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
+import { Platform } from 'react-native';
 
 import MainNavigator from './MainNavigator';
 import LaunchNavigator from "./LaunchNavigator";
@@ -16,6 +17,11 @@ export default createAppContainer(createSwitchNavigator(
     Success: SuccessScreen
   },
   {
-    initialRouteName: 'Launch'
+    initialRouteName: 'Launch',
+    defaultNavigationOptions: {
+        headerTitleStyle: {
+            fontFamily: Platform.OS === 'android' ? 'Roboto' : 'system font'
+        }
+    }
   }
 ));

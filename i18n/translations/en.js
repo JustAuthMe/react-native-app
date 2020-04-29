@@ -93,7 +93,7 @@ export default {
         invalid_token_message: 'An error occurred while attempting to retrieve authentication details. Please try again or contact support.',
 
         biometric_error: 'Biometric rejection',
-        biometric_error_message: 'Your system cannot recognize your fingerprint. Please lock your phone and enter your passcode to reactivate it.',
+        biometric_error_message: 'Your system cannot recognize your fingerprint. Try to lock your phone and enter your passcode to reactivate it.',
 
         unauthorized_login: 'Unauthorized login',
         unauthorized_login_message: 'A wrong authentication attempt has been detected.',
