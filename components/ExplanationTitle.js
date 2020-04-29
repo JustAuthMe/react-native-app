@@ -1,8 +1,8 @@
 import React from 'react';
 import {
-    Text,
     StyleSheet
 } from 'react-native';
+import Text from './JamText';
 
 export default class ExplanationTitle extends React.Component {
     state = {
