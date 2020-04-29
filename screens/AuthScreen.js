@@ -21,6 +21,7 @@ import {UserModel} from "../models/UserModel";
 import NetworkLoader from "../components/NetworkLoader";
 import {DateModel} from "../models/DateModel";
 import Translator from "../i18n/Translator";
+import Text from '../components/JamText'
 
 export default class AuthScreen extends React.Component {
     static navigationOptions = {

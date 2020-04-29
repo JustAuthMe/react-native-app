@@ -2,10 +2,10 @@ import React from 'react';
 import {
     View,
     StyleSheet,
-    TouchableOpacity,
-    Text
+    TouchableOpacity
 } from 'react-native';
 import * as Icon from '@expo/vector-icons';
+import Text from './JamText'
 
 export default class ActionBtn extends React.Component {
     state = {};

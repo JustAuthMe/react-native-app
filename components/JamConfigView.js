@@ -3,15 +3,13 @@ import {
     SectionList,
     Image,
     StyleSheet,
-    Text,
     View,
     Button,
     Linking,
     Platform
 } from 'react-native';
 import Constants from 'expo-constants';
-import * as SecureStore from "expo-secure-store";
-import Config from "../constants/Config";
+import Text from './JamText'
 
 
 export default class JamConfigView extends React.Component {

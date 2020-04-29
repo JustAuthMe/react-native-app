@@ -2,16 +2,14 @@ import React from 'react';
 import {
     View,
     StyleSheet,
-    Text,
-    StatusBar,
     Image,
     FlatList, TouchableOpacity
 } from 'react-native';
 import {DropdownSingleton} from "../models/DropdownSingleton";
 import Config from "../constants/Config";
-import * as Icon from '@expo/vector-icons';
 import DarkStatusBar from "../components/DarkStatusBar";
 import {DateModel} from "../models/DateModel";
+import Text from '../components/JamText'
 
 export default class ServiceScreen extends React.Component {
     static navigationOptions = ({ navigation }) => {

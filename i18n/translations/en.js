@@ -78,7 +78,7 @@ export default {
         delete_service_confirm_message:'This will NOT remove your %{domain} account, it will only remove the service from your login history.',
         error_delete: 'Cannot delete service',
         error_delete_message: 'Please contact support for further assistance.',
-        no_services_yet: 'You haven\'t logged to any of our partners website or app yet. Just click the "Authenticate" button above to begin your JustAuthMe experience.',
+        no_services_yet: 'You haven\'t logged to any of our partners website or app yet?',
         authenticate: 'Authenticate',
         services: 'Services'
     },

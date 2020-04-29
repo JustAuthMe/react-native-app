@@ -44,10 +44,9 @@ export default class UserScreen extends React.Component {
         this.dateModel = new DateModel();
         this._bootstrapAsync().then();
         this.requiredInfos = [
+            'email',
             'firstname',
-            'lastname',
-            'birthdate',
-            'email'
+            'lastname'
         ];
     }
 
@@ -122,7 +121,7 @@ export default class UserScreen extends React.Component {
 
         await AsyncStorage.setItem('firstname', this.state.user.firstname);
         await AsyncStorage.setItem('lastname', this.state.user.lastname);
-        await AsyncStorage.setItem('birthdate', this.state.user.birthdate);
+        await AsyncStorage.setItem('birthdate', this.state.user.birthdate ? this.state.user.birthdate : '');
 
         const oldEmail = await AsyncStorage.getItem('email');
         let hasEmailChanged = false;

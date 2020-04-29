@@ -1,7 +1,6 @@
 import React from 'react';
 import {
     StyleSheet,
-    Text,
     View,
     TouchableOpacity,
     Linking,
@@ -9,6 +8,7 @@ import {
 } from 'react-native';
 import Constants from 'expo-constants';
 import Translator from "../i18n/Translator";
+import Text from "./JamText"
 
 export default class LaunchFooter extends React.Component {
     render() {

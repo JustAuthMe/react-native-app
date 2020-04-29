@@ -2,22 +2,19 @@ import React from 'react';
 import {
     Image,
     StyleSheet,
-    Text,
     View,
     AsyncStorage,
     TouchableOpacity,
     TouchableHighlight,
     StatusBar,
-    Dimensions, Alert
+    Dimensions,
+    Alert,
+    Button,
+    Linking
 } from 'react-native';
-import { Linking } from 'expo';
-
-
 import Constants from 'expo-constants';
 import * as Icon from '@expo/vector-icons';
 import * as SecureStore from 'expo-secure-store';
-
-
 import Config from "../constants/Config";
 import LightStatusBar from "../components/LightStatusBar";
 import {AuthSingleton} from "../models/AuthSingleton";
@@ -32,6 +29,7 @@ import * as Permissions from "expo-permissions";
 import {UserModel} from "../models/UserModel";
 import NetworkLoader from "../components/NetworkLoader";
 import Translator from "../i18n/Translator";
+import Text from '../components/JamText'
 
 export default class HomeScreen extends React.Component {
     static navigationOptions = {
@@ -192,13 +190,16 @@ export default class HomeScreen extends React.Component {
     render() {
         let servicesList = <View></View>;
         if (this.state.services === null || Object.keys(this.state.services).length === 0) {
-            servicesList = <Text style={{
-                textAlign: 'center',
-                marginTop: 30,
-                padding: 20
-            }}>
-                {Translator.t('home.no_services_yet')}
-            </Text>;
+            servicesList = <View>
+                <Text style={{
+                    textAlign: 'center',
+                    marginTop: 30,
+                    padding: 20
+                }}>
+                    {Translator.t('home.no_services_yet')}
+                </Text>
+                <Button onPress={() => Linking.openURL('https://demo.justauth.me')} title={'Try our demo'} />
+            </View>;
         } else {
             const dataToList = this.parseServices();
             servicesList = <SwipeListView

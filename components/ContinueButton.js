@@ -1,9 +1,9 @@
 import React from 'react';
 import {
-    Text,
     TouchableOpacity,
 } from 'react-native';
 import Translator from "../i18n/Translator";
+import Text from '../components/JamText';
 
 export default class ContinueButton extends React.Component {
 
@@ -33,6 +33,7 @@ export default class ContinueButton extends React.Component {
                 onPress={!this.state.disabled ? this.props.onPress : null}>
                 <Text style={{
                     marginTop: this.props.marginTop || 60,
+                    marginBottom: 20,
                     paddingTop: 10,
                     paddingRight: 20,
                     paddingBottom: 10,

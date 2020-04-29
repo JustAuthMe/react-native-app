@@ -1,22 +1,17 @@
 import React from 'react';
 import {
     StyleSheet,
-    Text,
     View,
     Image,
     TouchableOpacity,
     TextInput,
     AsyncStorage,
     Platform,
-    Alert,
     ScrollView,
     Dimensions
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { SplashScreen } from 'expo';
-import * as Icon from '@expo/vector-icons';
-import * as Permissions from 'expo-permissions';
-import * as ImagePicker from 'expo-image-picker';
 import * as SecureStore from 'expo-secure-store';
 import Constants from 'expo-constants';
 import { Ionicons } from '@expo/vector-icons';
@@ -26,12 +21,12 @@ import Config from "../constants/Config";
 import LightStatusBar from "../components/LightStatusBar";
 import { StackActions, NavigationActions } from 'react-navigation';
 import {DropdownSingleton} from "../models/DropdownSingleton";
-import {DatePickerSingleton} from "../models/DatePickerSingleton";
 import Swiper from 'react-native-swiper';
 import ExplanationTitle from "../components/ExplanationTitle";
 import NetworkLoader from "../components/NetworkLoader";
 import KeyboardShift from "../components/KeyboardShift";
 import Translator from "../i18n/Translator";
+import Text from '../components/JamText'
 
 export default class LaunchScreen extends React.Component {
 
@@ -41,17 +36,12 @@ export default class LaunchScreen extends React.Component {
 
     state = {
         step: this.props.navigation.getParam('step') ? this.props.navigation.state.params.step : 'launch',
-        currentBirthdate: new Date(),
-        birthdateInputValue: '',
-        generationStatus: Translator.t('launch.generating')+'...',
-        avatar: null,
         explanationTitle: Translator.t('welcome'),
-        congratsTitle: Translator.t('wait')+'...',
-        displayCongrats: false,
     };
 
     constructor(props) {
         super(props);
+
         this.personnalInfos = {
             avatar: Config.defaultAvatar
         };
@@ -67,7 +57,7 @@ export default class LaunchScreen extends React.Component {
 
         this.isLoggedIn().then(loggedIn => {
             SplashScreen.hide();
-            if (loggedIn) {
+            if (loggedIn && this.state.step === 'launch') {
                 this.props.navigation.navigate('Main');
             }
         });
@@ -119,16 +109,23 @@ export default class LaunchScreen extends React.Component {
 
         AsyncStorage.setItem(key, this.personnalInfos[key], () => {
             if (nextStep === 'done') {
-                const resetAction = StackActions.reset({
-                    index: 0,
-                    actions: [NavigationActions.navigate({
-                        routeName: 'LaunchScreen',
-                        params: {
-                            step: nextStep
-                        }
-                    })],
+                this.networkLoader.setState({visible: true});
+                this.register().then(registered => {
+                    this.networkLoader.setState({visible: false});
+
+                    if (registered) {
+                        const resetAction = StackActions.reset({
+                            index: 0,
+                            actions: [NavigationActions.navigate({
+                                routeName: 'LaunchScreen',
+                                params: {
+                                    step: nextStep
+                                }
+                            })],
+                        });
+                        this.props.navigation.dispatch(resetAction);
+                    }
                 });
-                this.props.navigation.dispatch(resetAction);
             } else if (key === 'email') {
                 this.networkLoader.setState({visible: true});
                 fetch(
@@ -148,11 +145,6 @@ export default class LaunchScreen extends React.Component {
 
                     if (response.status === 200) {
                         this.props.navigation.push('LaunchScreen', {step: 'login'});
-                        /*DropdownSingleton.get().alertWithType(
-                            'info',
-                            'Check your inbox!',
-                            'We sent a Passcode to ' + this.state.user.email + '. Enter the received passcode below to recover your account.'
-                        );*/
                     } else if (response.status === 400) {
                         DropdownSingleton.get().alertWithType('error',  Translator.t('launch.error.invalid_email'),  Translator.t('launch.error.enter_valid_email'));
                     } else if (response.status === 404) {
@@ -181,43 +173,7 @@ export default class LaunchScreen extends React.Component {
         });
     }
 
-    changeBirthdate() {
-        const date = this.state.currentBirthdate;
-        const day = (date.getDate() < 10 ? '0' : '') + date.getDate();
-        const month = (date.getMonth() + 1 < 10 ? '0' : '') + (date.getMonth() + 1);
-        const humanDate = day + '/' + month + '/' + date.getFullYear();
-        this.onInputChange('birthdate', humanDate);
-        this.setState({
-            birthdateInputValue: humanDate
-        });
-    }
-
-    async onMessageRegister(message) {
-        const eventData = message.nativeEvent.data;
-        const data = Platform.OS === 'ios' ?
-            JSON.parse(decodeURIComponent(decodeURIComponent(eventData))) :
-            JSON.parse(eventData);
-
-        // Storing keypair
-        await SecureStore.setItemAsync(Config.storageKeys.publicKey, data.x, {
-            keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY
-        });
-        await SecureStore.setItemAsync(Config.storageKeys.privateKey, data.y, {
-            keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY
-        });
-
-        this.register().then(registered => {
-            if (registered) {
-                this.setState({
-                    congratsTitle: Translator.t('congratulations'),
-                    displayCongrats: true
-                });
-                this.continueBtn.setState({disabled: false});
-            }
-        });
-    }
-
-    async onMessageLogin(message) {
+    async onMessage(message) {
         const eventData = message.nativeEvent.data;
         const data = Platform.OS === 'ios' ?
             JSON.parse(decodeURIComponent(decodeURIComponent(eventData))) :
@@ -259,7 +215,6 @@ export default class LaunchScreen extends React.Component {
                 await SecureStore.setItemAsync(Config.storageKeys.jamID, responseJson.user.username, {
                     keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY
                 });
-                const jamID = await SecureStore.getItemAsync(Config.storageKeys.jamID);
 
                 return true;
             }
@@ -287,8 +242,6 @@ export default class LaunchScreen extends React.Component {
 
             return false;
         } catch (error) {
-            console.error(error);
-
             return false;
         }
     }
@@ -313,9 +266,9 @@ export default class LaunchScreen extends React.Component {
                 })
             }
         );
-        this.networkLoader.setState({visible: false});
 
         const responseJson = await response.json();
+        this.networkLoader.setState({visible: false});
 
         if (response.status === 200) {
             await SecureStore.setItemAsync(Config.storageKeys.jamID, responseJson.jam_id, {
@@ -346,38 +299,11 @@ export default class LaunchScreen extends React.Component {
         }
     };
 
-    lastStep = () => {
-        this.props.navigation.push('LaunchScreen', {step: 'done'});
-    };
-
     finish = () => {
         AsyncStorage.setItem(Config.servicesKey, JSON.stringify({}), () => {});
-
+        AsyncStorage.setItem('birthdate', '');
+        AsyncStorage.setItem('avatar', Config.defaultAvatar);
         this.props.navigation.navigate('Main');
-    };
-
-    _pickImage = async () => {
-        if (Constants.platform.ios) {
-            const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
-            if (status !== 'granted') {
-                DropdownSingleton.get().alertWithType('error', Translator.t('permission_required'), Translator.t('permission.camera_roll'));
-                return;
-            }
-        }
-
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsEditing: true,
-            aspect: [1, 1],
-            base64: true
-        });
-
-        if (!result.cancelled) {
-            const avatarUri = 'data:image/jpeg;base64,' + result.base64;
-            this.personnalInfos['avatar'] = avatarUri;
-            this.setState({avatar: avatarUri});
-            this.continueBtn.setState({disabled: false});
-        }
     };
 
     render() {
@@ -512,7 +438,7 @@ export default class LaunchScreen extends React.Component {
                                 <View style={styles.webview}>
                                     <WebView
                                         source={{uri: 'https://init.justauth.me'}}
-                                        onMessage={msg => this.onMessageLogin(msg)}
+                                        onMessage={msg => this.onMessage(msg)}
                                         useWebKit={true}
                                     />
                                 </View>
@@ -554,6 +480,7 @@ export default class LaunchScreen extends React.Component {
                         {() => (
                             <View style={styles.container}>
                                 <LightStatusBar/>
+                                <NetworkLoader ref={ref => this.networkLoader = ref} />
                                 <Image style={styles.logo} source={this.logo}/>
                                 <Text style={styles.baseline}>{Translator.t('launch.lastname')}</Text>
                                 <TextInput
@@ -567,96 +494,53 @@ export default class LaunchScreen extends React.Component {
                                     clearButtonMode={"always"}
                                     onChangeText={(text) => this.onInputChange('lastname', text)}
                                 />
-                                <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('lastname', 'birthdate')} />
+                                <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('lastname', 'done')} />
                                 <LaunchFooter />
+                                <View style={styles.webview}>
+                                    <WebView
+                                        source={{uri: 'https://init.justauth.me'}}
+                                        onMessage={msg => this.onMessage(msg)}
+                                        useWebKit={true}
+                                    />
+                                </View>
                             </View>
                         )}
                     </KeyboardShift>
                 );
 
-            case 'birthdate':
-                return (
-                    <View style={styles.container}>
-                        <LightStatusBar/>
-                        <Image style={styles.logo} source={this.logo}/>
-                        <Text style={styles.baseline}>{Translator.t('launch.birthdate')}</Text>
-                        <TouchableOpacity activeOpacity={.5} style={styles.inputTouchable} onPress={() => {
-                            DatePickerSingleton.get().open({
-                                date: this.state.currentBirthdate,
-                                onDateChange: date => this.setState({currentBirthdate: date}),
-                                onDone: () => this.changeBirthdate()
-                            })
-                        }}>
-                            <TextInput
-                                ref={'birthdateInput'}
-                                style={styles.textInput}
-                                placeholder={"e.g. 02/05/1974"}
-                                placeholderTextColor={"rgba(255,255,255,.5)"}
-                                returnKeyType={"done"}
-                                autoCorrect={false}
-                                spellCheck={false}
-                                editable={false}
-                                onChangeText={(text) => this.onInputChange('birthdate', text)}
-                                pointerEvents={"none"}
-                                value={this.state.birthdateInputValue}
-                            />
-                        </TouchableOpacity>
-                        <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('birthdate', 'avatar')} />
-                        <LaunchFooter />
-                    </View>
-                );
-
-            case 'avatar':
-                return (
-                    <View style={styles.container}>
-                        <LightStatusBar/>
-                        <Image style={styles.logo} source={this.logo}/>
-                        <Text style={styles.baseline}>{Translator.t('launch.avatar')}</Text>
-                        <TouchableOpacity onPress={() => this._pickImage()} style={styles.avatarContainer}>
-                            <Image source={{uri: this.state.avatar !== null ? this.state.avatar : '../assets/images/user.png'}} style={{
-                                ...styles.avatar,
-                                display: this.state.avatar !== null ? 'flex' : 'none',
-                            }} />
-                            <Icon.Ionicons
-                                name={'ios-cloud-upload'}
-                                size={120}
-                                color={'#FFFFFF'}
-                                 style={{
-                                     display: this.state.avatar === null ? 'flex' : 'none'
-                                 }}
-                            />
-                        </TouchableOpacity>
-                        <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('avatar', 'done')} marginTop={20} />
-                        <TouchableOpacity onPress={() => Alert.alert(Translator.t('launch.avatar_confirm'), '', [
-                            {text: Translator.t('cancel'), onPress: () => {}, style:'cancel'},
-                            {text: Translator.t('ok'), onPress: () => this.storeValue('avatar', 'done')}
-                        ])}>
-                            <Text style={styles.avatarIgnore}>{Translator.t('ignore_step')}</Text>
-                        </TouchableOpacity>
-                        <LaunchFooter />
-                    </View>
-                );
-
             case 'done':
                 return (
-                    <View style={styles.container}>
+                    <ScrollView style={styles.scrollView} contentContainerStyle={styles.container}>
                         <LightStatusBar/>
-                        <Image style={styles.logo} source={this.logo}/>
-                        <Text style={styles.baseline}>{this.state.congratsTitle /*Congratulations!*/}</Text>
-                        <View style={{...styles.warningTextContainer, display: this.state.displayCongrats ? 'flex' : 'none'}}>
-                            <Text style={styles.warningText}>
-                                {Translator.t('launch.success')}
-                            </Text>
-                        </View>
-                        <ContinueButton text={'Got it!'} ref={ref => this.continueBtn = ref} disabled={true} onPress={this.finish} marginTop={30} />
-                        <View style={styles.webview}>
-                            <WebView
-                                source={{uri: 'https://init.justauth.me'}}
-                                onMessage={msg => this.onMessageRegister(msg)}
-                                useWebKit={true}
-                            />
-                        </View>
-                    </View>
+                        <Text style={{
+                            color: '#fff',
+                            fontSize: 30,
+                            fontWeight: '600',
+                            textAlign: 'center',
+                            marginTop: isZoomed ? 20 : isBorderless ? 100 : 70
+                        }}>Congratulations!</Text>
+                        <Text style={{
+                            fontSize: isZoomed ? 70 : 100,
+                            marginTop: 50
+                        }}>🥳</Text>
+                        <Text style={{
+                            color: '#fff',
+                            fontSize: 20,
+                            lineHeight: 30,
+                            paddingLeft: 15,
+                            paddingRight: 15,
+                            textAlign: 'center',
+                            marginTop: 30
+                        }}>
+                            You successfully registered into JustAuthMe!
+                            {"\n"}We sent you a
+                            <Text style={{
+                                fontWeight: '800'
+                            }}> confirmation E-Mail! </Text>
+                            {"\n"}You can now enjoy all JustAuthMe benefits !
+                        </Text>
+                        <ContinueButton text={'Let\'s go!'} ref={ref => this.continueBtn = ref} onPress={this.finish} marginTop={50} />
+                    </ScrollView>
                 );
 
             default:
@@ -679,6 +563,12 @@ const isZoomed = Platform.OS === 'ios' && Dimensions.get('window').height < 667;
 const styles = StyleSheet.create({
     scrollView: {
         backgroundColor: '#3598DB'
+    },
+    scrollViewContainer: {
+        backgroundColor: '#3598DB',
+        width: '100%',
+        alignItems: 'center',
+        paddingTop: Constants.statusBarHeight
     },
     container: {
         backgroundColor: '#3598DB',
