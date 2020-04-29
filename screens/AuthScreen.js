@@ -116,7 +116,7 @@ export default class AuthScreen extends React.Component {
 
             let localAuth = await LocalAuthentication.authenticateAsync({promptMessage: Translator.t('auth.confirm_login')});
             canLogin = localAuth.success;
-            isUserBigFatFingersFault = localAuth.message === 'authentication_failed';
+            isUserBigFatFingersFault = localAuth.error === 'authentication_failed';
             isThereEvenAMessageOrSomething = localAuth.message && localAuth.message !== '';
 
             if (Platform.OS === 'android') {
@@ -128,7 +128,7 @@ export default class AuthScreen extends React.Component {
                     if (!canLogin) {
                         localAuth = await LocalAuthentication.authenticateAsync({promptMessage: Translator.t('auth.confirm_login')});
                         canLogin = localAuth.success;
-                        isUserBigFatFingersFault = localAuth.message === 'authentication_failed';
+                        isUserBigFatFingersFault = localAuth.error === 'authentication_failed';
                         isThereEvenAMessageOrSomething = localAuth.message && localAuth.message !== '';
                     }
                 } while (
