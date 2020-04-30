@@ -12,7 +12,7 @@ stages:
   - build-apps
   - deploy-apps
 
-tests:
+.tests:
   stage: tests
   tags:
     - macos
