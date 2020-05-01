@@ -6,12 +6,15 @@ import {
     SwitchNavigatorConfig
 } from "react-navigation";
 import {Platform} from "react-native";
+import Translator from "../i18n/Translator";
 
 function createDefaultNavigator(navigatorCreator, routeConfigMap: NavigationRouteConfigMap, stackConfig?: StackNavigatorConfig|SwitchNavigatorConfig = {}){
     let defaultNavigationOptions = {
         headerTitleStyle: {
             fontFamily: Platform.OS === 'android' ? 'Roboto' : 'system font'
-        }
+        },
+        headerBackTitle: Translator.t('back_btn'),
+        headerTruncatedBackTitle: Translator.t('back_btn')
     };
 
     let customStackConfig = {

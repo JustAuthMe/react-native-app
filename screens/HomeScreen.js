@@ -158,7 +158,7 @@ export default class HomeScreen extends React.Component {
                 } else if (response.status === 423) {
                     UserModel.logout(this.props.navigation);
                 } else {
-                    DropdownSingleton.get().alertWithType('error', Translator.t('home.error_delete'), Translator.t('home.error_delete_message'));
+                    DropdownSingleton.get().alertWithType('error', Translator.t('home.error_delete'), Translator.t('error_default'));
                 }
             }}
         ]);
@@ -198,7 +198,7 @@ export default class HomeScreen extends React.Component {
                 }}>
                     {Translator.t('home.no_services_yet')}
                 </Text>
-                <Button onPress={() => Linking.openURL('https://demo.justauth.me')} title={'Try our demo'} />
+                <Button onPress={() => Linking.openURL('https://demo.justauth.me')} title={Translator.t('home.try_demo')} />
             </View>;
         } else {
             const dataToList = this.parseServices();
@@ -212,7 +212,7 @@ export default class HomeScreen extends React.Component {
                     return (
                         <View style={styles.rowBack}>
                             <TouchableOpacity
-                                style={[styles.backRightBtn, styles.backRightBtnRight]}
+                                style={[styles.backRightBtn, {width: Translator.t('home.hidden.delete')}, styles.backRightBtnRight]}
                                 onPress={() => this.deletePopupAlert(this.state.services[item.item.key])}
                             >
                                 <Icon.Ionicons
@@ -226,7 +226,7 @@ export default class HomeScreen extends React.Component {
                         </View>
                     );
                 }}
-                rightOpenValue={-80}
+                rightOpenValue={Translator.t('home.hidden.size')}
                 disableRightSwipe
                 onSwipeValueChange={swipeData => {
                     if (this.isSwipeToDeleteEnabled && swipeData.direction === 'left' && swipeData.value <= -(Dimensions.get('window').width * 0.5)) {

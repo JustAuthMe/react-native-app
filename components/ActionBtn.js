@@ -8,8 +8,6 @@ import * as Icon from '@expo/vector-icons';
 import Text from './JamText'
 
 export default class ActionBtn extends React.Component {
-    state = {};
-
     render() {
         return (
             <View style={this.props.style}>

@@ -23,9 +23,9 @@ import Translator from "../i18n/Translator";
 import Text from '../components/JamText'
 
 export default class AuthScreen extends React.Component {
-    static navigationOptions = {
+    static navigationOptions = () => ({
         title: Translator.t('auth.title'),
-    };
+    });
 
     state = {
         token: this.props.navigation.getParam('token'),
@@ -35,7 +35,12 @@ export default class AuthScreen extends React.Component {
 
     constructor(props) {
         super(props);
-        this.getAuthDetails().then();
+    }
+
+    componentDidMount() {
+        this._navListener = this.props.navigation.addListener("didFocus", () => {
+            this.getAuthDetails().then();
+        });
     }
 
     async getAuthDetails() {
@@ -43,19 +48,39 @@ export default class AuthScreen extends React.Component {
         this.services = await ServicesModel.getServices();
 
         try {
+            this.networkLoader.setState({visible: true});
+
             const response = await fetch(endpointUrl);
             const responseJson = await response.json();
+            const isFirstLogin = !this.services.hasOwnProperty(responseJson.auth.client_app.app_id);
+
+            this.networkLoader.setState({visible: false});
+            console.log(this.networkLoader.state);
 
             if (responseJson.status === 'success') {
+                this.actualData = {};
+                let currentData = '';
+                for (let i = 0; i < responseJson.auth.client_app.data.length; i++) {
+                    currentData = await AsyncStorage.getItem(AuthDataList.getDataSlug(responseJson.auth.client_app.data[i]));
+                    this.actualData[responseJson.auth.client_app.data[i]] = currentData !== null && currentData !== '';
+
+                    if (isFirstLogin && !this.actualData[responseJson.auth.client_app.data[i]] && AuthDataList.isDataRequired(responseJson.auth.client_app.data[i])) {
+                        DropdownSingleton.get().alertWithType(
+                            'error',
+                            Translator.t('auth.missing_data'),
+                            Translator.t('auth.missing_data_message', {
+                                data: AuthDataList.getDataLabelFromID(responseJson.auth.client_app.data[i]),
+                                name: responseJson.auth.client_app.name
+                            })
+                        );
+                        this.props.navigation.navigate('User');
+                    }
+                }
+
                 this.setState({
                     auth: responseJson.auth,
-                    isFirstLogin: !this.services.hasOwnProperty(responseJson.auth.client_app.app_id)
+                    isFirstLogin: isFirstLogin
                 });
-
-                this.actualData = {};
-                for (let i = 0; i < responseJson.auth.client_app.data.length; i++) {
-                    this.actualData[responseJson.auth.client_app.data[i]] = true;
-                }
             } else {
 
                 const resetAction = StackActions.reset({
@@ -89,10 +114,7 @@ export default class AuthScreen extends React.Component {
 
         const authData = this.state.auth.client_app.data;
         for (let i = 0; i < authData.length; i++) {
-            let dataName = authData[i];
-            if (authData[i].indexOf('!') !== -1) {
-                dataName = authData[i].slice(0, -1);
-            }
+            let dataName = AuthDataList.getDataSlug(authData[i]);
 
             if (this.actualData[authData[i]]) {
                 data[dataName] = await AsyncStorage.getItem(dataName);
@@ -260,6 +282,7 @@ export default class AuthScreen extends React.Component {
 
             content =
                 <ScrollView style={styles.scrollViewContainer}>
+                    <NetworkLoader ref={ref => this.networkLoader = ref} />
                     <View style={styles.authHeader}>
                         <Image source={{uri: this.state.auth.client_app.logo}} style={styles.appIcon} />
                         <Text style={styles.logInto}>{Translator.t('auth.about_to_log')}</Text>
@@ -269,6 +292,7 @@ export default class AuthScreen extends React.Component {
                         style={styles.data}
                         domain={this.state.auth.client_app.domain}
                         data={data}
+                        checkable={Object.assign({}, this.actualData)}
                         isFirstLogin={this.state.isFirstLogin}
                         onAccept={this.onAcceptLogin}
                         onUpdate={this.onUpdateData}

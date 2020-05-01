@@ -10,55 +10,47 @@ import {
 } from 'react-native';
 import Constants from 'expo-constants';
 import Text from './JamText'
+import Translator from "../i18n/Translator";
 
 
 export default class JamConfigView extends React.Component {
     render() {
         const { manifest } = Constants;
         const sections = [
-            { data: [{ value: 'Build ' + manifest.version }], title: 'Version' },
-            { data: [{ value: manifest.orientation }], title: 'Orientation' },
+            { data: [{ value: Translator.t('settings.version.text') + ' ' + manifest.version }], title: Translator.t('settings.version.title') },
+            { data: [{ value: manifest.orientation }], title: Translator.t('settings.orientation') },
             {
                 data: [
                     {
-                        value:
-                            manifest.ios && manifest.ios.supportsTablet ? 'true' : 'false',
-                    },
-                ],
-                title: 'ios.supportsTablet',
-            },
-            {
-                data: [
-                    {
-                        value: 'Send me another confirmation E-Mail',
+                        value: Translator.t('settings.email.text'),
                         onPress: this.props.onConfirmEmail,
                         color: '',
                         type: 'button',
                     }
                 ],
-                title: 'Non confirmed E-Mail address?'
+                title: Translator.t('settings.email.title')
             },
             {
                 data: [
                     {
-                        value: 'Contact support',
+                        value: Translator.t('settings.support.text'),
                         onPress: () => Linking.openURL('mailto:support@justauth.me?subject=[Support] ' + Platform.OS + ' ' + manifest.version),
                         color: '#ff9900',
                         type: 'button',
                     }
                 ],
-                title: 'Help & Support'
+                title: Translator.t('settings.support.title')
             },
             {
                 data: [
                     {
-                        value: 'Logout',
+                        value: Translator.t('settings.logout'),
                         onPress: this.props.onLogout,
                         color: '#f00',
                         type: 'button'
                     }
                 ],
-                title: 'Logout'
+                title: Translator.t('settings.logout')
             }
         ];
 

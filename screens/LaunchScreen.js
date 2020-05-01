@@ -154,7 +154,7 @@ export default class LaunchScreen extends React.Component {
                         if (responseJson.message.match(/code/)) {
                             DropdownSingleton.get().alertWithType('error', Translator.t('launch.error.anti_spam'),  Translator.t('launch.error.anti_spam_message.email_code'));
                         } else {
-                            DropdownSingleton.get().alertWithType('error', Translator.t('launch.error.anti_spam'),  Translator.t('launch.error.anti_spam_message.email'));
+                            DropdownSingleton.get().alertWithType('error', Translator.t('launch.error.anti_spam'),  Translator.t('error_too_many'));
                         }
                     } else {
                         DropdownSingleton.get().alertWithType(
@@ -286,7 +286,7 @@ export default class LaunchScreen extends React.Component {
         } else if (response.status === 403) {
             DropdownSingleton.get().alertWithType('error', Translator.t('launch.error.wrong_passcode'), Translator.t('try_again'));
         } else if (response.status === 429) {
-            DropdownSingleton.get().alertWithType('error', Translator.t('launch.error.anti_spam'), Translator.t('launch.error.anti_spam_message.login'));
+            DropdownSingleton.get().alertWithType('error', Translator.t('launch.error.anti_spam'), Translator.t('error_too_many'));
         } else {
             DropdownSingleton.get().alertWithType(
                 'error',
@@ -381,7 +381,7 @@ export default class LaunchScreen extends React.Component {
                                 <Text style={styles.baseline}>{Translator.t('launch.email')}</Text>
                                 <TextInput
                                     style={styles.textInput}
-                                    placeholder={"e.g. aiden@pearce.me"}
+                                    placeholder={Translator.t('placeholders.email')}
                                     placeholderTextColor={"rgba(255,255,255,.5)"}
                                     returnKeyType={"done"}
                                     autoCorrect={false}
@@ -458,7 +458,7 @@ export default class LaunchScreen extends React.Component {
                                 <Text style={styles.baseline}>{Translator.t('launch.firstname')}</Text>
                                 <TextInput
                                     style={styles.textInput}
-                                    placeholder={"e.g. Aiden"}
+                                    placeholder={Translator.t('placeholders.firstname')}
                                     placeholderTextColor={"rgba(255,255,255,.5)"}
                                     returnKeyType={"done"}
                                     autoCorrect={false}
@@ -485,7 +485,7 @@ export default class LaunchScreen extends React.Component {
                                 <Text style={styles.baseline}>{Translator.t('launch.lastname')}</Text>
                                 <TextInput
                                     style={styles.textInput}
-                                    placeholder={"e.g. Pearce"}
+                                    placeholder={Translator.t('placeholders.lastname')}
                                     placeholderTextColor={"rgba(255,255,255,.5)"}
                                     returnKeyType={"done"}
                                     autoCorrect={false}
@@ -518,7 +518,7 @@ export default class LaunchScreen extends React.Component {
                             fontWeight: '600',
                             textAlign: 'center',
                             marginTop: isZoomed ? 20 : isBorderless ? 100 : 70
-                        }}>Congratulations!</Text>
+                        }}>{Translator.t('congratulations')}</Text>
                         <Text style={{
                             fontSize: isZoomed ? 70 : 100,
                             marginTop: 50
@@ -531,15 +531,8 @@ export default class LaunchScreen extends React.Component {
                             paddingRight: 15,
                             textAlign: 'center',
                             marginTop: 30
-                        }}>
-                            You successfully registered into JustAuthMe!
-                            {"\n"}We sent you a
-                            <Text style={{
-                                fontWeight: '800'
-                            }}> confirmation E-Mail! </Text>
-                            {"\n"}You can now enjoy all JustAuthMe benefits !
-                        </Text>
-                        <ContinueButton text={'Let\'s go!'} ref={ref => this.continueBtn = ref} onPress={this.finish} marginTop={50} />
+                        }}>{Translator.t('launch.success')}</Text>
+                        <ContinueButton text={Translator.t('lets_go')} ref={ref => this.continueBtn = ref} onPress={this.finish} marginTop={50} />
                     </ScrollView>
                 );
 

@@ -7,8 +7,8 @@ import {
     StyleSheet
 } from 'react-native';
 import ActionBtn from "./ActionBtn";
-import Config from "../constants/Config";
 import CheckMark from "./CheckMark";
+import Translator from "../i18n/Translator";
 
 export default class AuthDataList extends React.Component {
     constructor(props) {
@@ -20,12 +20,17 @@ export default class AuthDataList extends React.Component {
         return data.indexOf('!') === data.length - 1;
     }
 
-    getDataLabelFromID(data) {
+    static getDataSlug(data) {
         if (AuthDataList.isDataRequired(data)) {
             data = data.slice(0, -1);
         }
 
-        return Config.dataList[data];
+        return data;
+    }
+
+   static getDataLabelFromID(data) {
+        data = AuthDataList.getDataSlug(data);
+        return Translator.t('data_list.' + data);
     }
 
     onCheckMarkPressed = data => {
@@ -36,24 +41,25 @@ export default class AuthDataList extends React.Component {
     render() {
         return (
             <View style={this.props.style}>
-                <Text style={styles.authWarning}>{this.props.domain + ' ' + (this.props.isFirstLogin ? 'will have access to the following:' : 'has access to the following:')}</Text>
+                <Text style={styles.authWarning}>{Translator.t('auth.data_list.' + (this.props.isFirstLogin ? 'first' : 'relog'), {domain: this.props.domain})}:</Text>
                 <FlatList
                     style={styles.listContainer}
                     data={this.props.data}
                     renderItem={({item}) =>
                         <View style={styles.listItem}>
-                            <TouchableOpacity style={{...styles.itemCheckbox, borderColor: AuthDataList.isDataRequired(item.key) || !this.props.isFirstLogin ? '#ccc' : '#1459E3'}} activeOpacity={1} onPress={() => {
-                                if (!AuthDataList.isDataRequired(item.key) && this.props.isFirstLogin) {
+                            <TouchableOpacity style={{...styles.itemCheckbox, borderStyle: this.props.checkable[item.key] || !this.props.isFirstLogin ? 'solid' : 'dashed', borderColor: !this.props.checkable[item.key] && this.props.isFirstLogin ? '#ccc' : (AuthDataList.isDataRequired(item.key) || !this.props.isFirstLogin ? '#888' : '#1459E3')}} activeOpacity={1} onPress={() => {
+                                if (!AuthDataList.isDataRequired(item.key) && this.props.isFirstLogin && this.props.checkable[item.key]) {
                                     this.onCheckMarkPressed(item.key)
                                 }
                             }}>
-                                <CheckMark ref={ref =>(this.checkmarks[item.key] = ref)} itemKey={item.key} isFirstLogin={this.props.isFirstLogin} />
+                                <CheckMark ref={ref =>(this.checkmarks[item.key] = ref)} itemKey={item.key} visible={this.props.checkable[item.key] || !this.props.isFirstLogin} isFirstLogin={this.props.isFirstLogin} />
                             </TouchableOpacity>
-                            <Text style={styles.itemText}>{this.getDataLabelFromID(item.key)}</Text>
+                            <Text style={{...styles.itemText, color: this.props.checkable[item.key] || !this.props.isFirstLogin ? '#000' : '#ccc', fontWeight: AuthDataList.isDataRequired(item.key) ? '400' : '500'}}>{AuthDataList.getDataLabelFromID(item.key)}</Text>
+                            {!this.props.checkable[item.key] && this.props.isFirstLogin && <Text style={styles.notFilled}>{Translator.t('auth.missing')}</Text>}
                         </View>
                     }
                 />
-                <ActionBtn style={styles.loginBtn} btnText="Confirm login" btnIcon={'md-checkmark'} onPress={this.props.onAccept} />
+                <ActionBtn style={styles.loginBtn} btnText={Translator.t('auth.confirm_login')} btnIcon={'md-checkmark'} onPress={this.props.onAccept} />
             </View>
         );
     }
@@ -97,5 +103,12 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: '600',
         textAlign: 'center'
+    },
+    notFilled: {
+        position: 'absolute',
+        color: '#aaa',
+        fontSize: 12,
+        top: 23,
+        left: 36
     }
 });

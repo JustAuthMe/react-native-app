@@ -41,7 +41,6 @@ export default class App extends React.Component {
     }
 
     _loadResourcesAsync = async () => {
-        Translator.init(); //TODO: move init somewhere more appropriate
         const sounds = AudioModel.load(AudioLibrary);
         return Promise.all([
             Font.loadAsync({

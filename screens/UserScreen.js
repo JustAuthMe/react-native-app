@@ -26,11 +26,12 @@ import {NavigationActions, StackActions} from "react-navigation";
 import NetworkLoader from "../components/NetworkLoader";
 import {UserModel} from "../models/UserModel";
 import DarkStatusBar from "../components/DarkStatusBar";
+import Translator from "../i18n/Translator";
 
 export default class UserScreen extends React.Component {
-    static navigationOptions = {
-        title: 'My infos',
-    };
+    static navigationOptions = () => ({
+        title: Translator.t('user.title'),
+    });
 
     state = {
         user: {},
@@ -56,7 +57,15 @@ export default class UserScreen extends React.Component {
             lastname: await AsyncStorage.getItem('lastname'),
             birthdate: await AsyncStorage.getItem('birthdate'),
             email: await AsyncStorage.getItem('email'),
-            avatar: await AsyncStorage.getItem('avatar')
+            avatar: await AsyncStorage.getItem('avatar'),
+            address_1: await AsyncStorage.getItem('address_1'),
+            address_2: await AsyncStorage.getItem('address_2'),
+            postal_code: await AsyncStorage.getItem('postal_code'),
+            city: await AsyncStorage.getItem('city'),
+            state: await AsyncStorage.getItem('state'),
+            country: await AsyncStorage.getItem('country'),
+            job: await AsyncStorage.getItem('job'),
+            company: await AsyncStorage.getItem('company')
         };
         const splitDate = user.birthdate !== null ? user.birthdate.split('/') : [];
         this.setState({
@@ -93,7 +102,7 @@ export default class UserScreen extends React.Component {
         if (Constants.platform.ios) {
             const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
             if (status !== 'granted') {
-                DropdownSingleton.get().alertWithType('error', 'Permission required', 'Sorry, you need to grant Camera roll permission to change your avatar!');
+                DropdownSingleton.get().alertWithType('error', Translator.t('permission_required'), Translator.t('permission.camera_roll'));
                 return;
             }
         }
@@ -114,14 +123,10 @@ export default class UserScreen extends React.Component {
     async updateInfos() {
         for (let i = 0; i < this.requiredInfos.length; i++) {
             if (this.state.user[this.requiredInfos[i]] === '' || this.state.user[this.requiredInfos[i]] === null) {
-                DropdownSingleton.get().alertWithType('error', 'Empty field(s)', 'Please fill all the required informations.');
+                DropdownSingleton.get().alertWithType('error', Translator.t('user.error.empty.title'), Translator.t('user.error.empty.text'));
                 return;
             }
         }
-
-        await AsyncStorage.setItem('firstname', this.state.user.firstname);
-        await AsyncStorage.setItem('lastname', this.state.user.lastname);
-        await AsyncStorage.setItem('birthdate', this.state.user.birthdate ? this.state.user.birthdate : '');
 
         const oldEmail = await AsyncStorage.getItem('email');
         let hasEmailChanged = false;
@@ -159,13 +164,15 @@ export default class UserScreen extends React.Component {
             } else if (response.status === 423) {
                 UserModel.logout(this.props.navigation);
             } else if (response.status === 429) {
-                DropdownSingleton.get().alertWithType('error', 'E-Mail address is already registered', 'This E-Mail address is associated to another JustAuthMe account.');
+                DropdownSingleton.get().alertWithType('error', Translator.t('user.error.email_exists.title'), Translator.t('user.error.email_exists.text'));
             } else {
-                DropdownSingleton.get().alertWithType('error', 'Cannot update E-Mail address', 'Please contact support for further assistance.');
+                DropdownSingleton.get().alertWithType('error', Translator.t('user.error.email_update'), Translator('error_default'));
             }
         }
 
-        await AsyncStorage.setItem('avatar', this.state.user.avatar);
+        for (let i in this.state.user) {
+            await AsyncStorage.setItem(i, this.state.user[i] ? this.state.user[i] : '');
+        }
 
         if (!this.state.isLogin) {
             this.props.navigation.goBack();
@@ -184,13 +191,9 @@ export default class UserScreen extends React.Component {
         This fixes a glitch with the statusbar being updated to the alert color and reverted to thw old screen status bar color
          */
         if (hasEmailChanged) {
-            setTimeout(() => DropdownSingleton.get().alertWithType(
-                'info',
-                'Check your inbox!',
-                'We sent you a confirmation E-Mail to ' + this.state.user.email + '. Click on the link to confirm your new E-Mail address.'
-            ), 300);
+            setTimeout(() => DropdownSingleton.get().alertWithType('info', Translator.t('user.info.inbox.title'), Translator.t('user.info.inbox.text')), 300);
         } else {
-            setTimeout(() => DropdownSingleton.get().alertWithType('success', 'My infos', 'Saved successfully'), 300);
+            setTimeout(() => DropdownSingleton.get().alertWithType('success', Translator.t('user.title'), Translator.t('user.success')), 300);
         }
     }
 
@@ -216,11 +219,11 @@ export default class UserScreen extends React.Component {
                                     </View>
                                     <Image source={{uri: this.state.user.avatar}} style={styles.avatar} />
                                 </TouchableOpacity>
-                                <Text style={styles.textLabel}>E-Mail address:</Text>
+                                <Text style={styles.textLabel}>{Translator.t('data_list.email')}*:</Text>
                                 <TextInput
                                     ref={"email"}
                                     style={styles.textInput}
-                                    placeholder={"e.g. aiden@pearce.me"}
+                                    placeholder={Translator.t('placeholders.email')}
                                     returnKeyType={"done"}
                                     autoCorrect={false}
                                     spellCheck={false}
@@ -232,15 +235,15 @@ export default class UserScreen extends React.Component {
                                     onChangeText={(text) => this.setState({user:{...this.state.user, email:text}})}
                                     onFocus={() => DropdownSingleton.get().alertWithType(
                                         'info',
-                                        'Information',
-                                        'If you change your E-Mail address, you\'ll need to confirm your new address before continuing to use JustAuthMe'
+                                        Translator.t('alert.information'),
+                                        Translator.t('user.info.email_update')
                                     )}
                                 />
-                                <Text style={styles.textLabel}>Firstname:</Text>
+                                <Text style={styles.textLabel}>{Translator.t('data_list.firstname')}*:</Text>
                                 <TextInput
                                     ref={"firstname"}
                                     style={styles.textInput}
-                                    placeholder={"e.g. Aiden"}
+                                    placeholder={Translator.t('placeholders.firstname')}
                                     returnKeyType={"done"}
                                     autoCorrect={false}
                                     spellCheck={false}
@@ -249,11 +252,11 @@ export default class UserScreen extends React.Component {
                                     value={this.state.user.firstname}
                                     onChangeText={(text) => this.setState({user:{...this.state.user, firstname:text}})}
                                 />
-                                <Text style={styles.textLabel}>Lastname:</Text>
+                                <Text style={styles.textLabel}>{Translator.t('data_list.lastname')}*:</Text>
                                 <TextInput
                                     ref={"lastname"}
                                     style={styles.textInput}
-                                    placeholder={"e.g. Pearce"}
+                                    placeholder={Translator.t('placeholders.lastname')}
                                     returnKeyType={"done"}
                                     autoCorrect={false}
                                     spellCheck={false}
@@ -262,7 +265,7 @@ export default class UserScreen extends React.Component {
                                     value={this.state.user.lastname}
                                     onChangeText={(text) => this.setState({user:{...this.state.user, lastname:text}})}
                                 />
-                                <Text style={styles.textLabel}>Birthdate:</Text>
+                                <Text style={styles.textLabel}>{Translator.t('data_list.birthdate')}:</Text>
                                 <TouchableOpacity activeOpacity={.5} style={styles.inputTouchable} onPress={() => {
                                     DatePickerSingleton.get().open({
                                         date: this.state.currentBirthdate,
@@ -273,7 +276,7 @@ export default class UserScreen extends React.Component {
                                     <TextInput
                                         ref={'birthdateInput'}
                                         style={styles.textInput}
-                                        placeholder={"e.g. 02/05/1974"}
+                                        placeholder={Translator.t('placeholders.birthdate')}
                                         returnKeyType={"done"}
                                         autoCorrect={false}
                                         spellCheck={false}
@@ -283,7 +286,112 @@ export default class UserScreen extends React.Component {
                                         value={this.state.birthdateInputValue}
                                     />
                                 </TouchableOpacity>
-                                <ActionBtn btnText={"Save"} btnIcon={'md-checkmark'} onPress={() => this.updateInfos()}/>
+                                {/*<Text style={styles.textLabel}>{Translator.t('data_list.address_1')}:</Text>
+                                <TextInput
+                                    ref={"adress_1"}
+                                    style={styles.textInput}
+                                    placeholder={Translator.t('placeholders.address_1')}
+                                    returnKeyType={"done"}
+                                    autoCorrect={false}
+                                    spellCheck={false}
+                                    textContentType={"streetAddressLine1"}
+                                    clearButtonMode={"always"}
+                                    value={this.state.user.address_1}
+                                    onChangeText={(text) => this.setState({user:{...this.state.user, address_1:text}})}
+                                />
+                                <Text style={styles.textLabel}>{Translator.t('data_list.address_2')}:</Text>
+                                <TextInput
+                                    ref={"address_2"}
+                                    style={styles.textInput}
+                                    placeholder={Translator.t('placeholders.address_2')}
+                                    returnKeyType={"done"}
+                                    autoCorrect={false}
+                                    spellCheck={false}
+                                    textContentType={"streetAddressLine2"}
+                                    clearButtonMode={"always"}
+                                    value={this.state.user.address_2}
+                                    onChangeText={(text) => this.setState({user:{...this.state.user, address_2:text}})}
+                                />
+                                <Text style={styles.textLabel}>{Translator.t('data_list.postal_code')}:</Text>
+                                <TextInput
+                                    ref={"postal_code"}
+                                    style={styles.textInput}
+                                    placeholder={Translator.t('placeholders.postal_code')}
+                                    returnKeyType={"done"}
+                                    autoCorrect={false}
+                                    spellCheck={false}
+                                    keyboardType={'number-pad'}
+                                    textContentType={"postalCode"}
+                                    clearButtonMode={"always"}
+                                    value={this.state.user.postal_code}
+                                    onChangeText={(text) => this.setState({user:{...this.state.user, postal_code:text}})}
+                                />
+                                <Text style={styles.textLabel}>{Translator.t('data_list.city')}:</Text>
+                                <TextInput
+                                    ref={"city"}
+                                    style={styles.textInput}
+                                    placeholder={Translator.t('placeholders.city')}
+                                    returnKeyType={"done"}
+                                    autoCorrect={false}
+                                    spellCheck={false}
+                                    textContentType={"addressCity"}
+                                    clearButtonMode={"always"}
+                                    value={this.state.user.city}
+                                    onChangeText={(text) => this.setState({user:{...this.state.user, city:text}})}
+                                />
+                                <Text style={styles.textLabel}>{Translator.t('data_list.state')}:</Text>
+                                <TextInput
+                                    ref={"state"}
+                                    style={styles.textInput}
+                                    placeholder={Translator.t('placeholders.state')}
+                                    returnKeyType={"done"}
+                                    autoCorrect={false}
+                                    spellCheck={false}
+                                    textContentType={"addressState"}
+                                    clearButtonMode={"always"}
+                                    value={this.state.user.state}
+                                    onChangeText={(text) => this.setState({user:{...this.state.user, state:text}})}
+                                />
+                                <Text style={styles.textLabel}>{Translator.t('data_list.country')}:</Text>
+                                <TextInput
+                                    ref={"country"}
+                                    style={styles.textInput}
+                                    placeholder={Translator.t('placeholders.country')}
+                                    returnKeyType={"done"}
+                                    autoCorrect={false}
+                                    spellCheck={false}
+                                    textContentType={"countryName"}
+                                    clearButtonMode={"always"}
+                                    value={this.state.user.country}
+                                    onChangeText={(text) => this.setState({user:{...this.state.user, country:text}})}
+                                />
+                                <Text style={styles.textLabel}>{Translator.t('data_list.job')}:</Text>
+                                <TextInput
+                                    ref={"job"}
+                                    style={styles.textInput}
+                                    placeholder={Translator.t('placeholders.job')}
+                                    returnKeyType={"done"}
+                                    autoCorrect={false}
+                                    spellCheck={false}
+                                    textContentType={"jobTitle"}
+                                    clearButtonMode={"always"}
+                                    value={this.state.user.job}
+                                    onChangeText={(text) => this.setState({user:{...this.state.user, job:text}})}
+                                />
+                                <Text style={styles.textLabel}>{Translator.t('data_list.company')}:</Text>
+                                <TextInput
+                                    ref={"company"}
+                                    style={styles.textInput}
+                                    placeholder={Translator.t('placeholders.company')}
+                                    returnKeyType={"done"}
+                                    autoCorrect={false}
+                                    spellCheck={false}
+                                    textContentType={"organizationName"}
+                                    clearButtonMode={"always"}
+                                    value={this.state.user.company}
+                                    onChangeText={(text) => this.setState({user:{...this.state.user, company:text}})}
+                                />*/}
+                                <ActionBtn btnText={Translator.t('user.save')} btnIcon={'md-checkmark'} onPress={() => this.updateInfos()}/>
                             </View>
                         </ScrollView>
                     )}
@@ -303,7 +411,7 @@ const styles = StyleSheet.create({
     },
     content: {
         alignItems: 'center',
-        marginBottom: 30
+        marginBottom: 50
     },
     textLabel: {
         width: '70%',
