@@ -1,4 +1,4 @@
-export default {
+module.exports = {
     urlScheme: 'jam://',
     apiUrl: 'http://192.168.0.9/JustAuth.Me/core/public/api/',
     alertUrl: 'http://192.168.0.9/JustAuth.Me/alert/',

@@ -4,7 +4,7 @@ const root = __dirname + '/../';
 
 const toScan = ['components', 'constants', 'models', 'screens']
 
-const referenceLocale = require(root+'i18n/translations/en').default;
+const referenceLocale = require(root+'i18n/translations/en');
 
 let errors = [];
 let totalTranslates = 0;

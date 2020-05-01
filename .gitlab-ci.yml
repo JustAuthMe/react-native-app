@@ -19,7 +19,7 @@ tests:
   script:
     - npm run check-translations
 
-export-bundle-staging:
+export-bundle-staging-prod: #export staging bundle using prod core
   tags:
     - macos
   cache:
@@ -28,24 +28,67 @@ export-bundle-staging:
       - ~/.npm
       - node_modules/
   stage: export-bundle-staging
+  variables:
+    ALERT_URL: "$PROD_ALERT_URL"
+    CORE_API_URL: "$PROD_CORE_API_URL"
   script:
     - npm ci
-    - npx expo export -p $STAGING_CDN_URL --output-dir dist/bundle-staging -q
-    - tar -czvf dist/bundle.staging.tar.gz -C ./dist/bundle-staging/ .
+    - node scripts/before_export.js
+    - npx expo export -p $STAGING_CDN_URL/prod/ --output-dir dist/bundle-staging-prod -q
+    - tar -czvf dist/bundle.staging-prod.tar.gz -C ./dist/bundle-staging-prod/ .
   artifacts:
     paths:
-      - dist/bundle.staging.tar.gz
+      - dist/bundle.staging-prod.tar.gz
   only:
     - tags
 
-deploy-bundle-staging:
+export-bundle-staging-staging: #export staging bundle using staging core
+  tags:
+    - macos
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - ~/.npm
+      - node_modules/
+  stage: export-bundle-staging
+  variables:
+    ALERT_URL: "$PROD_ALERT_URL"
+    CORE_API_URL: "$STAGING_CORE_API_URL"
+  script:
+    - npm ci
+    - node scripts/before_export.js
+    - npx expo export -p $STAGING_CDN_URL/staging/ --output-dir dist/bundle-staging-staging -q
+    - tar -czvf dist/bundle.staging-staging.tar.gz -C ./dist/bundle-staging-staging/ .
+  artifacts:
+    paths:
+      - dist/bundle.staging-staging.tar.gz
+  only:
+    - tags
+
+deploy-bundle-staging-prod: # aka staging app using prod core
   tags:
     - macos
   stage: deploy-bundle-staging
   variables:
     HOST: "$STAGING_CDN_HOST"
-    ROOT_PATH: "/var/www/$STAGING_CDN_ROOT_PATH"
-    ENV_NAME: "staging"
+    ROOT_PATH: "/var/www/$STAGING_CDN_ROOT_PATH/prod"
+    ENV_NAME: "staging-prod"
+  script:
+    - chmod 600 $STAGING_CDN_PK
+    - echo Uploading bundle to cdn...
+    - PK_PATH="$STAGING_CDN_PK" ./deploy.sh
+    - rm $STAGING_CDN_PK
+  only:
+    - tags
+
+deploy-bundle-staging-staging: #aka staging app using staging core
+  tags:
+    - macos
+  stage: deploy-bundle-staging
+  variables:
+    HOST: "$STAGING_CDN_HOST"
+    ROOT_PATH: "/var/www/$STAGING_CDN_ROOT_PATH/staging"
+    ENV_NAME: "staging-staging"
   script:
     - chmod 600 $STAGING_CDN_PK
     - echo Uploading bundle to cdn...
@@ -63,8 +106,12 @@ export-bundle-prod:
       - ~/.npm
       - node_modules/
   stage: export-bundle-prod
+  variables:
+    ALERT_URL: "$PROD_ALERT_URL"
+    CORE_API_URL: "$PROD_CORE_API_URL"
   script:
     - npm ci
+    - node scripts/before_export.js
     - npx expo export -p $PROD_CDN_URL --output-dir dist/bundle-prod -q
     - tar -czvf dist/bundle.prod.tar.gz -C ./dist/bundle-prod/ .
   artifacts:
