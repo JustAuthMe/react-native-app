@@ -55,7 +55,12 @@ function checkExists(key){
     totalTranslates++;
     let cursor = referenceLocale;
     let parts = key.split('.');
+    let isObjectTargeted = false;
     parts.forEach(part => {
+        if(part === ''){ // we target an object
+            isObjectTargeted = true;
+            return;
+        }
         if(cursor === undefined){
             return;
         }
@@ -65,8 +70,13 @@ function checkExists(key){
     if(cursor === undefined){
         return {key: key, problem: 'Not found'};
     }
-    if (typeof cursor !== 'string'){
-        return {key: key, problem: 'Not a string'};
+
+    if(isObjectTargeted && typeof cursor !== 'object'){
+        return {key: key, problem: 'Not an object'};
+    }
+
+    if (!isObjectTargeted && typeof cursor === 'object'){
+        return {key: key, problem: 'Object'};
     }
     return null;
 }
