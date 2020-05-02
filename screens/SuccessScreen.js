@@ -7,6 +7,7 @@ import {
 import LottieView from 'lottie-react-native';
 import ActionBtn from "../components/ActionBtn";
 import {AudioModel} from "../models/AudioModel";
+import Translator from "../i18n/Translator";
 
 export default class SuccessScreen extends React.Component {
     static navigationOptions = {
@@ -31,7 +32,7 @@ export default class SuccessScreen extends React.Component {
     render() {
         return (
             <View style={styles.content}>
-                <Text style={styles.successText}>You're now logged in!</Text>
+                <Text style={styles.successText}>{Translator.t('now_logged_in')}</Text>
                 <View style={styles.animationContainer}>
                     <LottieView
                         ref={animation => {
@@ -43,7 +44,7 @@ export default class SuccessScreen extends React.Component {
                     />
                 </View>
                 <ActionBtn
-                    btnText={'Go back'}
+                    btnText={Translator.t('go_back')}
                     btnIcon={'ios-arrow-back'}
                     onPress={() => {
                         this.props.navigation.navigate('Home')

@@ -1,6 +1,5 @@
 import React from 'react';
-import {createStackNavigator} from 'react-navigation';
-
+import {createStackNavigator} from './Navigator';
 import HomeScreen from '../screens/HomeScreen';
 import ScannerScreen from "../screens/ScannerScreen";
 import AuthScreen from "../screens/AuthScreen";

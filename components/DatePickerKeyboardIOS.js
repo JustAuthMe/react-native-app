@@ -6,6 +6,7 @@ import {
     DatePickerIOS,
     Platform
 } from 'react-native';
+import Translator from "../i18n/Translator";
 
 export default class DatePickerKeyboardIOS extends React.Component {
 
@@ -48,8 +49,8 @@ export default class DatePickerKeyboardIOS extends React.Component {
                     <Button
                         style={styles.button}
                         onPress={() => this.setState({opened: false})}
-                        title={"Cancel"}
-                        accessibilityLabel={"Close the date picker"}
+                        title={Translator.t('cancel')}
+                        accessibilityLabel={Translator.t('ios_date_picker.cancel')}
                     />
                     <Button
                         style={styles.button}
@@ -57,8 +58,8 @@ export default class DatePickerKeyboardIOS extends React.Component {
                             this.props.onDone();
                             this.setState({opened: false});
                         }}
-                        title={"Done"}
-                        accessibilityLabel={"Validate the date"}
+                        title={Translator.t('done')}
+                        accessibilityLabel={Translator.t('ios_date_picker.done')}
                     />
                 </View>
                 <DatePickerIOS

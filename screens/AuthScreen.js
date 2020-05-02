@@ -1,7 +1,6 @@
 import React from 'react';
 import {
     View,
-    Text,
     StyleSheet,
     Image,
     AsyncStorage,
@@ -20,12 +19,13 @@ import {ServicesModel} from "../models/ServicesModel";
 import AndroidBiometricPrompt from "../components/AndroidBiometricPrompt";
 import {UserModel} from "../models/UserModel";
 import NetworkLoader from "../components/NetworkLoader";
-import {DateModel} from "../models/DateModel";
+import Translator from "../i18n/Translator";
+import Text from '../components/JamText'
 
 export default class AuthScreen extends React.Component {
-    static navigationOptions = {
-        title: 'Authentication',
-    };
+    static navigationOptions = () => ({
+        title: Translator.t('auth.title'),
+    });
 
     state = {
         token: this.props.navigation.getParam('token'),
@@ -35,7 +35,12 @@ export default class AuthScreen extends React.Component {
 
     constructor(props) {
         super(props);
-        this.getAuthDetails().then();
+    }
+
+    componentDidMount() {
+        this._navListener = this.props.navigation.addListener("didFocus", () => {
+            this.getAuthDetails().then();
+        });
     }
 
     async getAuthDetails() {
@@ -43,19 +48,39 @@ export default class AuthScreen extends React.Component {
         this.services = await ServicesModel.getServices();
 
         try {
+            this.networkLoader.setState({visible: true});
+
             const response = await fetch(endpointUrl);
             const responseJson = await response.json();
+            const isFirstLogin = !this.services.hasOwnProperty(responseJson.auth.client_app.app_id);
+
+            this.networkLoader.setState({visible: false});
+            console.log(this.networkLoader.state);
 
             if (responseJson.status === 'success') {
+                this.actualData = {};
+                let currentData = '';
+                for (let i = 0; i < responseJson.auth.client_app.data.length; i++) {
+                    currentData = await AsyncStorage.getItem(AuthDataList.getDataSlug(responseJson.auth.client_app.data[i]));
+                    this.actualData[responseJson.auth.client_app.data[i]] = currentData !== null && currentData !== '';
+
+                    if (isFirstLogin && !this.actualData[responseJson.auth.client_app.data[i]] && AuthDataList.isDataRequired(responseJson.auth.client_app.data[i])) {
+                        DropdownSingleton.get().alertWithType(
+                            'error',
+                            Translator.t('auth.missing_data'),
+                            Translator.t('auth.missing_data_message', {
+                                data: AuthDataList.getDataLabelFromID(responseJson.auth.client_app.data[i]),
+                                name: responseJson.auth.client_app.name
+                            })
+                        );
+                        this.props.navigation.navigate('User');
+                    }
+                }
+
                 this.setState({
                     auth: responseJson.auth,
-                    isFirstLogin: !this.services.hasOwnProperty(responseJson.auth.client_app.app_id)
+                    isFirstLogin: isFirstLogin
                 });
-
-                this.actualData = {};
-                for (let i = 0; i < responseJson.auth.client_app.data.length; i++) {
-                    this.actualData[responseJson.auth.client_app.data[i]] = true;
-                }
             } else {
 
                 const resetAction = StackActions.reset({
@@ -67,8 +92,8 @@ export default class AuthScreen extends React.Component {
                 this.props.navigation.dispatch(resetAction);
                 DropdownSingleton.get().alertWithType(
                     'error',
-                    'Invalid token',
-                    'An error occurred while attempting to retrieve authentication details. Please try again or contact support.'
+                    Translator.t('auth.invalid_token'),
+                    Translator.t('auth.invalid_token_message')
                 );
             }
         } catch (error) {
@@ -89,10 +114,7 @@ export default class AuthScreen extends React.Component {
 
         const authData = this.state.auth.client_app.data;
         for (let i = 0; i < authData.length; i++) {
-            let dataName = authData[i];
-            if (authData[i].indexOf('!') !== -1) {
-                dataName = authData[i].slice(0, -1);
-            }
+            let dataName = AuthDataList.getDataSlug(authData[i]);
 
             if (this.actualData[authData[i]]) {
                 data[dataName] = await AsyncStorage.getItem(dataName);
@@ -107,32 +129,46 @@ export default class AuthScreen extends React.Component {
         const isEnrolled = await LocalAuthentication.isEnrolledAsync();
 
         let canLogin = true;
+        let isUserBigFatFingersFault = false;
+        let isThereEvenAMessageOrSomething = false;
         if (hasHardware && isEnrolled) {
             if (Platform.OS === 'android') {
                 this.androidPrompt.setState({visible: true});
             }
 
-            let localAuth = await LocalAuthentication.authenticateAsync({promptMessage: 'Confirm login attempt'});
+            let localAuth = await LocalAuthentication.authenticateAsync({promptMessage: Translator.t('auth.confirm_login')});
             canLogin = localAuth.success;
+            isUserBigFatFingersFault = localAuth.error === 'authentication_failed';
+            isThereEvenAMessageOrSomething = localAuth.message && localAuth.message !== '';
 
             if (Platform.OS === 'android') {
-                let i = 0;
                 do {
-                    this.androidPrompt.setState({status: canLogin ? 'success' : 'error'});
+                    if (canLogin || isUserBigFatFingersFault) {
+                        this.androidPrompt.setState({status: canLogin ? 'success' : 'error'});
+                    }
 
                     if (!canLogin) {
-                        localAuth = await LocalAuthentication.authenticateAsync({promptMessage: 'Confirm login attempt'});
+                        localAuth = await LocalAuthentication.authenticateAsync({promptMessage: Translator.t('auth.confirm_login')});
                         canLogin = localAuth.success;
-                        i++;
+                        isUserBigFatFingersFault = localAuth.error === 'authentication_failed';
+                        isThereEvenAMessageOrSomething = localAuth.message && localAuth.message !== '';
                     }
-                } while (i < 5 && !canLogin && this.androidPrompt.state.visible);
+                } while (
+                    !canLogin &&
+                    this.androidPrompt.state.visible && (
+                    isUserBigFatFingersFault || (
+                            localAuth.error === 'unknown' && !isThereEvenAMessageOrSomething
+                        )
+                    )
+                );
 
                 if (!canLogin) {
+                    await LocalAuthentication.cancelAuthenticate();
                     this.androidPrompt.setState({visible: false});
                     DropdownSingleton.get().alertWithType(
                         'error',
-                        'Biometric rejection',
-                        'Your system cannot recognize your fingerprint. Please lock your phone and enter your passcode to reactivate it.'
+                        Translator.t('auth.biometric_error'),
+                        isThereEvenAMessageOrSomething ? localAuth.message : Translator.t('auth.biometric_error_message')
                     );
                 }
             }
@@ -142,7 +178,6 @@ export default class AuthScreen extends React.Component {
             const endpointUrl = Config.apiUrl + 'login';
             const data = await this.getUserDataFromDataset();
             const enc = new EncryptionModel();
-            const dateModel = new DateModel();
             const plain = enc.urlencode(enc.json_encode(data));
             const sign = await enc.sign(plain);
 
@@ -201,15 +236,15 @@ export default class AuthScreen extends React.Component {
                     this.props.navigation.navigate('Success');
                 } else {
                     if (response.status === 401) {
-                        DropdownSingleton.get().alertWithType('error', 'Unauthorized login', 'A wrong authentication attempt has been detected.');
+                        DropdownSingleton.get().alertWithType('error', Translator.t('auth.unauthorized_login'), Translator.t('auth.unauthorized_login_message'));
                     } else if (response.status === 403) {
-                        DropdownSingleton.get().alertWithType('error', 'Non confirmed E-Mail', 'Please confirm your E-Mail address before trying to authenticate.');
+                        DropdownSingleton.get().alertWithType('error', Translator.t('auth.non_confirmed_email'), Translator.t('auth.non_confirmed_email_message'));
                     } else if (response.status === 404) {
-                        DropdownSingleton.get().alertWithType('error', 'Invalid token', 'There is no such authentication token.');
+                        DropdownSingleton.get().alertWithType('error', Translator.t('auth.invalid_token'), Translator.t('auth.token_not_found'));
                     } else if (response.status === 423) {
                         UserModel.logout(this.props.navigation);
                     } else {
-                        DropdownSingleton.get().alertWithType('error', 'Unknow error', 'An error occurred during login challenge. Please contact support.');
+                        DropdownSingleton.get().alertWithType('error', Translator.t('auth.unknown_error'), Translator.t('auth.error_login'));
                     }
 
                     const resetAction = StackActions.reset({
@@ -247,15 +282,17 @@ export default class AuthScreen extends React.Component {
 
             content =
                 <ScrollView style={styles.scrollViewContainer}>
+                    <NetworkLoader ref={ref => this.networkLoader = ref} />
                     <View style={styles.authHeader}>
                         <Image source={{uri: this.state.auth.client_app.logo}} style={styles.appIcon} />
-                        <Text style={styles.logInto}>You're about to log into</Text>
+                        <Text style={styles.logInto}>{Translator.t('auth.about_to_log')}</Text>
                         <Text style={styles.appName}>{this.state.auth.client_app.name}</Text>
                     </View>
                     <AuthDataList
                         style={styles.data}
                         domain={this.state.auth.client_app.domain}
                         data={data}
+                        checkable={Object.assign({}, this.actualData)}
                         isFirstLogin={this.state.isFirstLogin}
                         onAccept={this.onAcceptLogin}
                         onUpdate={this.onUpdateData}

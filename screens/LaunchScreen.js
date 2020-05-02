@@ -1,22 +1,17 @@
 import React from 'react';
 import {
     StyleSheet,
-    Text,
     View,
     Image,
     TouchableOpacity,
     TextInput,
     AsyncStorage,
     Platform,
-    Alert,
     ScrollView,
     Dimensions
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { SplashScreen } from 'expo';
-import * as Icon from '@expo/vector-icons';
-import * as Permissions from 'expo-permissions';
-import * as ImagePicker from 'expo-image-picker';
 import * as SecureStore from 'expo-secure-store';
 import Constants from 'expo-constants';
 import { Ionicons } from '@expo/vector-icons';
@@ -26,11 +21,12 @@ import Config from "../constants/Config";
 import LightStatusBar from "../components/LightStatusBar";
 import { StackActions, NavigationActions } from 'react-navigation';
 import {DropdownSingleton} from "../models/DropdownSingleton";
-import {DatePickerSingleton} from "../models/DatePickerSingleton";
 import Swiper from 'react-native-swiper';
 import ExplanationTitle from "../components/ExplanationTitle";
 import NetworkLoader from "../components/NetworkLoader";
 import KeyboardShift from "../components/KeyboardShift";
+import Translator from "../i18n/Translator";
+import Text from '../components/JamText'
 
 export default class LaunchScreen extends React.Component {
 
@@ -40,33 +36,28 @@ export default class LaunchScreen extends React.Component {
 
     state = {
         step: this.props.navigation.getParam('step') ? this.props.navigation.state.params.step : 'launch',
-        currentBirthdate: new Date(),
-        birthdateInputValue: '',
-        generationStatus: 'Generating...',
-        avatar: null,
-        explanationTitle: 'Welcome',
-        congratsTitle: 'Please wait...',
-        displayCongrats: false,
+        explanationTitle: Translator.t('welcome'),
     };
 
     constructor(props) {
         super(props);
+
         this.personnalInfos = {
             avatar: Config.defaultAvatar
         };
         this.passcode = '';
         this.logo = require('../assets/images/logo-new.png');
         this.explanationTitles = [
-            'Welcome',
-            'How it works?',
-            'Biometrics rocks',
-            'Privacy matters',
-            'Ready to go!'
+            Translator.t('welcome'),
+            Translator.t('how_it_works'),
+            Translator.t('biometrics_rocks'),
+            Translator.t('privacy_matters'),
+            Translator.t('ready_go')
         ];
 
         this.isLoggedIn().then(loggedIn => {
             SplashScreen.hide();
-            if (loggedIn) {
+            if (loggedIn && this.state.step === 'launch') {
                 this.props.navigation.navigate('Main');
             }
         });
@@ -118,16 +109,23 @@ export default class LaunchScreen extends React.Component {
 
         AsyncStorage.setItem(key, this.personnalInfos[key], () => {
             if (nextStep === 'done') {
-                const resetAction = StackActions.reset({
-                    index: 0,
-                    actions: [NavigationActions.navigate({
-                        routeName: 'LaunchScreen',
-                        params: {
-                            step: nextStep
-                        }
-                    })],
+                this.networkLoader.setState({visible: true});
+                this.register().then(registered => {
+                    this.networkLoader.setState({visible: false});
+
+                    if (registered) {
+                        const resetAction = StackActions.reset({
+                            index: 0,
+                            actions: [NavigationActions.navigate({
+                                routeName: 'LaunchScreen',
+                                params: {
+                                    step: nextStep
+                                }
+                            })],
+                        });
+                        this.props.navigation.dispatch(resetAction);
+                    }
                 });
-                this.props.navigation.dispatch(resetAction);
             } else if (key === 'email') {
                 this.networkLoader.setState({visible: true});
                 fetch(
@@ -147,27 +145,25 @@ export default class LaunchScreen extends React.Component {
 
                     if (response.status === 200) {
                         this.props.navigation.push('LaunchScreen', {step: 'login'});
-                        /*DropdownSingleton.get().alertWithType(
-                            'info',
-                            'Check your inbox!',
-                            'We sent a Passcode to ' + this.state.user.email + '. Enter the received passcode below to recover your account.'
-                        );*/
                     } else if (response.status === 400) {
-                        DropdownSingleton.get().alertWithType('error', 'Invalid E-Mail', 'Please enter a valid E-Mail address.');
+                        DropdownSingleton.get().alertWithType('error',  Translator.t('launch.error.invalid_email'),  Translator.t('launch.error.enter_valid_email'));
                     } else if (response.status === 404) {
                         this.props.navigation.push('LaunchScreen', {step: 'firstname'});
                     } else if (response.status === 429) {
                         const responseJson = await response.json();
                         if (responseJson.message.match(/code/)) {
-                            DropdownSingleton.get().alertWithType('error', 'Anti-Spam', 'Please wait at least 2 minutes before asking for another code.');
+                            DropdownSingleton.get().alertWithType('error', Translator.t('launch.error.anti_spam'),  Translator.t('launch.error.anti_spam_message.email_code'));
                         } else {
-                            DropdownSingleton.get().alertWithType('error', 'Anti-Spam', 'You have tried to many times. Please wait a few minutes.');
+                            DropdownSingleton.get().alertWithType('error', Translator.t('launch.error.anti_spam'),  Translator.t('error_too_many'));
                         }
                     } else {
                         DropdownSingleton.get().alertWithType(
                             'error',
-                            'Unknow',
-                            'An unknow error occured. Please contact support mentionning that an HTTP ' + response.status + ' appeared during email check.');
+                            Translator.t('launch.error.unknown'),
+                            Translator.t('launch.error.unknown_message', {
+                                code: response.status,
+                                action: Translator.t('launch.action.email_check')
+                            }));
                     }
                 });
             } else {
@@ -177,43 +173,7 @@ export default class LaunchScreen extends React.Component {
         });
     }
 
-    changeBirthdate() {
-        const date = this.state.currentBirthdate;
-        const day = (date.getDate() < 10 ? '0' : '') + date.getDate();
-        const month = (date.getMonth() + 1 < 10 ? '0' : '') + (date.getMonth() + 1);
-        const humanDate = day + '/' + month + '/' + date.getFullYear();
-        this.onInputChange('birthdate', humanDate);
-        this.setState({
-            birthdateInputValue: humanDate
-        });
-    }
-
-    async onMessageRegister(message) {
-        const eventData = message.nativeEvent.data;
-        const data = Platform.OS === 'ios' ?
-            JSON.parse(decodeURIComponent(decodeURIComponent(eventData))) :
-            JSON.parse(eventData);
-
-        // Storing keypair
-        await SecureStore.setItemAsync(Config.storageKeys.publicKey, data.x, {
-            keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY
-        });
-        await SecureStore.setItemAsync(Config.storageKeys.privateKey, data.y, {
-            keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY
-        });
-
-        this.register().then(registered => {
-            if (registered) {
-                this.setState({
-                    congratsTitle: 'Congratulations!',
-                    displayCongrats: true
-                });
-                this.continueBtn.setState({disabled: false});
-            }
-        });
-    }
-
-    async onMessageLogin(message) {
+    async onMessage(message) {
         const eventData = message.nativeEvent.data;
         const data = Platform.OS === 'ios' ?
             JSON.parse(decodeURIComponent(decodeURIComponent(eventData))) :
@@ -255,19 +215,18 @@ export default class LaunchScreen extends React.Component {
                 await SecureStore.setItemAsync(Config.storageKeys.jamID, responseJson.user.username, {
                     keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY
                 });
-                const jamID = await SecureStore.getItemAsync(Config.storageKeys.jamID);
 
                 return true;
             }
 
             let step  = '';
             if (response.status === 400) {
-                DropdownSingleton.get().alertWithType('error', 'A HTTP 400 error occured', 'Please contact support at support@justauth.me mentionning the error code 400 at registration');
+                DropdownSingleton.get().alertWithType('error', Translator.t('launch.error.http', {code:400}), Translator.t('launch.error.http_message', {code:400}));
             } else if (response.status === 409) {
-                DropdownSingleton.get().alertWithType('error', 'Already member', 'You already have a JustAuthMe account, please log in');
+                DropdownSingleton.get().alertWithType('error', Translator.t('launch.error.already_member'), Translator.t('launch.error.account_already_existing'));
                 step = 'login';
             } else if (response.status === 429) {
-                DropdownSingleton.get().alertWithType('error', 'Anti-spam', 'Please try again in 30 seconds, this is an anti-spam measure');
+                DropdownSingleton.get().alertWithType('error', Translator.t('launch.error.anti_spam'), Translator.t('launch.error.anti_spam_message.register'));
             }
 
             const resetAction = StackActions.reset({
@@ -283,8 +242,6 @@ export default class LaunchScreen extends React.Component {
 
             return false;
         } catch (error) {
-            console.error(error);
-
             return false;
         }
     }
@@ -309,9 +266,9 @@ export default class LaunchScreen extends React.Component {
                 })
             }
         );
-        this.networkLoader.setState({visible: false});
 
         const responseJson = await response.json();
+        this.networkLoader.setState({visible: false});
 
         if (response.status === 200) {
             await SecureStore.setItemAsync(Config.storageKeys.jamID, responseJson.jam_id, {
@@ -327,49 +284,26 @@ export default class LaunchScreen extends React.Component {
                 }
             });
         } else if (response.status === 403) {
-            DropdownSingleton.get().alertWithType('error', 'Wrong passcode', 'Please try again.');
+            DropdownSingleton.get().alertWithType('error', Translator.t('launch.error.wrong_passcode'), Translator.t('try_again'));
         } else if (response.status === 429) {
-            DropdownSingleton.get().alertWithType('error', 'Anti-Spam', 'You have tried to many times. Please wait a few minutes.');
+            DropdownSingleton.get().alertWithType('error', Translator.t('launch.error.anti_spam'), Translator.t('error_too_many'));
         } else {
             DropdownSingleton.get().alertWithType(
                 'error',
-                'Unknow',
-                'An unknow error occured. Please contact support mentionning that an HTTP ' + response.status + ' appeared during applogin challenge.');
+                Translator.t('launch.error.unknown'),
+                Translator.t('launch.error.unknown_message', {
+                    code: response.status,
+                    action: Translator.t('launch.action.applogin_challenge')
+                })
+            );
         }
-    };
-
-    lastStep = () => {
-        this.props.navigation.push('LaunchScreen', {step: 'done'});
     };
 
     finish = () => {
         AsyncStorage.setItem(Config.servicesKey, JSON.stringify({}), () => {});
-
+        AsyncStorage.setItem('birthdate', '');
+        AsyncStorage.setItem('avatar', Config.defaultAvatar);
         this.props.navigation.navigate('Main');
-    };
-
-    _pickImage = async () => {
-        if (Constants.platform.ios) {
-            const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
-            if (status !== 'granted') {
-                DropdownSingleton.get().alertWithType('error', 'Permission required', 'Sorry, you need to grant Camera roll permission to chose your avatar!');
-                return;
-            }
-        }
-
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsEditing: true,
-            aspect: [1, 1],
-            base64: true
-        });
-
-        if (!result.cancelled) {
-            const avatarUri = 'data:image/jpeg;base64,' + result.base64;
-            this.personnalInfos['avatar'] = avatarUri;
-            this.setState({avatar: avatarUri});
-            this.continueBtn.setState({disabled: false});
-        }
     };
 
     render() {
@@ -395,50 +329,43 @@ export default class LaunchScreen extends React.Component {
                                 <View style={styles.swipablePage}>
                                     <Image source={require('../assets/images/undraw/celebrating.png')} style={styles.pageImage}/>
                                     <Text style={styles.pageText}>
-                                        Welcome to JustAuthMe! This app is meant to help you login to any website or
-                                        app with the "Sign in with JAM" button, without a single password.
+                                        {Translator.t('launch.explanation1')}
                                     </Text>
                                 </View>
                                 <View style={styles.swipablePage}>
                                     <Image source={require('../assets/images/undraw/accept_terms.png')} style={styles.pageImage}/>
                                     <Text style={styles.pageText}>
-                                        To login to apps or websites, just to click the "Sign in with JAM" button and
-                                        accept the login from the App, where you can check which informations you want
-                                        to share.
+                                        {Translator.t('launch.explanation2')}
                                     </Text>
                                 </View>
                                 <View style={styles.swipablePage}>
                                     <Image source={require('../assets/images/undraw/confirmed.png')} style={styles.pageImage}/>
                                     <Text style={styles.pageText}>
-                                        From there, you will be prompt to check your biometrical print (if your device
-                                        is equiped) and the informations needed to log you will be automatically sent.
+                                        {Translator.t('launch.explanation3')}
                                     </Text>
                                 </View>
                                 <View style={styles.swipablePage}>
                                     <Image source={require('../assets/images/undraw/privacy.png')} style={styles.pageImage}/>
                                     <Text style={styles.pageText}>
-                                        Your personal informations are stored only on your device and will never be
-                                        stored on our servers. If we can't access them, we can't sell them to anyone.
+                                        {Translator.t('launch.explanation4')}
                                     </Text>
                                 </View>
                                 <View style={styles.swipablePage}>
                                     <Image source={require('../assets/images/undraw/done.png')} style={styles.pageImage}/>
                                     <Text style={styles.pageText}>
-                                        We assume that your phone is the best way to authenticate yourself. Never
-                                        remember a single password or fill a boring register form again.{"\n"}This is
-                                        JustAuthMe.
+                                        {Translator.t('launch.explanation5')}
                                     </Text>
                                 </View>
                             </Swiper>
                         </View>
                         <ContinueButton
-                            text={'Let\'s go!'}
+                            text={Translator.t('lets_go')}
                             ref={ref => this.continueBtn = ref}
                             onPress={() => this.props.navigation.push('LaunchScreen', {step: 'email'})}
                             marginTop={30}
                         />
                         <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
-                            <Text style={styles.swipeBack}>Not now</Text>
+                            <Text style={styles.swipeBack}>{Translator.t('not_now')}</Text>
                         </TouchableOpacity>
                     </View>
                 );
@@ -451,10 +378,10 @@ export default class LaunchScreen extends React.Component {
                                 <LightStatusBar/>
                                 <NetworkLoader ref={ref => this.networkLoader = ref} />
                                 <Image style={styles.logo} source={this.logo}/>
-                                <Text style={styles.baseline}>Let's begin with your E-Mail</Text>
+                                <Text style={styles.baseline}>{Translator.t('launch.email')}</Text>
                                 <TextInput
                                     style={styles.textInput}
-                                    placeholder={"e.g. aiden@pearce.me"}
+                                    placeholder={Translator.t('placeholders.email')}
                                     placeholderTextColor={"rgba(255,255,255,.5)"}
                                     returnKeyType={"done"}
                                     autoCorrect={false}
@@ -481,7 +408,7 @@ export default class LaunchScreen extends React.Component {
                                 <LightStatusBar/>
                                 <NetworkLoader ref={ref => this.networkLoader = ref} />
                                 <Image style={styles.logo} source={this.logo}/>
-                                <Text style={styles.baseline}>Enter the passcode you just received by E-Mail</Text>
+                                <Text style={styles.baseline}>{Translator.t('launch.enter_code')}</Text>
                                 <TextInput
                                     style={{
                                         ...styles.textInput,
@@ -511,7 +438,7 @@ export default class LaunchScreen extends React.Component {
                                 <View style={styles.webview}>
                                     <WebView
                                         source={{uri: 'https://init.justauth.me'}}
-                                        onMessage={msg => this.onMessageLogin(msg)}
+                                        onMessage={msg => this.onMessage(msg)}
                                         useWebKit={true}
                                     />
                                 </View>
@@ -528,10 +455,10 @@ export default class LaunchScreen extends React.Component {
                             <ScrollView style={styles.scrollView} contentContainerStyle={styles.container}>
                                 <LightStatusBar/>
                                 <Image style={styles.logo} source={this.logo}/>
-                                <Text style={styles.baseline}>What's your firstname?</Text>
+                                <Text style={styles.baseline}>{Translator.t('launch.firstname')}</Text>
                                 <TextInput
                                     style={styles.textInput}
-                                    placeholder={"e.g. Aiden"}
+                                    placeholder={Translator.t('placeholders.firstname')}
                                     placeholderTextColor={"rgba(255,255,255,.5)"}
                                     returnKeyType={"done"}
                                     autoCorrect={false}
@@ -553,11 +480,12 @@ export default class LaunchScreen extends React.Component {
                         {() => (
                             <View style={styles.container}>
                                 <LightStatusBar/>
+                                <NetworkLoader ref={ref => this.networkLoader = ref} />
                                 <Image style={styles.logo} source={this.logo}/>
-                                <Text style={styles.baseline}>And your lastname?</Text>
+                                <Text style={styles.baseline}>{Translator.t('launch.lastname')}</Text>
                                 <TextInput
                                     style={styles.textInput}
-                                    placeholder={"e.g. Pearce"}
+                                    placeholder={Translator.t('placeholders.lastname')}
                                     placeholderTextColor={"rgba(255,255,255,.5)"}
                                     returnKeyType={"done"}
                                     autoCorrect={false}
@@ -566,97 +494,46 @@ export default class LaunchScreen extends React.Component {
                                     clearButtonMode={"always"}
                                     onChangeText={(text) => this.onInputChange('lastname', text)}
                                 />
-                                <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('lastname', 'birthdate')} />
+                                <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('lastname', 'done')} />
                                 <LaunchFooter />
+                                <View style={styles.webview}>
+                                    <WebView
+                                        source={{uri: 'https://init.justauth.me'}}
+                                        onMessage={msg => this.onMessage(msg)}
+                                        useWebKit={true}
+                                    />
+                                </View>
                             </View>
                         )}
                     </KeyboardShift>
                 );
 
-            case 'birthdate':
-                return (
-                    <View style={styles.container}>
-                        <LightStatusBar/>
-                        <Image style={styles.logo} source={this.logo}/>
-                        <Text style={styles.baseline}>What about your birthdate?</Text>
-                        <TouchableOpacity activeOpacity={.5} style={styles.inputTouchable} onPress={() => {
-                            DatePickerSingleton.get().open({
-                                date: this.state.currentBirthdate,
-                                onDateChange: date => this.setState({currentBirthdate: date}),
-                                onDone: () => this.changeBirthdate()
-                            })
-                        }}>
-                            <TextInput
-                                ref={'birthdateInput'}
-                                style={styles.textInput}
-                                placeholder={"e.g. 02/05/1974"}
-                                placeholderTextColor={"rgba(255,255,255,.5)"}
-                                returnKeyType={"done"}
-                                autoCorrect={false}
-                                spellCheck={false}
-                                editable={false}
-                                onChangeText={(text) => this.onInputChange('birthdate', text)}
-                                pointerEvents={"none"}
-                                value={this.state.birthdateInputValue}
-                            />
-                        </TouchableOpacity>
-                        <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('birthdate', 'avatar')} />
-                        <LaunchFooter />
-                    </View>
-                );
-
-            case 'avatar':
-                return (
-                    <View style={styles.container}>
-                        <LightStatusBar/>
-                        <Image style={styles.logo} source={this.logo}/>
-                        <Text style={styles.baseline}>Finally, chose an avatar</Text>
-                        <TouchableOpacity onPress={() => this._pickImage()} style={styles.avatarContainer}>
-                            <Image source={{uri: this.state.avatar !== null ? this.state.avatar : '../assets/images/user.png'}} style={{
-                                ...styles.avatar,
-                                display: this.state.avatar !== null ? 'flex' : 'none',
-                            }} />
-                            <Icon.Ionicons
-                                name={'ios-cloud-upload'}
-                                size={120}
-                                color={'#FFFFFF'}
-                                 style={{
-                                     display: this.state.avatar === null ? 'flex' : 'none'
-                                 }}
-                            />
-                        </TouchableOpacity>
-                        <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('avatar', 'done')} marginTop={20} />
-                        <TouchableOpacity onPress={() => Alert.alert('Are you sure? You still could update your avatar later.', '', [
-                            {text: 'Cancel', onPress: () => {}, style:'cancel'},
-                            {text: 'OK', onPress: () => this.storeValue('avatar', 'done')}
-                        ])}>
-                            <Text style={styles.avatarIgnore}>Ignore this step</Text>
-                        </TouchableOpacity>
-                        <LaunchFooter />
-                    </View>
-                );
-
             case 'done':
                 return (
-                    <View style={styles.container}>
+                    <ScrollView style={styles.scrollView} contentContainerStyle={styles.container}>
                         <LightStatusBar/>
-                        <Image style={styles.logo} source={this.logo}/>
-                        <Text style={styles.baseline}>{this.state.congratsTitle /*Congratulations!*/}</Text>
-                        <View style={{...styles.warningTextContainer, display: this.state.displayCongrats ? 'flex' : 'none'}}>
-                            <Text style={styles.warningText}>
-                                You successfully registered into JustAuthMe! You can now login on any website or app which
-                                provide the "Login with JustAuthMe" button.
-                            </Text>
-                        </View>
-                        <ContinueButton text={'Got it!'} ref={ref => this.continueBtn = ref} disabled={true} onPress={this.finish} marginTop={30} />
-                        <View style={styles.webview}>
-                            <WebView
-                                source={{uri: 'https://init.justauth.me'}}
-                                onMessage={msg => this.onMessageRegister(msg)}
-                                useWebKit={true}
-                            />
-                        </View>
-                    </View>
+                        <Text style={{
+                            color: '#fff',
+                            fontSize: 30,
+                            fontWeight: '600',
+                            textAlign: 'center',
+                            marginTop: isZoomed ? 20 : isBorderless ? 100 : 70
+                        }}>{Translator.t('congratulations')}</Text>
+                        <Text style={{
+                            fontSize: isZoomed ? 70 : 100,
+                            marginTop: 50
+                        }}>🥳</Text>
+                        <Text style={{
+                            color: '#fff',
+                            fontSize: 20,
+                            lineHeight: 30,
+                            paddingLeft: 15,
+                            paddingRight: 15,
+                            textAlign: 'center',
+                            marginTop: 30
+                        }}>{Translator.t('launch.success')}</Text>
+                        <ContinueButton text={Translator.t('lets_go')} ref={ref => this.continueBtn = ref} onPress={this.finish} marginTop={50} />
+                    </ScrollView>
                 );
 
             default:
@@ -664,7 +541,7 @@ export default class LaunchScreen extends React.Component {
                     <View style={styles.container}>
                         <LightStatusBar/>
                         <Image style={styles.logo} source={this.logo}/>
-                        <Text style={styles.baseline}>Join the revolution</Text>
+                        <Text style={styles.baseline}>{Translator.t('join_revolution')}</Text>
                         <TouchableOpacity style={styles.startBtn} onPress={() => this.props.navigation.push('LaunchScreen', {step: 'explanation'})}>
                             <Ionicons name="ios-arrow-forward" size={56} color="white" style={styles.arrowIcon}/>
                         </TouchableOpacity>
@@ -679,6 +556,12 @@ const isZoomed = Platform.OS === 'ios' && Dimensions.get('window').height < 667;
 const styles = StyleSheet.create({
     scrollView: {
         backgroundColor: '#3598DB'
+    },
+    scrollViewContainer: {
+        backgroundColor: '#3598DB',
+        width: '100%',
+        alignItems: 'center',
+        paddingTop: Constants.statusBarHeight
     },
     container: {
         backgroundColor: '#3598DB',

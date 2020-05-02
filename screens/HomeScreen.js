@@ -2,22 +2,19 @@ import React from 'react';
 import {
     Image,
     StyleSheet,
-    Text,
     View,
     AsyncStorage,
     TouchableOpacity,
     TouchableHighlight,
     StatusBar,
-    Dimensions, Alert
+    Dimensions,
+    Alert,
+    Button,
+    Linking
 } from 'react-native';
-import { Linking } from 'expo';
-
-
 import Constants from 'expo-constants';
 import * as Icon from '@expo/vector-icons';
 import * as SecureStore from 'expo-secure-store';
-
-
 import Config from "../constants/Config";
 import LightStatusBar from "../components/LightStatusBar";
 import {AuthSingleton} from "../models/AuthSingleton";
@@ -31,6 +28,8 @@ import {DropdownSingleton} from "../models/DropdownSingleton";
 import * as Permissions from "expo-permissions";
 import {UserModel} from "../models/UserModel";
 import NetworkLoader from "../components/NetworkLoader";
+import Translator from "../i18n/Translator";
+import Text from '../components/JamText'
 
 export default class HomeScreen extends React.Component {
     static navigationOptions = {
@@ -119,11 +118,11 @@ export default class HomeScreen extends React.Component {
     };
 
     deletePopupAlert = service => {
-        Alert.alert('Delete the ' + service.name + ' service?', 'This will NOT remove your ' + service.domain + ' account, it will only remove the service from your login history.', [
-            {text: 'Cancel', onPress: () => {
+        Alert.alert(Translator.t('home.delete_service_confirm', {name:service.name}), Translator.t('home.delete_service_confirm_message', {domain:service.domain}), [
+            {text: Translator.t('cancel'), onPress: () => {
                     this.isSwipeToDeleteEnabled = true;
                 }, style:'cancel'},
-            {text: 'OK', onPress: async () => {
+            {text: Translator.t('ok'), onPress: async () => {
                 this.isSwipeToDeleteEnabled = true;
                 const dateModel = new DateModel();
                 const enc = new EncryptionModel();
@@ -159,7 +158,7 @@ export default class HomeScreen extends React.Component {
                 } else if (response.status === 423) {
                     UserModel.logout(this.props.navigation);
                 } else {
-                    DropdownSingleton.get().alertWithType('error', 'Cannot delete service', 'Please contact support for further assistance.');
+                    DropdownSingleton.get().alertWithType('error', Translator.t('home.error_delete'), Translator.t('error_default'));
                 }
             }}
         ]);
@@ -191,14 +190,16 @@ export default class HomeScreen extends React.Component {
     render() {
         let servicesList = <View></View>;
         if (this.state.services === null || Object.keys(this.state.services).length === 0) {
-            servicesList = <Text style={{
-                textAlign: 'center',
-                marginTop: 30,
-                padding: 20
-            }}>
-                You haven't logged to any of our partners website or app yet. Just click the
-                "Authenticate" button above to begin your JustAuthMe experience.
-            </Text>;
+            servicesList = <View>
+                <Text style={{
+                    textAlign: 'center',
+                    marginTop: 30,
+                    padding: 20
+                }}>
+                    {Translator.t('home.no_services_yet')}
+                </Text>
+                <Button onPress={() => Linking.openURL('https://demo.justauth.me')} title={Translator.t('home.try_demo')} />
+            </View>;
         } else {
             const dataToList = this.parseServices();
             servicesList = <SwipeListView
@@ -211,7 +212,7 @@ export default class HomeScreen extends React.Component {
                     return (
                         <View style={styles.rowBack}>
                             <TouchableOpacity
-                                style={[styles.backRightBtn, styles.backRightBtnRight]}
+                                style={[styles.backRightBtn, {width: Translator.t('home.hidden.delete')}, styles.backRightBtnRight]}
                                 onPress={() => this.deletePopupAlert(this.state.services[item.item.key])}
                             >
                                 <Icon.Ionicons
@@ -220,12 +221,12 @@ export default class HomeScreen extends React.Component {
                                     color={'#fff'}
                                     style={{marginTop:3}}
                                 />
-                                <Text style={styles.backTextWhite}>Delete</Text>
+                                <Text style={styles.backTextWhite}>{Translator.t('delete')}</Text>
                             </TouchableOpacity>
                         </View>
                     );
                 }}
-                rightOpenValue={-80}
+                rightOpenValue={Translator.t('home.hidden.size')}
                 disableRightSwipe
                 onSwipeValueChange={swipeData => {
                     if (this.isSwipeToDeleteEnabled && swipeData.direction === 'left' && swipeData.value <= -(Dimensions.get('window').width * 0.5)) {
@@ -288,7 +289,7 @@ export default class HomeScreen extends React.Component {
                             fontSize: 18,
                             fontWeight: '600',
                             paddingBottom: 5
-                        }}>{this.state.alert.type === 'warning' ? 'Alert' : 'Information'}</Text>
+                        }}>{this.state.alert.type === 'warning' ? Translator.t('alert.alert') : Translator.t('alert.information')}</Text>
                         <Text style={{
                             flexWrap: 'wrap'
                         }}>{this.state.alert.text}</Text>
@@ -323,17 +324,17 @@ export default class HomeScreen extends React.Component {
                             onPress={async () => {
                                 const permissionResponse = await Permissions.askAsync(Permissions.CAMERA);
                                 if (permissionResponse.status !== 'granted') {
-                                    DropdownSingleton.get().alertWithType('error', 'Permission required', 'You need camera permission to be able to scan QR Codes.');
+                                    DropdownSingleton.get().alertWithType('error', Translator.t('permission_required'), Translator.t('permission.camera'));
                                 } else {
                                     this.props.navigation.navigate('Scanner');
                                 }
                             }}
                             btnIcon={'ios-qr-scanner'}
-                            btnText={'Authenticate'}
+                            btnText={Translator.t('home.authenticate')}
                         />
                     </View>
                     {alert}
-                    <Text style={styles.servicesTitle}>Services</Text>
+                    <Text style={styles.servicesTitle}>{Translator.t('home.services')}</Text>
                     {servicesList}
                 </View>
             </View>
