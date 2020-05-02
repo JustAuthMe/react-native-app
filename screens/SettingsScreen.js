@@ -10,11 +10,12 @@ import {UserModel} from "../models/UserModel";
 import {DropdownSingleton} from "../models/DropdownSingleton";
 import NetworkLoader from "../components/NetworkLoader";
 import DarkStatusBar from "../components/DarkStatusBar";
+import Translator from "../i18n/Translator";
 
 export default class SettingsScreen extends React.Component {
-    static navigationOptions = {
-        title: 'Settings'
-    };
+    static navigationOptions = () => ({
+        title: Translator.t('settings.title')
+    });
 
     constructor(props) {
         super(props);
@@ -71,9 +72,9 @@ export default class SettingsScreen extends React.Component {
     };
 
     logout = () => {
-        Alert.alert('Are you sure?', '', [
-            {text: 'Cancel', onPress: () => {}, style:'cancel'},
-            {text: 'OK', onPress: () => {
+        Alert.alert(Translator.t('are_you_sure'), '', [
+            {text: Translator.t('cancel'), onPress: () => {}, style:'cancel'},
+            {text: Translator.t('ok'), onPress: () => {
                 UserModel.logout(this.props.navigation);
             }}
         ]);

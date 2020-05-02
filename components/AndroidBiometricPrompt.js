@@ -6,6 +6,8 @@ import {
     Button
 } from 'react-native';
 import * as Icon from '@expo/vector-icons';
+import * as LocalAuthentication from 'expo-local-authentication';
+import Translator from "../i18n/Translator";
 
 export default class AndroidBiometricPrompt extends React.Component {
     state = {
@@ -32,17 +34,22 @@ export default class AndroidBiometricPrompt extends React.Component {
                     <Text style={{
                         ...styles.statusText,
                         color: this.state.status === 'wait' ? '#bbb' : (this.state.status === 'success' ? userStyles.biometricSuccessColor : userStyles.biometricErrorColor)
-                    }}>{this.state.status === 'wait' ? 'Waiting...' : (this.state.status === 'success' ? 'Verified!' : 'Please retry')}</Text>
+                    }}>{this.state.status === 'wait' ?
+                        Translator.t('auth.android_prompt.waiting') : (
+                            this.state.status === 'success' ?
+                                Translator.t('auth.android_prompt.verified') :
+                                Translator.t('auth.android_prompt.retry')
+                        )
+                    }</Text>
                     <View style={styles.btnContainer}>
                         <Button
                             title={'Cancel'}
                             color={'#1565c0'}
-                            onPress={() => this.setState({visible: false})}
+                            onPress={async () => {
+                                await LocalAuthentication.cancelAuthenticate();
+                                this.setState({visible: false})
+                            }}
                         />
-                        {/*<Button
-                            title={'Use passcode'}
-                            color={'#1565c0'}
-                        />*/}
                     </View>
                 </View>
             </View>

@@ -2,23 +2,21 @@ import React from 'react';
 import {
     View,
     StyleSheet,
-    Text,
-    StatusBar,
     Image,
-    FlatList, TouchableOpacity
+    FlatList
 } from 'react-native';
 import {DropdownSingleton} from "../models/DropdownSingleton";
-import Config from "../constants/Config";
-import * as Icon from '@expo/vector-icons';
 import DarkStatusBar from "../components/DarkStatusBar";
 import {DateModel} from "../models/DateModel";
+import Text from '../components/JamText'
+import Translator from "../i18n/Translator";
 
 export default class ServiceScreen extends React.Component {
     static navigationOptions = ({ navigation }) => {
         const service = navigation.getParam('service', null);
         if (service === null) {
             return {
-                title: 'Service details'
+                title: Translator.t('service.title')
             };
         }
 
@@ -43,7 +41,7 @@ export default class ServiceScreen extends React.Component {
         const service = this.props.navigation.getParam('service', null);
         if (service === null) {
             this.props.navigation.goBack();
-            DropdownSingleton.get().alertWithType('error', 'Unknow service', 'The service you are trying to access seems to be unavailable.');
+            DropdownSingleton.get().alertWithType('error', Translator.t('service.error_unknow.title'), Translator.t('service.error_unknow.text'));
             return;
         }
 
@@ -96,12 +94,12 @@ export default class ServiceScreen extends React.Component {
                     paddingTop: 10,
                     paddingBottom: 5,
                     color: '#888'
-                }}>First login at: {dateModel.getFullDate(new Date(this.state.service.created_at))}</Text>}
+                }}>{Translator.t('service.first_login')}: {dateModel.getFullDate(new Date(this.state.service.created_at))}</Text>}
                 {this.state.service.updated_at && <Text style={{
                     textAlign: 'center',
                     fontSize: 14,
                     color: '#888'
-                }}>Last login at: {dateModel.getFullDate(new Date(this.state.service.updated_at))}</Text>}
+                }}>{Translator.t('service.last_login')}: {dateModel.getFullDate(new Date(this.state.service.updated_at))}</Text>}
                 <Text style={{
                     width: '100%',
                     textAlign: 'center',
@@ -114,7 +112,7 @@ export default class ServiceScreen extends React.Component {
                     textAlign: 'center',
                     fontSize: 16,
                     marginTop: 5
-                }}>Has access to the following:</Text>
+                }}>{Translator.t('service.has_access')}:</Text>
                 <FlatList
                     style={{
                         width: '100%',
@@ -133,7 +131,7 @@ export default class ServiceScreen extends React.Component {
                             <Text style={{
                                 fontWeight: '700',
                                 fontSize: 18
-                            }}>&rarr; {Config.dataList[item.key]}</Text>
+                            }}>&rarr; {Translator.t('data_list.' + item.key)}</Text>
                             {item.key !== 'avatar' && <View style={{
                                 flexDirection: 'row'
                             }}>
