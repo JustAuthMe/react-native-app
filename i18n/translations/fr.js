@@ -6,6 +6,8 @@ module.exports = {
     privacy_matters: 'Votre vie privée',
     ready_go: 'Tout est prêt !',
     lets_go: 'C\'est parti !',
+    terms: 'J\'ai lu et j\'accepte les CGU',
+    terms_url: 'https://justauth.me/p/conditions-generales-dutilisation',
     go_back: 'Retour',
     not_now: 'Pas maintenant',
     having_trouble: 'Vous rencontrez des difficultés ?',
@@ -22,7 +24,7 @@ module.exports = {
     are_you_sure: 'Êtes-vous sur ?',
     back_btn: 'Retour',
     data_list: {
-        email: 'Adresse E-Mail',
+        email: 'Adresse e-mail',
         firstname: 'Prénom',
         lastname: 'Nom',
         tel: 'Numéro de téléphone',
@@ -71,10 +73,10 @@ module.exports = {
         explanation2: 'Pour vous connecter aux sites et applis, cliquez sur "Se connecter avec JustAuthMe" et validez la connexion dans l\'application après avoir choisi les informations à partager.',
         explanation3: 'Vous serez ensuite amenez à vous authentifier grâce à la biométrie (si votre appareil le permet) et les informations nécessaires à la connexion seront automatiquement envoyées.',
         explanation4: 'Vos informations personnelles sont stockées sur votre téléphone uniqument et non sur nos serveurs. Si nous n\'y avons pas accès, nous ne pourrons les vendre à personne.',
-        explanation5: 'Nous pensons que votre téléphone est le meilleur moyen de vous authentifier. Ne cherchez plus à retenir un seul mot de passe ni à remplir un seul formulaire.\nBienvenue sur JustAuthMe.',
+        explanation5: 'Nous pensons que votre téléphone est le meilleur moyen de vous authentifier. Ne cherchez plus à retenir des mots de passe.\nBienvenue sur JustAuthMe.',
 
-        email:'Commençons avec votre adresse E-Mail',
-        enter_code: 'Entrez le code de confirmation que vous avez reçu par E-Mail',
+        email:'Commençons par votre e-mail',
+        enter_code: 'Entrez le code de confirmation que vous avez reçu par e-mail',
         firstname:'Quel est votre prénom ?',
         lastname:'Et votre nom ?',
         birthdate:'Qu\'en est-il de votre date de naissance ?',
@@ -83,11 +85,11 @@ module.exports = {
 
         generating: 'Génération en cours',
 
-        success: 'Vous êtes maintenant inscrit sur JustAuthMe !\nNous vous avons envoyé un E-Mail de confirmation.\nVous pouvez maintenant profiter pleinement de JustAuthMe.',
+        success: 'Vous êtes maintenant inscrit sur JustAuthMe !\nNous vous avons envoyé un e-mail de confirmation.\nVous pouvez maintenant profiter pleinement de JustAuthMe.',
 
         action: {
             applogin_challenge: 'la vérification de code de confirmation',
-            email_check: 'la vérification de l\'adresse E-Mail'
+            email_check: 'la vérification de l\'adresse e-mail'
         },
 
         error:{
@@ -105,8 +107,8 @@ module.exports = {
                 email_code: 'Merci d\'attendre au moins 2 minutes avant de redemander un code. Vérifez vos spams.',
             },
 
-            invalid_email: 'Adresse E-Mail invalide',
-            enter_valid_email: 'Merci de renseigner une addresse E-Mail valide',
+            invalid_email: 'Adresse e-mail invalide',
+            enter_valid_email: 'Merci de renseigner une addresse e-mail valide',
 
             already_member: 'Vous êtes déjà membre',
             account_already_existing: 'Vous possédez déjà un compte JustAuthMe, merci de vous y connecter.',
@@ -141,8 +143,8 @@ module.exports = {
         unauthorized_login: 'Connexion interdite',
         unauthorized_login_message: 'Une tentative frauduleuse de connexion a été détectée',
 
-        non_confirmed_email:'Adresse E-Mail non confirmée',
-        non_confirmed_email_message:'Merci de confirmer votre adresse E-Mail avant d\'essayer de vous connecter',
+        non_confirmed_email:'Adresse e-mail non confirmée',
+        non_confirmed_email_message:'Merci de confirmer votre adresse e-mail avant d\'essayer de vous connecter',
 
         missing_data: 'Donnée manquante',
         missing_data_message: 'Un(e) %{data} est requis(e) pour se connecter à %{name}. Merci de renseigner votre %{data} avant de continuer',
@@ -183,8 +185,8 @@ module.exports = {
         },
         orientation: 'Orientation',
         email: {
-            title: 'Adresse E-Mail non confirmée ?',
-            text: 'Envoyez-moi un nouvel E-Mail'
+            title: 'Adresse e-mail non confirmée ?',
+            text: 'Envoyez-moi un nouvel e-mail'
         },
         support: {
             title: 'Assistance',
@@ -200,17 +202,17 @@ module.exports = {
                 text: 'Merci de renseigner les champs obligatoires.'
             },
             email_exists: {
-                title: 'Cette adresse E-Mail est déjà enregistrée',
-                text: 'Cette adresse E-Mail appartient à un autre compte JustAuthMe'
+                title: 'Cette adresse e-mail est déjà enregistrée',
+                text: 'Cette adresse e-mail appartient à un autre compte JustAuthMe'
             },
-            email_update: 'Impossible de mettre à jour l\'adresse E-Mail'
+            email_update: 'Impossible de mettre à jour l\'adresse e-mail'
         },
         info: {
             inbox: {
-                title: 'Vérifiez vos E-Mails !',
-                text: 'Nous avons envoyé un E-Mail de confirmation à %{email}. Cliquez sur le lien dans l\'email pour activer votre nouvelle adresse.'
+                title: 'Vérifiez vos e-mails !',
+                text: 'Nous avons envoyé un e-mail de confirmation à %{email}. Cliquez sur le lien dans l\'email pour activer votre nouvelle adresse.'
             },
-            email_update: 'Si vous changez d\'adresse E-Mail, vous devrez confirmez la nouvelle adresse avant de continuer d\'utiliser JustAuthMe'
+            email_update: 'Si vous changez d\'adresse e-mail, vous devrez confirmez la nouvelle adresse avant de continuer d\'utiliser JustAuthMe'
         },
         success: 'Sauvegardées avec succès',
         save: 'Sauvegarder'

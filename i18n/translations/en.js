@@ -6,6 +6,8 @@ module.exports = {
     privacy_matters: 'Privacy matters',
     ready_go: 'Ready to go!',
     lets_go: 'Let\'s go!',
+    terms: 'I read and I accept the TOS',
+    terms_url: 'https://justauth.me/p/conditions-generales-dutilisation',
     go_back: 'Go back',
     not_now: 'Not now',
     having_trouble: 'Having trouble using the app?',
@@ -22,7 +24,7 @@ module.exports = {
     are_you_sure: 'Are you sure?',
     back_btn: 'Back',
     data_list: {
-        email: 'E-Mail address',
+        email: 'e-mail address',
         firstname: 'Firstname',
         lastname: 'Lastname',
         tel: 'Phone number',
@@ -73,8 +75,8 @@ module.exports = {
         explanation4: 'Your personal informations are stored only on your device and will never be stored on our servers. If we can\'t access them, we can\'t sell them to anyone.',
         explanation5: 'We assume that your phone is the best way to authenticate yourself. Never remember a single password or fill a boring register form again.\nThis is JustAuthMe.',
 
-        email:'Let\'s begin with your E-Mail',
-        enter_code: 'Enter the passcode you just received by E-Mail',
+        email:'Let\'s begin with your e-mail',
+        enter_code: 'Enter the passcode you just received by e-mail',
         firstname:'What\'s your firstname?',
         lastname:'And your lastname?',
         birthdate:'What about your birthdate?',
@@ -83,7 +85,7 @@ module.exports = {
 
         generating: 'Generating',
 
-        success: 'You successfully registered into JustAuthMe!\nWe sent you a confirmation E-Mail.\nYou can now enjoy all JustAuthMe benefits.',
+        success: 'You successfully registered into JustAuthMe!\nWe sent you a confirmation e-mail.\nYou can now enjoy all JustAuthMe benefits.',
 
         action: {
             applogin_challenge: 'applogin challenge',
@@ -105,8 +107,8 @@ module.exports = {
                 email_code: 'Please wait at least 2 minutes before asking for another code. Check your junk mail.',
             },
 
-            invalid_email: 'Invalid E-Mail',
-            enter_valid_email: 'Please enter a valid E-Mail address',
+            invalid_email: 'Invalid e-mail',
+            enter_valid_email: 'Please enter a valid e-mail address',
 
             already_member: 'Already member',
             account_already_existing: 'You already have a JustAuthMe account, please log in',
@@ -141,8 +143,8 @@ module.exports = {
         unauthorized_login: 'Unauthorized login',
         unauthorized_login_message: 'A wrong authentication attempt has been detected.',
 
-        non_confirmed_email:'Non confirmed E-Mail',
-        non_confirmed_email_message:'Please confirm your E-Mail address before trying to authenticate.',
+        non_confirmed_email:'Non confirmed e-mail',
+        non_confirmed_email_message:'Please confirm your e-mail address before trying to authenticate.',
 
         missing_data: 'Missing data',
         missing_data_message: 'A(n) %{data} is required to log into %{name}. Please fill in your %{data} before continuing',
@@ -183,8 +185,8 @@ module.exports = {
         },
         orientation: 'Orientation',
         email: {
-            title: 'Non confirmed E-Mail address ?',
-            text: 'Send me another confirmation E-Mail'
+            title: 'Non confirmed e-mail address ?',
+            text: 'Send me another confirmation e-mail'
         },
         support: {
             title: 'Help & Support',
@@ -200,17 +202,17 @@ module.exports = {
                 text: 'Please fill all the required informations.'
             },
             email_exists: {
-                title: 'E-Mail address is already registered',
-                text: 'This E-Mail address is associated to another JustAuthMe account.'
+                title: 'e-mail address is already registered',
+                text: 'This e-mail address is associated to another JustAuthMe account.'
             },
-            email_update: 'Cannot update E-Mail address'
+            email_update: 'Cannot update e-mail address'
         },
         info: {
             inbox: {
                 title: 'Check your inbox!',
-                text: 'We sent you a confirmation E-Mail to %{email}. Click on the link to confirm your new E-Mail address.'
+                text: 'We sent you a confirmation e-mail to %{email}. Click on the link to confirm your new e-mail address.'
             },
-            email_update: 'If you change your E-Mail address, you\'ll need to confirm your new address before continuing to use JustAuthMe'
+            email_update: 'If you change your e-mail address, you\'ll need to confirm your new address before continuing to use JustAuthMe'
         },
         success: 'Saved successfully',
         save: 'Save'

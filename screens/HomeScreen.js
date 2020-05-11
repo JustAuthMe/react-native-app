@@ -10,7 +10,8 @@ import {
     Dimensions,
     Alert,
     Button,
-    Linking
+    Linking,
+    Platform,
 } from 'react-native';
 import Constants from 'expo-constants';
 import * as Icon from '@expo/vector-icons';
@@ -342,7 +343,7 @@ export default class HomeScreen extends React.Component {
     }
 }
 
-const isBorderless = Constants.statusBarHeight > 20;
+const isBorderless = Platform.OS === 'ios' && Constants.statusBarHeight > 20;
 const styles = StyleSheet.create({
     container: {
         flex: 1,

@@ -8,10 +8,12 @@ import {
     AsyncStorage,
     Platform,
     ScrollView,
-    Dimensions
+    Dimensions,
+    Switch,
+    Linking
 } from 'react-native';
 import { WebView } from 'react-native-webview';
-import { SplashScreen } from 'expo';
+import {SplashScreen} from 'expo';
 import * as SecureStore from 'expo-secure-store';
 import Constants from 'expo-constants';
 import { Ionicons } from '@expo/vector-icons';
@@ -27,6 +29,7 @@ import NetworkLoader from "../components/NetworkLoader";
 import KeyboardShift from "../components/KeyboardShift";
 import Translator from "../i18n/Translator";
 import Text from '../components/JamText'
+import SwiperPage from "../components/SwiperPage";
 
 export default class LaunchScreen extends React.Component {
 
@@ -37,6 +40,7 @@ export default class LaunchScreen extends React.Component {
     state = {
         step: this.props.navigation.getParam('step') ? this.props.navigation.state.params.step : 'launch',
         explanationTitle: Translator.t('welcome'),
+        termsAccept: !(this.props.navigation.getParam('step') && this.props.navigation.getParam('step') === 'explanation')
     };
 
     constructor(props) {
@@ -319,50 +323,60 @@ export default class LaunchScreen extends React.Component {
                         <View style={styles.swiperContainer}>
                             <Swiper
                                 activeDotColor={'#555'}
-                                autoplay={true}
+                                autoplay={false}
                                 autoplayTimeout={15}
                                 removeClippedSubviews={false}
                                 onIndexChanged={(index) => {
                                     this.explanationTitle.setState({text: this.explanationTitles[index]});
                                 }}
+                                paginationStyle={{
+                                    marginLeft: 20,
+                                    marginRight: 20,
+                                    height: 30,
+                                    bottom: 0
+                                }}
                             >
-                                <View style={styles.swipablePage}>
-                                    <Image source={require('../assets/images/undraw/celebrating.png')} style={styles.pageImage}/>
-                                    <Text style={styles.pageText}>
-                                        {Translator.t('launch.explanation1')}
-                                    </Text>
-                                </View>
-                                <View style={styles.swipablePage}>
-                                    <Image source={require('../assets/images/undraw/accept_terms.png')} style={styles.pageImage}/>
-                                    <Text style={styles.pageText}>
-                                        {Translator.t('launch.explanation2')}
-                                    </Text>
-                                </View>
-                                <View style={styles.swipablePage}>
-                                    <Image source={require('../assets/images/undraw/confirmed.png')} style={styles.pageImage}/>
-                                    <Text style={styles.pageText}>
-                                        {Translator.t('launch.explanation3')}
-                                    </Text>
-                                </View>
-                                <View style={styles.swipablePage}>
-                                    <Image source={require('../assets/images/undraw/privacy.png')} style={styles.pageImage}/>
-                                    <Text style={styles.pageText}>
-                                        {Translator.t('launch.explanation4')}
-                                    </Text>
-                                </View>
-                                <View style={styles.swipablePage}>
-                                    <Image source={require('../assets/images/undraw/done.png')} style={styles.pageImage}/>
-                                    <Text style={styles.pageText}>
-                                        {Translator.t('launch.explanation5')}
-                                    </Text>
-                                </View>
+                                <SwiperPage image={require('../assets/images/undraw/celebrating.png')} text={'launch.explanation1'} />
+                                <SwiperPage image={require('../assets/images/undraw/accept_terms.png')} text={'launch.explanation2'} />
+                                <SwiperPage image={require('../assets/images/undraw/confirmed.png')} text={'launch.explanation3'} />
+                                <SwiperPage image={require('../assets/images/undraw/privacy.png')} text={'launch.explanation4'} />
+                                <SwiperPage image={require('../assets/images/undraw/done.png')} text={'launch.explanation5'} />
                             </Swiper>
+                        </View>
+                        <View style={{
+                            flexDirection: 'row',
+                            marginTop: 5,
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            width: '80%'
+                        }}>
+                            <TouchableOpacity onPress={() => Linking.openURL(Translator.t('terms_url'))}>
+                                <Text style={{
+                                    height: 30,
+                                    lineHeight: 30,
+                                    color: '#fffc',
+                                    paddingRight: 20,
+                                    textDecorationLine: "underline",
+                                    textDecorationStyle: "solid",
+                                    textDecorationColor: "#fffc",
+                                    fontSize: 16
+                                }}>{Translator.t('terms')}</Text>
+                            </TouchableOpacity>
+                            <Switch
+                                value={this.state.termsAccept}
+                                onValueChange={value => {
+                                    this.continueBtn.setState({disabled: !value})
+                                    this.setState({termsAccept: value});
+                                }}
+                                ios_backgroundColor={'#fffa'}
+                            />
                         </View>
                         <ContinueButton
                             text={Translator.t('lets_go')}
                             ref={ref => this.continueBtn = ref}
+                            disabled={true}
                             onPress={() => this.props.navigation.push('LaunchScreen', {step: 'email'})}
-                            marginTop={30}
+                            marginTop={25}
                         />
                         <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
                             <Text style={styles.swipeBack}>{Translator.t('not_now')}</Text>
@@ -521,8 +535,8 @@ export default class LaunchScreen extends React.Component {
                         }}>{Translator.t('congratulations')}</Text>
                         <Text style={{
                             fontSize: isZoomed ? 70 : 100,
-                            marginTop: 50
-                        }}>🥳</Text>
+                            marginTop: isBorderless ? 50 : 20
+                        }}>{Platform.OS === 'android' ? '🎉' : '🥳'}</Text>
                         <Text style={{
                             color: '#fff',
                             fontSize: 20,
@@ -571,7 +585,7 @@ const styles = StyleSheet.create({
         paddingTop: Constants.statusBarHeight
     },
     logo: {
-        marginTop: isBorderless ? 100 : (isZoomed ? 50 : 80),
+        marginTop: isBorderless ? 80 : (isZoomed ? 30 : 60),
         width: '100%',
         height: isBorderless ? 170 : 120,
         resizeMode: 'contain'
@@ -660,12 +674,13 @@ const styles = StyleSheet.create({
         fontSize: 32,
         color: 'white',
         fontWeight: '600',
-        marginTop: isBorderless ? 80 : 30
+        marginTop: isBorderless ? 60 : 20,
+        textAlign: 'center'
     },
     swiperContainer: {
         width: '80%',
         height: isZoomed ? 330 : 400,
-        backgroundColor: 'white',
+        backgroundColor: '#fff',
         borderRadius: 20,
     },
     swipablePage: {
@@ -674,11 +689,10 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start'
     },
     pageImage: {
-        height: isZoomed ? '50%' : '60%',
+        width: '100%',
         resizeMode: 'contain'
     },
     pageText: {
-        marginTop: 20,
         fontSize: 15,
         textAlign: 'center',
         color: '#555'
