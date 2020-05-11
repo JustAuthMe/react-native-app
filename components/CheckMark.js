@@ -3,7 +3,7 @@ import {
     View
 } from 'react-native';
 import * as Icon from '@expo/vector-icons';
-import AuthDataList from "./AuthDataList";
+import {DataModel} from '../models/DataModel';
 
 export default class CheckMark extends React.Component {
     state = {
@@ -17,7 +17,7 @@ export default class CheckMark extends React.Component {
     }
 
     getCheckMarkStyle = (data) => {
-        const bgColor = AuthDataList.isDataRequired(data) || !this.props.isFirstLogin ? '#888' : '#1459E3';
+        const bgColor = DataModel.isDataRequired(data) || !this.props.isFirstLogin ? '#888' : '#1459E3';
         const visible = this.state.visible ? 'flex' : 'none';
         return {
             width: 18,

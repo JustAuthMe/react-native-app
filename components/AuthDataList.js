@@ -9,28 +9,12 @@ import {
 import ActionBtn from "./ActionBtn";
 import CheckMark from "./CheckMark";
 import Translator from "../i18n/Translator";
+import {DataModel} from '../models/DataModel';
 
 export default class AuthDataList extends React.Component {
     constructor(props) {
         super(props);
         this.checkmarks = {};
-    }
-
-    static isDataRequired(data) {
-        return data.indexOf('!') === data.length - 1;
-    }
-
-    static getDataSlug(data) {
-        if (AuthDataList.isDataRequired(data)) {
-            data = data.slice(0, -1);
-        }
-
-        return data;
-    }
-
-   static getDataLabelFromID(data) {
-        data = AuthDataList.getDataSlug(data);
-        return Translator.t('data_list.' + data);
     }
 
     onCheckMarkPressed = data => {
@@ -47,14 +31,14 @@ export default class AuthDataList extends React.Component {
                     data={this.props.data}
                     renderItem={({item}) =>
                         <View style={styles.listItem}>
-                            <TouchableOpacity style={{...styles.itemCheckbox, borderStyle: this.props.checkable[item.key] || !this.props.isFirstLogin ? 'solid' : 'dashed', borderColor: !this.props.checkable[item.key] && this.props.isFirstLogin ? '#ccc' : (AuthDataList.isDataRequired(item.key) || !this.props.isFirstLogin ? '#888' : '#1459E3')}} activeOpacity={1} onPress={() => {
-                                if (!AuthDataList.isDataRequired(item.key) && this.props.isFirstLogin && this.props.checkable[item.key]) {
+                            <TouchableOpacity style={{...styles.itemCheckbox, borderStyle: this.props.checkable[item.key] || !this.props.isFirstLogin ? 'solid' : 'dashed', borderColor: !this.props.checkable[item.key] && this.props.isFirstLogin ? '#ccc' : (DataModel.isDataRequired(item.key) || !this.props.isFirstLogin ? '#888' : '#1459E3')}} activeOpacity={1} onPress={() => {
+                                if (!DataModel.isDataRequired(item.key) && this.props.isFirstLogin && this.props.checkable[item.key]) {
                                     this.onCheckMarkPressed(item.key)
                                 }
                             }}>
                                 <CheckMark ref={ref =>(this.checkmarks[item.key] = ref)} itemKey={item.key} visible={this.props.checkable[item.key] || !this.props.isFirstLogin} isFirstLogin={this.props.isFirstLogin} />
                             </TouchableOpacity>
-                            <Text style={{...styles.itemText, color: this.props.checkable[item.key] || !this.props.isFirstLogin ? '#000' : '#ccc', fontWeight: AuthDataList.isDataRequired(item.key) ? '400' : '500'}}>{AuthDataList.getDataLabelFromID(item.key)}</Text>
+                            <Text style={{...styles.itemText, color: this.props.checkable[item.key] || !this.props.isFirstLogin ? '#000' : '#ccc', fontWeight: DataModel.isDataRequired(item.key) ? '400' : '500'}}>{DataModel.getDataLabelFromID(item.key)}</Text>
                             {!this.props.checkable[item.key] && this.props.isFirstLogin && <Text style={styles.notFilled}>{Translator.t('auth.missing')}</Text>}
                         </View>
                     }

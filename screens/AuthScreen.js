@@ -21,6 +21,7 @@ import {UserModel} from "../models/UserModel";
 import NetworkLoader from "../components/NetworkLoader";
 import Translator from "../i18n/Translator";
 import Text from '../components/JamText'
+import {DataModel} from '../models/DataModel';
 
 export default class AuthScreen extends React.Component {
     static navigationOptions = () => ({
@@ -61,15 +62,15 @@ export default class AuthScreen extends React.Component {
                 this.actualData = {};
                 let currentData = '';
                 for (let i = 0; i < responseJson.auth.client_app.data.length; i++) {
-                    currentData = await AsyncStorage.getItem(AuthDataList.getDataSlug(responseJson.auth.client_app.data[i]));
+                    currentData = await AsyncStorage.getItem(DataModel.getDataSlug(responseJson.auth.client_app.data[i]));
                     this.actualData[responseJson.auth.client_app.data[i]] = currentData !== null && currentData !== '';
 
-                    if (isFirstLogin && !this.actualData[responseJson.auth.client_app.data[i]] && AuthDataList.isDataRequired(responseJson.auth.client_app.data[i])) {
+                    if (isFirstLogin && !this.actualData[responseJson.auth.client_app.data[i]] && DataModel.isDataRequired(responseJson.auth.client_app.data[i])) {
                         DropdownSingleton.get().alertWithType(
                             'error',
                             Translator.t('auth.missing_data'),
                             Translator.t('auth.missing_data_message', {
-                                data: AuthDataList.getDataLabelFromID(responseJson.auth.client_app.data[i]),
+                                data: DataModel.getDataLabelFromID(responseJson.auth.client_app.data[i]),
                                 name: responseJson.auth.client_app.name
                             })
                         );
@@ -114,7 +115,7 @@ export default class AuthScreen extends React.Component {
 
         const authData = this.state.auth.client_app.data;
         for (let i = 0; i < authData.length; i++) {
-            let dataName = AuthDataList.getDataSlug(authData[i]);
+            let dataName = DataModel.getDataSlug(authData[i]);
 
             if (this.actualData[authData[i]]) {
                 data[dataName] = await AsyncStorage.getItem(dataName);
