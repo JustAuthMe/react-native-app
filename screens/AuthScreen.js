@@ -130,8 +130,6 @@ export default class AuthScreen extends React.Component {
         const isEnrolled = await LocalAuthentication.isEnrolledAsync();
 
         let canLogin = true;
-        let isUserBigFatFingersFault = false;
-        let isThereEvenAMessageOrSomething = false;
         if (hasHardware && isEnrolled) {
             if (Platform.OS === 'android') {
                 this.androidPrompt.setState({visible: true});
@@ -139,7 +137,7 @@ export default class AuthScreen extends React.Component {
 
             let localAuth = await LocalAuthentication.authenticateAsync({promptMessage: Translator.t('auth.confirm_login')});
             canLogin = localAuth.success;
-            isUserBigFatFingersFault = localAuth.error === 'authentication_failed';
+            /*isUserBigFatFingersFault = localAuth.error === 'authentication_failed';
             isThereEvenAMessageOrSomething = localAuth.message && localAuth.message !== '';
 
             if (Platform.OS === 'android') {
@@ -172,7 +170,7 @@ export default class AuthScreen extends React.Component {
                         isThereEvenAMessageOrSomething ? localAuth.message : Translator.t('auth.biometric_error_message')
                     );
                 }
-            }
+            }*/
         }
 
         if (canLogin) {

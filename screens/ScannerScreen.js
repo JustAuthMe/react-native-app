@@ -54,7 +54,10 @@ export default class ScannerScreen extends React.Component {
         return (
             <View style={styles.container}>
                 <DarkStatusBar/>
-                <BarCodeScanner onBarCodeScanned={this._handleBarCodeScanned} style={StyleSheet.absoluteFillObject} />
+                <BarCodeScanner onBarCodeScanned={this._handleBarCodeScanned} style={{
+                    ...StyleSheet.absoluteFillObject,
+                    backgroundColor: '#000'
+                }} />
                 <View style={{
                     backgroundColor: 'transparent',
                     borderLeftWidth: 2,

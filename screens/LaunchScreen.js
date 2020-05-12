@@ -674,7 +674,7 @@ const styles = StyleSheet.create({
         fontSize: 32,
         color: 'white',
         fontWeight: '600',
-        marginTop: isBorderless ? 60 : 20,
+        marginTop: isBorderless ? 60 : 10,
         textAlign: 'center'
     },
     swiperContainer: {
