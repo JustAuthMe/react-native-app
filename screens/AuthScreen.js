@@ -131,9 +131,9 @@ export default class AuthScreen extends React.Component {
 
         let canLogin = true;
         if (hasHardware && isEnrolled) {
-            if (Platform.OS === 'android') {
+           /* if (Platform.OS === 'android') {
                 this.androidPrompt.setState({visible: true});
-            }
+            }*/
 
             let localAuth = await LocalAuthentication.authenticateAsync({promptMessage: Translator.t('auth.confirm_login')});
             canLogin = localAuth.success;

@@ -1,11 +1,11 @@
 import React from 'react';
 import {
     View,
-    Text,
     FlatList,
     TouchableOpacity,
     StyleSheet
 } from 'react-native';
+import Text from './JamText';
 import ActionBtn from "./ActionBtn";
 import CheckMark from "./CheckMark";
 import Translator from "../i18n/Translator";

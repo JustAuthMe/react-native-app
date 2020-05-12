@@ -204,11 +204,8 @@ export default class UserScreen extends React.Component {
                 <NetworkLoader ref={ref => this.networkLoader = ref} />
                 <KeyboardShift>
                     {() => (
-                        <ScrollView style={{
-                            ...styles.ScrollView,
-                            paddingTop: this.state.isLogin ? 75 : 15
-                        }}>
-                            <View style={styles.content}>
+                        <ScrollView style={styles.scrollView}>
+                            <View style={{...styles.content, paddingTop: this.state.isLogin ? 35 : 15}}>
                                 <TouchableOpacity onPress={() => this._pickImage()} style={styles.avatarEdit}>
                                     <View style={styles.avatarUpdateBtn}>
                                         <Icon.Ionicons
