@@ -56,7 +56,6 @@ export default class AuthScreen extends React.Component {
             const isFirstLogin = !this.services.hasOwnProperty(responseJson.auth.client_app.app_id);
 
             this.networkLoader.setState({visible: false});
-            console.log(this.networkLoader.state);
 
             if (responseJson.status === 'success') {
                 this.actualData = {};
@@ -97,9 +96,7 @@ export default class AuthScreen extends React.Component {
                     Translator.t('auth.invalid_token_message')
                 );
             }
-        } catch (error) {
-            console.error(error);
-        }
+        } catch (error) {}
     }
 
     async getUserDataFromDataset() {
