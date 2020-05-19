@@ -24,12 +24,12 @@ export default class LaunchFooter extends React.Component {
     }
 }
 
-const isBorderless = Constants.statusBarHeight > 20;
+const isBorderless = Platform.OS === 'ios' && Constants.statusBarHeight > 20;
 const styles = StyleSheet.create({
     footer: {
         flex: 1,
         justifyContent: 'flex-end',
-        marginBottom: isBorderless ? 70 : 30
+        marginBottom: isBorderless ? 50 : 20
     },
     alreadyMember: {
         color: 'white',

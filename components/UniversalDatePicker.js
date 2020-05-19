@@ -41,7 +41,7 @@ export default class UniversalDatePicker extends React.Component {
                 date: this.state.date,
                 minDate: this.state.minimumDate,
                 maxDate: this.state.maximumDate,
-                mode: 'default'
+                mode: 'spinner'
             });
 
             if (action === DatePickerAndroid.dateSetAction) {

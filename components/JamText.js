@@ -15,6 +15,6 @@ export default class extends React.Component {
 
 const styles = StyleSheet.create({
     text: {
-        fontFamily: Platform.OS === 'android' ? 'Roboto' : 'system font'
+        ...(Platform.OS === 'android' ? {fontFamily: 'Roboto'} : {})
     }
 });

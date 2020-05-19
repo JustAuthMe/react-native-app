@@ -23,9 +23,11 @@ export class AudioModel {
         try {
             if (soundObjects[name]) {
                 await soundObjects[name].replayAsync();
+                window.setTimeout(() =>
+                    soundObjects[name].stopAsync().then(),
+                    2000
+                );
             }
-        } catch (error) {
-            console.warn(error)
-        }
+        } catch (error) {}
     }
 }
