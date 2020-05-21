@@ -23,7 +23,7 @@ export-bundle-staging-prod: #export staging bundle using prod core
   tags:
     - macos
   cache:
-    key: ${CI_COMMIT_REF_SLUG}
+    key: ${CI_COMMIT_SHA}
     paths:
       - ~/.npm
       - node_modules/
@@ -46,7 +46,7 @@ export-bundle-staging-staging: #export staging bundle using staging core
   tags:
     - macos
   cache:
-    key: ${CI_COMMIT_REF_SLUG}
+    key: ${CI_COMMIT_SHA}
     paths:
       - ~/.npm
       - node_modules/
@@ -101,7 +101,7 @@ export-bundle-prod:
   tags:
     - macos
   cache:
-    key: ${CI_COMMIT_REF_SLUG}
+    key: ${CI_COMMIT_SHA}
     paths:
       - ~/.npm
       - node_modules/
@@ -140,8 +140,14 @@ deploy-bundle-prod:
 build-android:
   tags:
     - macos
+  cache:
+    key: ${CI_COMMIT_SHA}
+    paths:
+      - ~/.npm
+      - node_modules/
   stage: build-apps
   script:
+    - npm ci
     - turtle build:android --keystore-path /Users/ci/Documents/key0.jks --keystore-alias key0 --public-url $PROD_CDN_URL/android-index.json -t apk --output dist/app.apk
     - turtle build:android --keystore-path /Users/ci/Documents/key0.jks --keystore-alias key0 --public-url $PROD_CDN_URL/android-index.json -t aab --output dist/app.aab
   artifacts:
@@ -155,8 +161,14 @@ build-android:
 build-ios:
   tags:
     - macos
+  cache:
+    key: ${CI_COMMIT_SHA}
+    paths:
+      - ~/.npm
+      - node_modules/
   stage: build-apps
   script:
+    - npm ci
     - turtle build:ios --team-id Z2HF8PJ3F7 --dist-p12-path /Users/ci/Documents/Certificates.p12 --provisioning-profile-path /Users/ci/Documents/JAMDistrib.mobileprovision --public-url $PROD_CDN_URL/ios-index.json --output dist/app.ipa
   artifacts:
     paths:
