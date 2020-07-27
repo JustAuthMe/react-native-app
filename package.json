@@ -16,6 +16,7 @@
     "@expo/vector-icons": "^10.0.0",
     "@react-native-community/datetimepicker": "2.2.2",
     "@react-native-community/masked-view": "0.1.6",
+    "@taccolaa/react-native-settings-screen": "^2.2.10",
     "expo": "^37.0.0",
     "expo-asset": "~8.1.4",
     "expo-av": "~8.1.0",

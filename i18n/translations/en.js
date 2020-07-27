@@ -179,20 +179,15 @@ module.exports = {
     },
     settings: {
         title: 'Settings',
-        version: {
-            title: 'Version',
-            text: 'Build'
-        },
+        version: 'Version',
         orientation: 'Orientation',
-        email: {
-            title: 'Non confirmed e-mail address ?',
-            text: 'Send me another confirmation e-mail'
-        },
-        support: {
-            title: 'Help & Support',
-            text: 'Contact support'
-        },
-        logout: 'Logout'
+        email: 'Send me another confirmation e-mail',
+        support: 'Contact support',
+        logout: 'Logout',
+        privacy: 'Privacy',
+        tos: 'Terms of use',
+        legal: 'Legal',
+        about: "About"
     },
     user: {
         title: 'My profile',
