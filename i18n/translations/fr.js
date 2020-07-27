@@ -179,20 +179,14 @@ module.exports = {
     },
     settings: {
         title: 'Paramètres',
-        version: {
-            title: 'Version',
-            text: 'Révision'
-        },
-        orientation: 'Orientation',
-        email: {
-            title: 'Adresse e-mail non confirmée ?',
-            text: 'Envoyez-moi un nouvel e-mail'
-        },
-        support: {
-            title: 'Assistance',
-            text: 'Contacter le support'
-        },
-        logout: 'Déconnexion'
+        version: 'Version',
+        email: 'Envoyez-moi un nouvel e-mail',
+        support: 'Contacter le support',
+        logout: 'Déconnexion',
+        privacy: 'Confidentialité',
+        tos: "Conditions d'utilisation",
+        legal: "Mentions légales",
+        about: "À propos"
     },
     user: {
         title: 'Mon profil',

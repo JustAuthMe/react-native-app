@@ -1,16 +1,14 @@
 import React from 'react';
 import {
-    View, Alert, AsyncStorage,
-    StatusBar, StyleSheet
+    View, Alert, AsyncStorage, StyleSheet
 } from 'react-native';
-import JamConfigView from "../components/JamConfigView";
 import Config from "../constants/Config";
-import * as SecureStore from "expo-secure-store";
 import {UserModel} from "../models/UserModel";
 import {DropdownSingleton} from "../models/DropdownSingleton";
 import NetworkLoader from "../components/NetworkLoader";
 import DarkStatusBar from "../components/DarkStatusBar";
 import Translator from "../i18n/Translator";
+import {SettingsView} from "../components/SettingsView";
 
 export default class SettingsScreen extends React.Component {
     static navigationOptions = () => ({
@@ -19,10 +17,6 @@ export default class SettingsScreen extends React.Component {
 
     constructor(props) {
         super(props);
-        this._bootstrapAsync().then();
-    }
-
-    async _bootstrapAsync() {
     }
 
     confirmEmail = async () => {
@@ -81,13 +75,12 @@ export default class SettingsScreen extends React.Component {
     };
 
     render() {
-        return (
-            <View style={styles.container}>
-                <DarkStatusBar />
-                <NetworkLoader ref={ref => this.networkLoader = ref} />
-                <JamConfigView onLogout={() => this.logout()} onConfirmEmail={() => this.confirmEmail()} />
-            </View>
-        );
+
+        return <View style={styles.container}>
+            <DarkStatusBar />
+            <NetworkLoader ref={ref => this.networkLoader = ref} />
+            <SettingsView onLogout={() => this.logout()} onConfirmEmail={() => this.confirmEmail()} showEmailSend={true} />
+        </View>;
     }
 }
 
