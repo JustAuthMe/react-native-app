@@ -102,7 +102,7 @@ export default class UserScreen extends React.Component {
         if (Constants.platform.ios) {
             const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
             if (status !== 'granted') {
-                DropdownSingleton.get().alertWithType('error', Translator.t('permission_required'), Translator.t('permission.camera_roll'));
+                DropdownSingleton.get().alertWithType('info', Translator.t('permission_required'), Translator.t('permission.camera_roll'));
                 return;
             }
         }
@@ -123,7 +123,7 @@ export default class UserScreen extends React.Component {
     async updateInfos() {
         for (let i = 0; i < this.requiredInfos.length; i++) {
             if (this.state.user[this.requiredInfos[i]] === '' || this.state.user[this.requiredInfos[i]] === null) {
-                DropdownSingleton.get().alertWithType('error', Translator.t('user.error.empty.title'), Translator.t('user.error.empty.text'));
+                DropdownSingleton.get().alertWithType('warn', Translator.t('user.error.empty.title'), Translator.t('user.error.empty.text'));
                 return;
             }
         }
@@ -164,7 +164,7 @@ export default class UserScreen extends React.Component {
             } else if (response.status === 423) {
                 UserModel.logout(this.props.navigation);
             } else if (response.status === 429) {
-                DropdownSingleton.get().alertWithType('error', Translator.t('user.error.email_exists.title'), Translator.t('user.error.email_exists.text'));
+                DropdownSingleton.get().alertWithType('warn', Translator.t('user.error.email_exists.title'), Translator.t('user.error.email_exists.text'));
             } else {
                 DropdownSingleton.get().alertWithType('error', Translator.t('user.error.email_update'), Translator('error_default'));
             }
@@ -229,7 +229,7 @@ export default class UserScreen extends React.Component {
                                     keyboardType={"email-address"}
                                     clearButtonMode={"always"}
                                     value={this.state.user.email}
-                                    onChangeText={(text) => this.setState({user:{...this.state.user, email:text}})}
+                                    onChangeText={(text) => this.setState({user:{...this.state.user, email:text.trim()}})}
                                     onFocus={() => DropdownSingleton.get().alertWithType(
                                         'info',
                                         Translator.t('alert.information'),
@@ -248,6 +248,7 @@ export default class UserScreen extends React.Component {
                                     clearButtonMode={"always"}
                                     value={this.state.user.firstname}
                                     onChangeText={(text) => this.setState({user:{...this.state.user, firstname:text}})}
+                                    onEndEditing={() => this.setState({user:{...this.state.user, firstname:this.state.user.firstname.trim()}})}
                                 />
                                 <Text style={styles.textLabel}>{Translator.t('data_list.lastname')}*:</Text>
                                 <TextInput
@@ -261,6 +262,7 @@ export default class UserScreen extends React.Component {
                                     clearButtonMode={"always"}
                                     value={this.state.user.lastname}
                                     onChangeText={(text) => this.setState({user:{...this.state.user, lastname:text}})}
+                                    onEndEditing={() => this.setState({user:{...this.state.user, firstname:this.state.user.lastname.trim()}})}
                                 />
                                 <Text style={styles.textLabel}>{Translator.t('data_list.birthdate')}:</Text>
                                 <TouchableOpacity activeOpacity={.5} style={styles.inputTouchable} onPress={() => {
@@ -295,6 +297,7 @@ export default class UserScreen extends React.Component {
                                     clearButtonMode={"always"}
                                     value={this.state.user.address_1}
                                     onChangeText={(text) => this.setState({user:{...this.state.user, address_1:text}})}
+                                    onEndEditing={() => this.setState({user:{...this.state.user, firstname:this.state.user.address_1.trim()}})}
                                 />
                                 <Text style={styles.textLabel}>{Translator.t('data_list.address_2')}:</Text>
                                 <TextInput
@@ -308,6 +311,7 @@ export default class UserScreen extends React.Component {
                                     clearButtonMode={"always"}
                                     value={this.state.user.address_2}
                                     onChangeText={(text) => this.setState({user:{...this.state.user, address_2:text}})}
+                                    onEndEditing={() => this.setState({user:{...this.state.user, firstname:this.state.user.address_2.trim()}})}
                                 />
                                 <Text style={styles.textLabel}>{Translator.t('data_list.postal_code')}:</Text>
                                 <TextInput
@@ -322,6 +326,7 @@ export default class UserScreen extends React.Component {
                                     clearButtonMode={"always"}
                                     value={this.state.user.postal_code}
                                     onChangeText={(text) => this.setState({user:{...this.state.user, postal_code:text}})}
+                                    onEndEditing={() => this.setState({user:{...this.state.user, firstname:this.state.user.postal_code.trim()}})}
                                 />
                                 <Text style={styles.textLabel}>{Translator.t('data_list.city')}:</Text>
                                 <TextInput
@@ -335,6 +340,7 @@ export default class UserScreen extends React.Component {
                                     clearButtonMode={"always"}
                                     value={this.state.user.city}
                                     onChangeText={(text) => this.setState({user:{...this.state.user, city:text}})}
+                                    onEndEditing={() => this.setState({user:{...this.state.user, firstname:this.state.user.city.trim()}})}
                                 />
                                 <Text style={styles.textLabel}>{Translator.t('data_list.state')}:</Text>
                                 <TextInput
@@ -348,6 +354,7 @@ export default class UserScreen extends React.Component {
                                     clearButtonMode={"always"}
                                     value={this.state.user.state}
                                     onChangeText={(text) => this.setState({user:{...this.state.user, state:text}})}
+                                    onEndEditing={() => this.setState({user:{...this.state.user, firstname:this.state.user.state.trim()}})}
                                 />
                                 <Text style={styles.textLabel}>{Translator.t('data_list.country')}:</Text>
                                 <TextInput
@@ -361,6 +368,7 @@ export default class UserScreen extends React.Component {
                                     clearButtonMode={"always"}
                                     value={this.state.user.country}
                                     onChangeText={(text) => this.setState({user:{...this.state.user, country:text}})}
+                                    onEndEditing={() => this.setState({user:{...this.state.user, firstname:this.state.user.country.trim()}})}
                                 />
                                 <Text style={styles.textLabel}>{Translator.t('data_list.job')}:</Text>
                                 <TextInput
@@ -374,6 +382,7 @@ export default class UserScreen extends React.Component {
                                     clearButtonMode={"always"}
                                     value={this.state.user.job}
                                     onChangeText={(text) => this.setState({user:{...this.state.user, job:text}})}
+                                    onEndEditing={() => this.setState({user:{...this.state.user, firstname:this.state.user.job.trim()}})}
                                 />
                                 <Text style={styles.textLabel}>{Translator.t('data_list.company')}:</Text>
                                 <TextInput
@@ -387,6 +396,7 @@ export default class UserScreen extends React.Component {
                                     clearButtonMode={"always"}
                                     value={this.state.user.company}
                                     onChangeText={(text) => this.setState({user:{...this.state.user, company:text}})}
+                                    onEndEditing={() => this.setState({user:{...this.state.user, firstname:this.state.user.company.trim()}})}
                                 />*/}
                                 <ActionBtn btnText={Translator.t('user.save')} btnIcon={'md-checkmark'} onPress={() => this.updateInfos()}/>
                             </View>

@@ -186,8 +186,10 @@ module.exports = {
         logout: 'Logout',
         privacy: 'Privacy',
         tos: 'Terms of use',
-        legal: 'Legal',
-        about: "About"
+        notice: 'Legal',
+        about: "About",
+        dev: "Developers dashboard",
+        legal: "Legal"
     },
     user: {
         title: 'My profile',

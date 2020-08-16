@@ -325,7 +325,7 @@ export default class HomeScreen extends React.Component {
                             onPress={async () => {
                                 const permissionResponse = await Permissions.askAsync(Permissions.CAMERA);
                                 if (permissionResponse.status !== 'granted') {
-                                    DropdownSingleton.get().alertWithType('error', Translator.t('permission_required'), Translator.t('permission.camera'));
+                                    DropdownSingleton.get().alertWithType('info', Translator.t('permission_required'), Translator.t('permission.camera'));
                                 } else {
                                     this.props.navigation.navigate('Scanner');
                                 }

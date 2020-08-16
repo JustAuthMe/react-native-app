@@ -41,7 +41,7 @@ export default class ServiceScreen extends React.Component {
         const service = this.props.navigation.getParam('service', null);
         if (service === null) {
             this.props.navigation.goBack();
-            DropdownSingleton.get().alertWithType('error', Translator.t('service.error_unknow.title'), Translator.t('service.error_unknow.text'));
+            DropdownSingleton.get().alertWithType('warn', Translator.t('service.error_unknow.title'), Translator.t('service.error_unknow.text'));
             return;
         }
 

@@ -45,13 +45,13 @@ export default class SettingsScreen extends React.Component {
                 );
             } else if (response.status === 404) {
                 DropdownSingleton.get().alertWithType(
-                    'error',
-                    'Unknow E-Mail',
+                    'info',
+                    'Already confirmed',
                     'Are you sure that your E-Mail address isn\'t already validated? If it isn\'t, please contact support@justauth.me'
                 );
             } else if (response.status === 429) {
                 DropdownSingleton.get().alertWithType(
-                    'error',
+                    'warn',
                     'Please check your inbox',
                     'Please wait at least 10 minutes before asking for a new confirmation E-Mail. Please also check your junk mail.'
                 )

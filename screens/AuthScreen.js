@@ -4,8 +4,7 @@ import {
     StyleSheet,
     Image,
     AsyncStorage,
-    ScrollView,
-    Platform
+    ScrollView
 } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import * as LocalAuthentication from 'expo-local-authentication';
@@ -66,7 +65,7 @@ export default class AuthScreen extends React.Component {
 
                     if (isFirstLogin && !this.actualData[responseJson.auth.client_app.data[i]] && DataModel.isDataRequired(responseJson.auth.client_app.data[i])) {
                         DropdownSingleton.get().alertWithType(
-                            'error',
+                            'warn',
                             Translator.t('auth.missing_data'),
                             Translator.t('auth.missing_data_message', {
                                 data: DataModel.getDataLabelFromID(responseJson.auth.client_app.data[i]),
@@ -128,46 +127,8 @@ export default class AuthScreen extends React.Component {
 
         let canLogin = true;
         if (hasHardware && isEnrolled) {
-           /* if (Platform.OS === 'android') {
-                this.androidPrompt.setState({visible: true});
-            }*/
-
             let localAuth = await LocalAuthentication.authenticateAsync({promptMessage: Translator.t('auth.confirm_login')});
             canLogin = localAuth.success;
-            /*isUserBigFatFingersFault = localAuth.error === 'authentication_failed';
-            isThereEvenAMessageOrSomething = localAuth.message && localAuth.message !== '';
-
-            if (Platform.OS === 'android') {
-                do {
-                    if (canLogin || isUserBigFatFingersFault) {
-                        this.androidPrompt.setState({status: canLogin ? 'success' : 'error'});
-                    }
-
-                    if (!canLogin) {
-                        localAuth = await LocalAuthentication.authenticateAsync({promptMessage: Translator.t('auth.confirm_login')});
-                        canLogin = localAuth.success;
-                        isUserBigFatFingersFault = localAuth.error === 'authentication_failed';
-                        isThereEvenAMessageOrSomething = localAuth.message && localAuth.message !== '';
-                    }
-                } while (
-                    !canLogin &&
-                    this.androidPrompt.state.visible && (
-                    isUserBigFatFingersFault || (
-                            localAuth.error === 'unknown' && !isThereEvenAMessageOrSomething
-                        )
-                    )
-                );
-
-                if (!canLogin) {
-                    await LocalAuthentication.cancelAuthenticate();
-                    this.androidPrompt.setState({visible: false});
-                    DropdownSingleton.get().alertWithType(
-                        'error',
-                        Translator.t('auth.biometric_error'),
-                        isThereEvenAMessageOrSomething ? localAuth.message : Translator.t('auth.biometric_error_message')
-                    );
-                }
-            }*/
         }
 
         if (canLogin) {

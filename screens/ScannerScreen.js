@@ -27,7 +27,7 @@ export default class ScannerScreen extends React.Component {
         const permissionResponse = await Permissions.askAsync(Permissions.CAMERA);
         if (permissionResponse.status !== 'granted') {
             this.props.navigation.goBack();
-            DropdownSingleton.get().alertWithType('error', Translator.t('permission_required'), Translator.t('permission.camera'));
+            DropdownSingleton.get().alertWithType('info', Translator.t('permission_required'), Translator.t('permission.camera'));
             return;
         }
 

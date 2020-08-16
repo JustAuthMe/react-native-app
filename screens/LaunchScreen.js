@@ -62,7 +62,13 @@ export default class LaunchScreen extends React.Component {
         this.isLoggedIn().then(loggedIn => {
             SplashScreen.hide();
             if (loggedIn && this.state.step === 'launch') {
-                this.props.navigation.navigate('Main');
+                this.hasInfos().then(hasInfos => {
+                    if (hasInfos) {
+                        this.props.navigation.navigate('Main');
+                    } else {
+                        this.props.navigation.navigate('Login', {login: true});
+                    }
+                });
             }
         });
     }
@@ -150,15 +156,15 @@ export default class LaunchScreen extends React.Component {
                     if (response.status === 200) {
                         this.props.navigation.push('LaunchScreen', {step: 'login'});
                     } else if (response.status === 400) {
-                        DropdownSingleton.get().alertWithType('error',  Translator.t('launch.error.invalid_email'),  Translator.t('launch.error.enter_valid_email'));
+                        DropdownSingleton.get().alertWithType('warn',  Translator.t('launch.error.invalid_email'),  Translator.t('launch.error.enter_valid_email'));
                     } else if (response.status === 404) {
                         this.props.navigation.push('LaunchScreen', {step: 'firstname'});
                     } else if (response.status === 429) {
                         const responseJson = await response.json();
                         if (responseJson.message.match(/code/)) {
-                            DropdownSingleton.get().alertWithType('error', Translator.t('launch.error.anti_spam'),  Translator.t('launch.error.anti_spam_message.email_code'));
+                            DropdownSingleton.get().alertWithType('info', Translator.t('launch.error.anti_spam'),  Translator.t('launch.error.anti_spam_message.email_code'));
                         } else {
-                            DropdownSingleton.get().alertWithType('error', Translator.t('launch.error.anti_spam'),  Translator.t('error_too_many'));
+                            DropdownSingleton.get().alertWithType('info', Translator.t('launch.error.anti_spam'),  Translator.t('error_too_many'));
                         }
                     } else {
                         DropdownSingleton.get().alertWithType(
@@ -227,10 +233,10 @@ export default class LaunchScreen extends React.Component {
             if (response.status === 400) {
                 DropdownSingleton.get().alertWithType('error', Translator.t('launch.error.http', {code:400}), Translator.t('launch.error.http_message', {code:400}));
             } else if (response.status === 409) {
-                DropdownSingleton.get().alertWithType('error', Translator.t('launch.error.already_member'), Translator.t('launch.error.account_already_existing'));
+                DropdownSingleton.get().alertWithType('info', Translator.t('launch.error.already_member'), Translator.t('launch.error.account_already_existing'));
                 step = 'login';
             } else if (response.status === 429) {
-                DropdownSingleton.get().alertWithType('error', Translator.t('launch.error.anti_spam'), Translator.t('launch.error.anti_spam_message.register'));
+                DropdownSingleton.get().alertWithType('info', Translator.t('launch.error.anti_spam'), Translator.t('launch.error.anti_spam_message.register'));
             }
 
             const resetAction = StackActions.reset({
@@ -323,7 +329,7 @@ export default class LaunchScreen extends React.Component {
                         <View style={styles.swiperContainer}>
                             <Swiper
                                 activeDotColor={'#555'}
-                                autoplay={false}
+                                autoplay={true}
                                 autoplayTimeout={15}
                                 removeClippedSubviews={false}
                                 onIndexChanged={(index) => {
@@ -404,7 +410,7 @@ export default class LaunchScreen extends React.Component {
                                     textContentType={"emailAddress"}
                                     keyboardType={"email-address"}
                                     clearButtonMode={"always"}
-                                    onChangeText={(text) => this.onInputChange('email', text)}
+                                    onChangeText={(text) => this.onInputChange('email', text.trim())}
 
                                 />
                                 <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('email')} />
@@ -447,6 +453,12 @@ export default class LaunchScreen extends React.Component {
                                             disabled: text === ''
                                         });
                                     }}
+                                    onEndEditing={() => {
+                                        this.passcode = this.passcode.trim();
+                                        this.continueBtn.setState({
+                                            disabled: this.passcode === ''
+                                        });
+                                    }}
                                 />
                                 <ContinueButton text={'Login'} ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.login()} />
                                 <View style={styles.webview}>
@@ -480,6 +492,7 @@ export default class LaunchScreen extends React.Component {
                                     textContentType={"givenName"}
                                     clearButtonMode={"always"}
                                     onChangeText={(text) => this.onInputChange('firstname', text)}
+                                    onEndEditing={() => this.onInputChange('firstname', this.personnalInfos['firstname'].trim())}
                                 />
                                 <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('firstname', 'lastname')} />
                                 <LaunchFooter />
@@ -507,6 +520,7 @@ export default class LaunchScreen extends React.Component {
                                     textContentType={"familyName"}
                                     clearButtonMode={"always"}
                                     onChangeText={(text) => this.onInputChange('lastname', text)}
+                                    onEndEditing={() => this.onInputChange('lastname', this.personnalInfos['lastname'].trim())}
                                 />
                                 <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('lastname', 'done')} />
                                 <LaunchFooter />

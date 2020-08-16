@@ -185,8 +185,10 @@ module.exports = {
         logout: 'Déconnexion',
         privacy: 'Confidentialité',
         tos: "Conditions d'utilisation",
-        legal: "Mentions légales",
-        about: "À propos"
+        notice: "Mentions légales",
+        about: "À propos",
+        dev: "Panel développeurs",
+        legal: "Infos légales"
     },
     user: {
         title: 'Mon profil',
