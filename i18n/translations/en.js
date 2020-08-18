@@ -167,6 +167,18 @@ module.exports = {
             relog: '%{domain} has access to the following'
         }
     },
+    success: {
+        error: 'Something went wrong?',
+        alert: {
+            title: 'Error during login?',
+            msg: 'Do you confirm that the login to %{domain} went wrong?',
+            ok_btn: 'I confirm'
+        },
+        dropdown: {
+            title: 'Thank you for your feedback!',
+            text: 'We removed %{name} from your services. You can now try again!'
+        }
+    },
     service: {
         title: 'Service details',
         error_unknow: {

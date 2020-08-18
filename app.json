@@ -32,7 +32,7 @@
       }
     },
     "android": {
-      "versionCode": 2,
+      "versionCode": 3,
       "package": "me.justauth.app.android"
     },
     "androidStatusBar": {

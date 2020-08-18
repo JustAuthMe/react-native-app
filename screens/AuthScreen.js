@@ -190,7 +190,7 @@ export default class AuthScreen extends React.Component {
                     }
 
                     await ServicesModel.saveService(this.state.auth.client_app.app_id, service);
-                    this.props.navigation.navigate('Success');
+                    this.props.navigation.navigate('Success', {service: service});
                 } else {
                     if (response.status === 401) {
                         DropdownSingleton.get().alertWithType('error', Translator.t('auth.unauthorized_login'), Translator.t('auth.unauthorized_login_message'));

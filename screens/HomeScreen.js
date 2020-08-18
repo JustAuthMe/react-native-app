@@ -15,16 +15,12 @@ import {
 } from 'react-native';
 import Constants from 'expo-constants';
 import * as Icon from '@expo/vector-icons';
-import * as SecureStore from 'expo-secure-store';
-import Config from "../constants/Config";
 import LightStatusBar from "../components/LightStatusBar";
 import {AuthSingleton} from "../models/AuthSingleton";
 import ActionBtn from "../components/ActionBtn";
 import {ServicesModel} from "../models/ServicesModel";
 import {AlertModel} from "../models/AlertModel";
 import {SwipeListView} from "react-native-swipe-list-view";
-import {DateModel} from "../models/DateModel";
-import {EncryptionModel} from "../models/EncryptionModel";
 import {DropdownSingleton} from "../models/DropdownSingleton";
 import * as Permissions from "expo-permissions";
 import {UserModel} from "../models/UserModel";
@@ -97,6 +93,7 @@ export default class HomeScreen extends React.Component {
         }
 
         let items = [];
+        let j=0;
         for (let i in this.state.services) {
             items.push({
                 key: i
@@ -125,30 +122,8 @@ export default class HomeScreen extends React.Component {
                 }, style:'cancel'},
             {text: Translator.t('ok'), onPress: async () => {
                 this.isSwipeToDeleteEnabled = true;
-                const dateModel = new DateModel();
-                const enc = new EncryptionModel();
-                const dataToSend = {
-                    app_id: service.app_id,
-                    jam_id: await SecureStore.getItemAsync(Config.storageKeys.jamID),
-                    timestamp: dateModel.getUnixTimestamp()
-                };
-
                 this.networkLoader.setState({visible: true});
-                const sign = await enc.sign(enc.urlencode(enc.json_encode(dataToSend)));
-                const response = await fetch(
-                    Config.apiUrl + 'user_login',
-                    {
-                        method: 'DELETE',
-                        headers: {
-                            Accept: 'application/json',
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            data: dataToSend,
-                            sign: sign
-                        })
-                    }
-                );
+                const response = await ServicesModel.remoteRemove(service);
                 this.networkLoader.setState({visible: false});
 
                 if (response.status === 200 || response.status === 404) {
@@ -174,7 +149,7 @@ export default class HomeScreen extends React.Component {
                     });
                 }}
             >
-                <View style={[styles.serviceContainer, isLast && {borderBottomWidth: 1}]}>
+                <View style={[styles.serviceContainer, isLast && {borderBottomWidth: 1, marginBottom: 50}]}>
                     <Image source={{uri: this.state.services[key].logo}} style={styles.serviceIcon}/>
                     <Text style={styles.serviceName}>{this.state.services[key].name}</Text>
                     <Icon.Ionicons
@@ -202,7 +177,7 @@ export default class HomeScreen extends React.Component {
                 <Button onPress={() => Linking.openURL('https://demo.justauth.me')} title={Translator.t('home.try_demo')} />
             </View>;
         } else {
-            const dataToList = this.parseServices();
+            let dataToList = this.parseServices();
             servicesList = <SwipeListView
                 style={styles.servicesList}
                 data={dataToList}
@@ -398,8 +373,7 @@ const styles = StyleSheet.create({
     },
     servicesList: {
         width: '100%',
-        paddingTop: 25,
-        marginBottom: 30
+        paddingTop: 25
     },
     serviceContainer: {
         backgroundColor: '#FFF',
@@ -431,6 +405,7 @@ const styles = StyleSheet.create({
         top: 23
     },
     rowBack: {
+        maxHeight: 70,
         alignItems: 'center',
         backgroundColor: '#ff3838',
         flex: 1,

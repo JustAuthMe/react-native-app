@@ -4,14 +4,12 @@ import { AppLoading } from 'expo';
 import * as Icon from '@expo/vector-icons';
 import * as Font from 'expo-font';
 import AppNavigator from './navigation/AppNavigator';
-import Config from "./constants/Config";
 import {AudioModel} from "./models/AudioModel";
 import AudioLibrary from "./constants/AudioLibrary";
 import DropdownAlert from "react-native-dropdownalert";
 import {DropdownSingleton} from "./models/DropdownSingleton";
 import UniversalDatePicker from "./components/UniversalDatePicker";
 import {DatePickerSingleton} from "./models/DatePickerSingleton";
-import Translator from "./i18n/Translator";
 
 export default class App extends React.Component {
     state = {

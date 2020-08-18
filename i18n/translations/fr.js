@@ -167,6 +167,18 @@ module.exports = {
             relog: '%{domain} a accès aux informations suivante'
         }
     },
+    success: {
+        error: 'Un problème est survenu ?',
+        alert: {
+            title: 'Erreur lors de la connexion ?',
+            msg: 'Confirmez-vous que la connexion à %{domain} a échouée ?',
+            ok_btn: 'Je confirme'
+        },
+        dropdown: {
+            title: 'Merci pour votre retour !',
+            text: 'Nous avons retiré %{name} de vos services. Vous pouvez maintenant réessayer !'
+        }
+    },
     service: {
         title: 'Détails du service',
         error_unknow: {

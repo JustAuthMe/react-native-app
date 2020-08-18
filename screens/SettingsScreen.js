@@ -45,9 +45,9 @@ export default class SettingsScreen extends React.Component {
                 );
             } else if (response.status === 404) {
                 DropdownSingleton.get().alertWithType(
-                    'info',
+                    'success',
                     'Already confirmed',
-                    'Are you sure that your E-Mail address isn\'t already validated? If it isn\'t, please contact support@justauth.me'
+                    'Your E-Mail address is already confirmed! You have nothing more to do.'
                 );
             } else if (response.status === 429) {
                 DropdownSingleton.get().alertWithType(
