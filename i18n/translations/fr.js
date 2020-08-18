@@ -200,7 +200,25 @@ module.exports = {
         notice: "Mentions légales",
         about: "À propos",
         dev: "Panel développeurs",
-        legal: "Infos légales"
+        legal: "Infos légales",
+        dropdown: {
+            success: {
+                title: 'Vérifiez votre boite mail !',
+                text: 'Nous vous avons envoyé un mail de confirmation à l\'adresse %{email}. Cliquez sur le lien dans l\'email pour confirmer votre adresse.'
+            },
+            already_confirmed: {
+                title: 'Déjà validée',
+                text: 'Votre adresse e-mail est déjà validée ! Vous n\'avez rien d\'autre à faire.'
+            },
+            spam: {
+                title: 'Merci de vérifier votre boite mail',
+                text: 'Patientez au moins 10 minutes avant de demander un nouvel e-mail de confirmation. Merci également de vérifier vos spams.'
+            },
+            unknow: {
+                title: 'Erreur inconnue',
+                text: 'Une erreur inconnue s\'est produite. Merci de contacter support@justauth.me en mentionnant qu\'une erreur HTTP %{status} est apparue lors de la demande d\'e-mail de confirmation.'
+            }
+        }
     },
     user: {
         title: 'Mon profil',

@@ -201,7 +201,25 @@ module.exports = {
         notice: 'Legal',
         about: "About",
         dev: "Developers dashboard",
-        legal: "Legal"
+        legal: "Legal",
+        dropdown: {
+            success: {
+                title: 'Check your inbox!',
+                text: 'We sent you a confirmation E-Mail to %{email}. Click on the link to confirm your E-Mail address.'
+            },
+            already_confirmed: {
+                title: 'Already confirmed',
+                text: 'Your E-Mail address is already confirmed! You have nothing more to do.'
+            },
+            spam: {
+                title: 'Please check your inbox',
+                text: 'Wait at least 10 minutes before asking for a new confirmation E-Mail. Please also check your junk mail.'
+            },
+            unknow: {
+                title: 'Uknown error',
+                text: 'An unknow error occured. Please contact support@justauth.me, mentionning that a HTTP %{status} appeared at E-Mail confirmation request.'
+            }
+        }
     },
     user: {
         title: 'My profile',

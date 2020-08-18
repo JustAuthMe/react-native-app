@@ -40,26 +40,26 @@ export default class SettingsScreen extends React.Component {
             if (response.status === 200) {
                 DropdownSingleton.get().alertWithType(
                     'success',
-                    'Check your inbox!',
-                    'We sent you a confirmation E-Mail to ' + email + '. Click on the link to confirm your E-Mail address.'
+                    Translator.t('settings.dropdown.success.title'),
+                    Translator.t('settings.dropdown.success.text', {email: email})
                 );
             } else if (response.status === 404) {
                 DropdownSingleton.get().alertWithType(
                     'success',
-                    'Already confirmed',
-                    'Your E-Mail address is already confirmed! You have nothing more to do.'
+                    Translator.t('settings.dropdown.already_confirmed.title'),
+                    Translator.t('settings.dropdown.already_confirmed.text')
                 );
             } else if (response.status === 429) {
                 DropdownSingleton.get().alertWithType(
                     'warn',
-                    'Please check your inbox',
-                    'Please wait at least 10 minutes before asking for a new confirmation E-Mail. Please also check your junk mail.'
+                    Translator.t('settings.dropdown.spam.title'),
+                    Translator.t('settings.dropdown.spam.text')
                 )
             } else {
                 DropdownSingleton.get().alertWithType(
                     'error',
-                    'Uknow error',
-                    'An unknow error occured. Please contact support@justauth.me, mentionning that a HTTP ' + response.status + ' appeared at E-Mail confirmation request.'
+                    Translator.t('settings.dropdown.unknow.title'),
+                    Translator.t('settings.dropdown.unknow.text', {status: response.status})
                 );
             }
         });
