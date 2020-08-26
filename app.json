@@ -33,7 +33,12 @@
     },
     "android": {
       "versionCode": 3,
-      "package": "me.justauth.app.android"
+      "package": "me.justauth.app.android",
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
     },
     "androidStatusBar": {
       "translucent": false
