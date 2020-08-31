@@ -24,6 +24,7 @@
     ],
     "ios": {
       "bundleIdentifier": "me.justauth.app.ios",
+      "buildNumber": "2",
       "supportsTablet": true,
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "We use Photo Library in order to update your profile picture",
