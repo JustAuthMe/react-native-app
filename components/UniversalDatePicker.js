@@ -10,7 +10,11 @@ export default class UniversalDatePicker extends React.Component {
     state = {
         date: new Date(),
         onDone: null,
-        onDateChange: null,
+        onDateChange: date => {
+            this.setState({date: date});
+            this.state.onDateChangeCallback(date);
+        },
+        onDateChangeCallback: date => {},
         minimumDate: new Date('1900-01-01T00:00:00'),
         maximumDate: new Date((new Date().getFullYear()) + '-12-31T00:00:00')
     };

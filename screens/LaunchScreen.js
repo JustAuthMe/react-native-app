@@ -92,13 +92,12 @@ export default class LaunchScreen extends React.Component {
 
         const firstname = await AsyncStorage.getItem('firstname');
         const lastname = await AsyncStorage.getItem('lastname');
-        const birthdate = await AsyncStorage.getItem('birthdate');
         const avatar = await AsyncStorage.getItem('avatar');
         if (avatar === null) {
             await AsyncStorage.setItem('avatar', Config.defaultAvatar);
         }
 
-        return firstname !== null && lastname !== null && birthdate !== null;
+        return firstname !== null && lastname !== null;
     };
 
     onInputChange(key, value) {

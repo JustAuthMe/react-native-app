@@ -268,7 +268,7 @@ export default class UserScreen extends React.Component {
                                 <TouchableOpacity activeOpacity={.5} style={styles.inputTouchable} onPress={() => {
                                     DatePickerSingleton.get().open({
                                         date: this.state.currentBirthdate,
-                                        onDateChange: date => this.setState({currentBirthdate: date}),
+                                        onDateChangeCallback: date => this.setState({currentBirthdate: date}),
                                         onDone: () => this.changeBirthdate()
                                     })
                                 }}>
