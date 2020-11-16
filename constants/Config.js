@@ -1,7 +1,7 @@
 module.exports = {
     urlScheme: 'jam://',
-    apiUrl: 'http://192.168.0.6/JustAuth.Me/core/public/api/',
-    alertUrl: 'http://192.168.0.6/JustAuth.Me/alert/',
+    apiUrl: 'http://192.168.1.100/JustAuth.Me/core/public/api/',
+    alertUrl: 'http://192.168.1.100/JustAuth.Me/alert/',
     storageKeys: {
         publicKey: 'pubkey',
         privateKey: 'privkey',

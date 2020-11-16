@@ -8,7 +8,7 @@
       "ios",
       "android"
     ],
-    "version": "1.3.0",
+    "version": "1.4.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "splash": {
@@ -24,7 +24,7 @@
     ],
     "ios": {
       "bundleIdentifier": "me.justauth.app.ios",
-      "buildNumber": "2",
+      "buildNumber": "3",
       "supportsTablet": true,
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "We use Photo Library in order to update your profile picture",
@@ -33,7 +33,7 @@
       }
     },
     "android": {
-      "versionCode": 3,
+      "versionCode": 4,
       "package": "me.justauth.app.android",
       "permissions": [
         "CAMERA",
