@@ -285,7 +285,21 @@ export default class UserScreen extends React.Component {
                                         value={this.state.birthdateInputValue}
                                     />
                                 </TouchableOpacity>
-                                {/*<Text style={styles.textLabel}>{Translator.t('data_list.address_1')}:</Text>
+                                <Text style={styles.textLabel}>{Translator.t('data_list.birthlocation')}:</Text>
+                                <TextInput
+                                    ref={"birthlocation"}
+                                    style={styles.textInput}
+                                    placeholder={Translator.t('placeholders.birthlocation')}
+                                    returnKeyType={"done"}
+                                    autoCorrect={false}
+                                    spellCheck={false}
+                                    textContentType={"birthlocation"}
+                                    clearButtonMode={"always"}
+                                    value={this.state.user.birthlocation}
+                                    onChangeText={(text) => this.setState({user:{...this.state.user, birthlocation:text}})}
+                                    onEndEditing={() => this.setState({user:{...this.state.user, firstname:this.state.user.birthlocation.trim()}})}
+                                />
+                                <Text style={styles.textLabel}>{Translator.t('data_list.address_1')}:</Text>
                                 <TextInput
                                     ref={"adress_1"}
                                     style={styles.textInput}
@@ -397,7 +411,7 @@ export default class UserScreen extends React.Component {
                                     value={this.state.user.company}
                                     onChangeText={(text) => this.setState({user:{...this.state.user, company:text}})}
                                     onEndEditing={() => this.setState({user:{...this.state.user, firstname:this.state.user.company.trim()}})}
-                                />*/}
+                                />
                                 <ActionBtn btnText={Translator.t('user.save')} btnIcon={'md-checkmark'} onPress={() => this.updateInfos()}/>
                             </View>
                         </ScrollView>
