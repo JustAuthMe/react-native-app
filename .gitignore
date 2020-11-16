@@ -11,3 +11,4 @@ dist/
 *.sh
 !deploy.sh
 .DS_Store
+web-build/
