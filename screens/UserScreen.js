@@ -230,7 +230,12 @@ export default class UserScreen extends React.Component {
                                     keyboardType={"email-address"}
                                     clearButtonMode={"always"}
                                     value={this.state.user.email}
-                                    onChangeText={(text) => this.setState({user:{...this.state.user, email:text.trim()}})}
+                                    onChangeText={(text) => this.setState({
+                                        user: {
+                                            ...this.state.user,
+                                            email: text?.trim() || null
+                                        }
+                                    })}
                                     onFocus={() => DropdownSingleton.get().alertWithType(
                                         'info',
                                         Translator.t('alert.information'),
@@ -249,7 +254,12 @@ export default class UserScreen extends React.Component {
                                     clearButtonMode={"always"}
                                     value={this.state.user.firstname}
                                     onChangeText={(text) => this.setState({user:{...this.state.user, firstname:text}})}
-                                    onEndEditing={() => this.setState({user:{...this.state.user, firstname:this.state.user.firstname.trim()}})}
+                                    onEndEditing={() => this.setState({
+                                        user: {
+                                            ...this.state.user,
+                                            firstname: this.state.user.firstname?.trim() || null
+                                        }
+                                    })}
                                 />
                                 <Text style={styles.textLabel}>{Translator.t('data_list.lastname')}*:</Text>
                                 <TextInput
@@ -263,7 +273,12 @@ export default class UserScreen extends React.Component {
                                     clearButtonMode={"always"}
                                     value={this.state.user.lastname}
                                     onChangeText={(text) => this.setState({user:{...this.state.user, lastname:text}})}
-                                    onEndEditing={() => this.setState({user:{...this.state.user, lastname:this.state.user.lastname.trim()}})}
+                                    onEndEditing={() => this.setState({
+                                        user: {
+                                            ...this.state.user,
+                                            lastname: this.state.user.lastname?.trim() || null
+                                        }
+                                    })}
                                 />
                                 <Text style={styles.textLabel}>{Translator.t('data_list.birthdate')}:</Text>
                                 <TouchableOpacity activeOpacity={.5} style={styles.inputTouchable} onPress={() => {
@@ -298,7 +313,12 @@ export default class UserScreen extends React.Component {
                                     clearButtonMode={"always"}
                                     value={this.state.user.birthlocation}
                                     onChangeText={(text) => this.setState({user:{...this.state.user, birthlocation:text}})}
-                                    onEndEditing={() => this.setState({user:{...this.state.user, birthlocation:this.state.user.birthlocation.trim()}})}
+                                    onEndEditing={() => this.setState({
+                                        user: {
+                                            ...this.state.user,
+                                            birthlocation: this.state.user.birthlocation?.trim() || null
+                                        }
+                                    })}
                                 />
                                 <Text style={styles.textLabel}>{Translator.t('data_list.address_1')}:</Text>
                                 <TextInput
@@ -312,7 +332,12 @@ export default class UserScreen extends React.Component {
                                     clearButtonMode={"always"}
                                     value={this.state.user.address_1}
                                     onChangeText={(text) => this.setState({user:{...this.state.user, address_1:text}})}
-                                    onEndEditing={() => this.setState({user:{...this.state.user, address_1:this.state.user.address_1.trim()}})}
+                                    onEndEditing={() => this.setState({
+                                        user: {
+                                            ...this.state.user,
+                                            address_1: this.state.user.address_1?.trim() || null
+                                        }
+                                    })}
                                 />
                                 <Text style={styles.textLabel}>{Translator.t('data_list.address_2')}:</Text>
                                 <TextInput
@@ -326,7 +351,12 @@ export default class UserScreen extends React.Component {
                                     clearButtonMode={"always"}
                                     value={this.state.user.address_2}
                                     onChangeText={(text) => this.setState({user:{...this.state.user, address_2:text}})}
-                                    onEndEditing={() => this.setState({user:{...this.state.user, address_2:this.state.user.address_2.trim()}})}
+                                    onEndEditing={() => this.setState({
+                                        user: {
+                                            ...this.state.user,
+                                            address_2: this.state.user.address_2?.trim() || null
+                                        }
+                                    })}
                                 />
                                 <Text style={styles.textLabel}>{Translator.t('data_list.postal_code')}:</Text>
                                 <TextInput
@@ -341,7 +371,12 @@ export default class UserScreen extends React.Component {
                                     clearButtonMode={"always"}
                                     value={this.state.user.postal_code}
                                     onChangeText={(text) => this.setState({user:{...this.state.user, postal_code:text}})}
-                                    onEndEditing={() => this.setState({user:{...this.state.user, postal_code:this.state.user.postal_code.trim()}})}
+                                    onEndEditing={() => this.setState({
+                                        user: {
+                                            ...this.state.user,
+                                            postal_code: this.state.user.postal_code?.trim() || null
+                                        }
+                                    })}
                                 />
                                 <Text style={styles.textLabel}>{Translator.t('data_list.city')}:</Text>
                                 <TextInput
@@ -355,7 +390,12 @@ export default class UserScreen extends React.Component {
                                     clearButtonMode={"always"}
                                     value={this.state.user.city}
                                     onChangeText={(text) => this.setState({user:{...this.state.user, city:text}})}
-                                    onEndEditing={() => this.setState({user:{...this.state.user, city:this.state.user.city.trim()}})}
+                                    onEndEditing={() => this.setState({
+                                        user: {
+                                            ...this.state.user,
+                                            city: this.state.user.city?.trim() || null
+                                        }
+                                    })}
                                 />
                                 <Text style={styles.textLabel}>{Translator.t('data_list.state')}:</Text>
                                 <TextInput
@@ -369,7 +409,12 @@ export default class UserScreen extends React.Component {
                                     clearButtonMode={"always"}
                                     value={this.state.user.state}
                                     onChangeText={(text) => this.setState({user:{...this.state.user, state:text}})}
-                                    onEndEditing={() => this.setState({user:{...this.state.user, state:this.state.user.state.trim()}})}
+                                    onEndEditing={() => this.setState({
+                                        user: {
+                                            ...this.state.user,
+                                            state:this.state.user.state?.trim() || null
+                                        }
+                                    })}
                                 />
                                 <Text style={styles.textLabel}>{Translator.t('data_list.country')}:</Text>
                                 <TextInput
@@ -383,7 +428,12 @@ export default class UserScreen extends React.Component {
                                     clearButtonMode={"always"}
                                     value={this.state.user.country}
                                     onChangeText={(text) => this.setState({user:{...this.state.user, country:text}})}
-                                    onEndEditing={() => this.setState({user:{...this.state.user, country:this.state.user.country.trim()}})}
+                                    onEndEditing={() => this.setState({
+                                        user: {
+                                            ...this.state.user,
+                                            country:this.state.user.country?.trim() || null
+                                        }
+                                    })}
                                 />
                                 <Text style={styles.textLabel}>{Translator.t('data_list.job')}:</Text>
                                 <TextInput
@@ -397,7 +447,12 @@ export default class UserScreen extends React.Component {
                                     clearButtonMode={"always"}
                                     value={this.state.user.job}
                                     onChangeText={(text) => this.setState({user:{...this.state.user, job:text}})}
-                                    onEndEditing={() => this.setState({user:{...this.state.user, job:this.state.user.job.trim()}})}
+                                    onEndEditing={() => this.setState({
+                                        user: {
+                                            ...this.state.user,
+                                            job: this.state.user.job?.trim() || null
+                                        }
+                                    })}
                                 />
                                 <Text style={styles.textLabel}>{Translator.t('data_list.company')}:</Text>
                                 <TextInput
@@ -411,7 +466,12 @@ export default class UserScreen extends React.Component {
                                     clearButtonMode={"always"}
                                     value={this.state.user.company}
                                     onChangeText={(text) => this.setState({user:{...this.state.user, company:text}})}
-                                    onEndEditing={() => this.setState({user:{...this.state.user, company:this.state.user.company.trim()}})}
+                                    onEndEditing={() => this.setState({
+                                        user: {
+                                            ...this.state.user,
+                                            company:this.state.user.company?.trim() || null
+                                        }
+                                    })}
                                 />
                                 <ActionBtn btnText={Translator.t('user.save')} btnIcon={'md-checkmark'} onPress={() => this.updateInfos()}/>
                             </View>
