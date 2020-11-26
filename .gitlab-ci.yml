@@ -15,13 +15,13 @@ stages:
 tests:
   stage: tests
   tags:
-    - macos
+    - private-network
   script:
     - npm run check-translations
 
 export-bundle-staging-prod: #export staging bundle using prod core
   tags:
-    - macos
+    - private-network
   cache:
     key: ${CI_COMMIT_SHA}
     paths:
@@ -44,7 +44,7 @@ export-bundle-staging-prod: #export staging bundle using prod core
 
 export-bundle-staging-staging: #export staging bundle using staging core
   tags:
-    - macos
+    - private-network
   cache:
     key: ${CI_COMMIT_SHA}
     paths:
@@ -67,7 +67,7 @@ export-bundle-staging-staging: #export staging bundle using staging core
 
 deploy-bundle-staging-prod: # aka staging app using prod core
   tags:
-    - macos
+    - private-network
   stage: deploy-bundle-staging
   variables:
     HOST: "$STAGING_CDN_HOST"
@@ -83,7 +83,7 @@ deploy-bundle-staging-prod: # aka staging app using prod core
 
 deploy-bundle-staging-staging: #aka staging app using staging core
   tags:
-    - macos
+    - private-network
   stage: deploy-bundle-staging
   variables:
     HOST: "$STAGING_CDN_HOST"
@@ -99,7 +99,7 @@ deploy-bundle-staging-staging: #aka staging app using staging core
 
 export-bundle-prod:
   tags:
-    - macos
+    - private-network
   cache:
     key: ${CI_COMMIT_SHA}
     paths:
@@ -177,7 +177,7 @@ build-ios:
   only:
     - tags
 
-deploy-android:
+.deploy-android:
   tags:
     - macos
   stage: deploy-apps
@@ -188,7 +188,7 @@ deploy-android:
   only:
     - tags
 
-deploy-ios:
+.deploy-ios:
   tags:
     - macos
   stage: deploy-apps
