@@ -184,7 +184,7 @@ build-android-aab:
   script:
     - npm ci
     - base64 -d $ANDROID_KEYSTORE_B64 > keystore.jks
-    - turtle build:android --keystore-path keystore.jks --keystore-alias key0 --public-url $PROD_CDN_URL/android-index.json -t apk --output dist/app.apk
+    - turtle build:android --keystore-path keystore.jks --keystore-alias key0 --public-url $PROD_CDN_URL/android-index.json -t aab --output dist/app.aab
     - rm keystore.jks
   artifacts:
     paths:
