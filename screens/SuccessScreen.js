@@ -17,7 +17,7 @@ import {DropdownSingleton} from "../models/DropdownSingleton";
 
 export default class SuccessScreen extends React.Component {
     static navigationOptions = {
-        header: null,
+        headerShown: false,
     };
 
     state = {

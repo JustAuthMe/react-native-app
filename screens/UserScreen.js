@@ -219,7 +219,7 @@ export default class UserScreen extends React.Component {
                                 </TouchableOpacity>
                                 <Text style={styles.textLabel}>{Translator.t('data_list.email')}*:</Text>
                                 <TextInput
-                                    ref={"email"}
+
                                     style={styles.textInput}
                                     placeholder={Translator.t('placeholders.email')}
                                     returnKeyType={"done"}
@@ -244,7 +244,7 @@ export default class UserScreen extends React.Component {
                                 />
                                 <Text style={styles.textLabel}>{Translator.t('data_list.firstname')}*:</Text>
                                 <TextInput
-                                    ref={"firstname"}
+
                                     style={styles.textInput}
                                     placeholder={Translator.t('placeholders.firstname')}
                                     returnKeyType={"done"}
@@ -263,7 +263,7 @@ export default class UserScreen extends React.Component {
                                 />
                                 <Text style={styles.textLabel}>{Translator.t('data_list.lastname')}*:</Text>
                                 <TextInput
-                                    ref={"lastname"}
+
                                     style={styles.textInput}
                                     placeholder={Translator.t('placeholders.lastname')}
                                     returnKeyType={"done"}
@@ -289,7 +289,7 @@ export default class UserScreen extends React.Component {
                                     })
                                 }}>
                                     <TextInput
-                                        ref={'birthdateInput'}
+
                                         style={styles.textInput}
                                         placeholder={Translator.t('placeholders.birthdate')}
                                         returnKeyType={"done"}
@@ -303,7 +303,7 @@ export default class UserScreen extends React.Component {
                                 </TouchableOpacity>
                                 <Text style={styles.textLabel}>{Translator.t('data_list.birthlocation')}:</Text>
                                 <TextInput
-                                    ref={"birthlocation"}
+
                                     style={styles.textInput}
                                     placeholder={Translator.t('placeholders.birthlocation')}
                                     returnKeyType={"done"}
@@ -322,7 +322,7 @@ export default class UserScreen extends React.Component {
                                 />
                                 <Text style={styles.textLabel}>{Translator.t('data_list.address_1')}:</Text>
                                 <TextInput
-                                    ref={"adress_1"}
+
                                     style={styles.textInput}
                                     placeholder={Translator.t('placeholders.address_1')}
                                     returnKeyType={"done"}
@@ -341,7 +341,7 @@ export default class UserScreen extends React.Component {
                                 />
                                 <Text style={styles.textLabel}>{Translator.t('data_list.address_2')}:</Text>
                                 <TextInput
-                                    ref={"address_2"}
+
                                     style={styles.textInput}
                                     placeholder={Translator.t('placeholders.address_2')}
                                     returnKeyType={"done"}
@@ -360,7 +360,7 @@ export default class UserScreen extends React.Component {
                                 />
                                 <Text style={styles.textLabel}>{Translator.t('data_list.postal_code')}:</Text>
                                 <TextInput
-                                    ref={"postal_code"}
+
                                     style={styles.textInput}
                                     placeholder={Translator.t('placeholders.postal_code')}
                                     returnKeyType={"done"}
@@ -380,7 +380,7 @@ export default class UserScreen extends React.Component {
                                 />
                                 <Text style={styles.textLabel}>{Translator.t('data_list.city')}:</Text>
                                 <TextInput
-                                    ref={"city"}
+
                                     style={styles.textInput}
                                     placeholder={Translator.t('placeholders.city')}
                                     returnKeyType={"done"}
@@ -399,7 +399,7 @@ export default class UserScreen extends React.Component {
                                 />
                                 <Text style={styles.textLabel}>{Translator.t('data_list.state')}:</Text>
                                 <TextInput
-                                    ref={"state"}
+
                                     style={styles.textInput}
                                     placeholder={Translator.t('placeholders.state')}
                                     returnKeyType={"done"}
@@ -418,7 +418,7 @@ export default class UserScreen extends React.Component {
                                 />
                                 <Text style={styles.textLabel}>{Translator.t('data_list.country')}:</Text>
                                 <TextInput
-                                    ref={"country"}
+
                                     style={styles.textInput}
                                     placeholder={Translator.t('placeholders.country')}
                                     returnKeyType={"done"}
@@ -437,7 +437,7 @@ export default class UserScreen extends React.Component {
                                 />
                                 <Text style={styles.textLabel}>{Translator.t('data_list.job')}:</Text>
                                 <TextInput
-                                    ref={"job"}
+
                                     style={styles.textInput}
                                     placeholder={Translator.t('placeholders.job')}
                                     returnKeyType={"done"}
@@ -456,7 +456,7 @@ export default class UserScreen extends React.Component {
                                 />
                                 <Text style={styles.textLabel}>{Translator.t('data_list.company')}:</Text>
                                 <TextInput
-                                    ref={"company"}
+
                                     style={styles.textInput}
                                     placeholder={Translator.t('placeholders.company')}
                                     returnKeyType={"done"}

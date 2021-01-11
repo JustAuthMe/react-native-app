@@ -39,6 +39,8 @@ export-bundle-staging-prod: #export staging bundle using prod core
   artifacts:
     paths:
       - dist/bundle.staging-prod.tar.gz
+  needs:
+    - tests
   only:
     - tags
 
@@ -62,6 +64,8 @@ export-bundle-staging-staging: #export staging bundle using staging core
   artifacts:
     paths:
       - dist/bundle.staging-staging.tar.gz
+  needs:
+    - tests
   only:
     - tags
 
@@ -78,6 +82,8 @@ deploy-bundle-staging-prod: # aka staging app using prod core
     - echo Uploading bundle to cdn...
     - PK_PATH="$STAGING_CDN_PK" ./deploy.sh
     - rm $STAGING_CDN_PK
+  needs:
+    - export-bundle-staging-prod
   only:
     - tags
 
@@ -94,6 +100,8 @@ deploy-bundle-staging-staging: #aka staging app using staging core
     - echo Uploading bundle to cdn...
     - PK_PATH="$STAGING_CDN_PK" ./deploy.sh
     - rm $STAGING_CDN_PK
+  needs:
+    - export-bundle-staging-staging
   only:
     - tags
 
@@ -117,6 +125,8 @@ export-bundle-prod:
   artifacts:
     paths:
       - dist/bundle.prod.tar.gz
+  needs:
+    - tests
   only:
     - tags
 
@@ -134,12 +144,14 @@ deploy-bundle-prod:
     - PK_PATH="$PROD_CDN_PK" ./deploy.sh
     - rm $PROD_CDN_PK
   when: manual
+  needs:
+    - export-bundle-prod
   only:
     - tags
 
 build-android:
   tags:
-    - macos
+    - private-network
   cache:
     key: ${CI_COMMIT_SHA}
     paths:
@@ -148,13 +160,38 @@ build-android:
   stage: build-apps
   script:
     - npm ci
-    - turtle build:android --keystore-path /Users/ci/Documents/key0.jks --keystore-alias key0 --public-url $PROD_CDN_URL/android-index.json -t apk --output dist/app.apk
-    - turtle build:android --keystore-path /Users/ci/Documents/key0.jks --keystore-alias key0 --public-url $PROD_CDN_URL/android-index.json -t aab --output dist/app.aab
+    - base64 -d $ANDROID_KEYSTORE_B64 > keystore.jks
+    - turtle build:android --keystore-path keystore.jks --keystore-alias key0 --public-url $PROD_CDN_URL/android-index.json -t apk --output dist/app.apk
+    - rm keystore.jks
   artifacts:
     paths:
       - dist/app.apk
+  when: manual
+  needs:
+    - deploy-bundle-prod
+  only:
+    - tags
+
+build-android-aab:
+  tags:
+    - private-network
+  cache:
+    key: ${CI_COMMIT_SHA}
+    paths:
+      - ~/.npm
+      - node_modules/
+  stage: build-apps
+  script:
+    - npm ci
+    - base64 -d $ANDROID_KEYSTORE_B64 > keystore.jks
+    - turtle build:android --keystore-path keystore.jks --keystore-alias key0 --public-url $PROD_CDN_URL/android-index.json -t apk --output dist/app.apk
+    - rm keystore.jks
+  artifacts:
+    paths:
       - dist/app.aab
   when: manual
+  needs:
+    - deploy-bundle-prod
   only:
     - tags
 
@@ -174,6 +211,8 @@ build-ios:
     paths:
       - dist/app.ipa
   when: manual
+  needs:
+    - deploy-bundle-prod
   only:
     - tags
 

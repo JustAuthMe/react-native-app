@@ -13,7 +13,7 @@ import {
     Linking
 } from 'react-native';
 import { WebView } from 'react-native-webview';
-import {SplashScreen} from 'expo';
+import * as SplashScreen from 'expo-splash-screen';
 import * as SecureStore from 'expo-secure-store';
 import Constants from 'expo-constants';
 import { Ionicons } from '@expo/vector-icons';
@@ -34,7 +34,7 @@ import SwiperPage from "../components/SwiperPage";
 export default class LaunchScreen extends React.Component {
 
     static navigationOptions = {
-        header: null,
+        headerShown: false,
     };
 
     state = {
@@ -60,7 +60,7 @@ export default class LaunchScreen extends React.Component {
         ];
 
         this.isLoggedIn().then(loggedIn => {
-            SplashScreen.hide();
+            SplashScreen.hideAsync();
             if (loggedIn && this.state.step === 'launch') {
                 this.hasInfos().then(hasInfos => {
                     if (hasInfos) {
@@ -570,7 +570,7 @@ export default class LaunchScreen extends React.Component {
                         <Image style={styles.logo} source={this.logo}/>
                         <Text style={styles.baseline}>{Translator.t('join_revolution')}</Text>
                         <TouchableOpacity style={styles.startBtn} onPress={() => this.props.navigation.push('LaunchScreen', {step: 'explanation'})}>
-                            <Ionicons name="ios-arrow-forward" size={56} color="white" style={styles.arrowIcon}/>
+                            <Ionicons name="chevron-forward-outline" size={56} color="white" style={styles.arrowIcon}/>
                         </TouchableOpacity>
                         <LaunchFooter />
                     </View>
