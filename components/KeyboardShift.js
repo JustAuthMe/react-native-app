@@ -1,6 +1,7 @@
 import { PropTypes } from 'prop-types';
 import React, { Component } from 'react';
 import { Animated, Dimensions, Keyboard, StyleSheet, TextInput, UIManager } from 'react-native';
+import {Platform} from "react-native";
 
 const { State: TextInputState } = TextInput;
 
@@ -30,25 +31,30 @@ export default class KeyboardShift extends Component {
     }
 
     handleKeyboardDidShow = (event) => {
+        if(Platform.OS === "android") return;
+
+
         const { height: windowHeight } = Dimensions.get('window');
         const keyboardHeight = event.endCoordinates.height;
-        const currentlyFocusedField = TextInputState.currentlyFocusedField();
-        UIManager.measure(currentlyFocusedField, (originX, originY, width, height, pageX, pageY) => {
-            const fieldHeight = height;
-            const fieldTop = pageY;
-            const gap = (windowHeight - keyboardHeight) - (fieldTop + fieldHeight);
-            if (gap >= 0) {
-                return;
-            }
-            Animated.timing(
-                this.state.shift,
-                {
-                    toValue: gap,
-                    duration: 250,
-                    useNativeDriver: true,
+        const currentlyFocusedInput = TextInputState.currentlyFocusedInput();
+        if(currentlyFocusedInput) {
+            UIManager.measure(currentlyFocusedInput._nativeTag, (originX, originY, width, height, pageX, pageY) => {
+                const fieldHeight = height;
+                const fieldTop = pageY;
+                const gap = (windowHeight - keyboardHeight) - (fieldTop + fieldHeight);
+                if (gap >= 0) {
+                    return;
                 }
-            ).start();
-        });
+                Animated.timing(
+                    this.state.shift,
+                    {
+                        toValue: gap,
+                        duration: 250,
+                        useNativeDriver: true,
+                    }
+                ).start();
+            });
+        }
     };
 
     handleKeyboardDidHide = () => {

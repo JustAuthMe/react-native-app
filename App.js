@@ -1,6 +1,6 @@
 import React from 'react';
 import {StyleSheet, View, AsyncStorage} from 'react-native';
-import { AppLoading } from 'expo';
+import AppLoading from 'expo-app-loading';
 import * as Icon from '@expo/vector-icons';
 import * as Font from 'expo-font';
 import AppNavigator from './navigation/AppNavigator';

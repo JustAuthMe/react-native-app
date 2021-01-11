@@ -30,7 +30,7 @@ import Text from '../components/JamText'
 
 export default class HomeScreen extends React.Component {
     static navigationOptions = {
-        header: null
+        headerShown: false
     };
 
     state = {
@@ -148,12 +148,13 @@ export default class HomeScreen extends React.Component {
                         service: this.state.services[key]
                     });
                 }}
+                style={isLast && {marginBottom: 50}}
             >
-                <View style={[styles.serviceContainer, isLast && {borderBottomWidth: 1, marginBottom: 50}]}>
+                <View style={[styles.serviceContainer, isLast && {borderBottomWidth: 1}]}>
                     <Image source={{uri: this.state.services[key].logo}} style={styles.serviceIcon}/>
                     <Text style={styles.serviceName}>{this.state.services[key].name}</Text>
                     <Icon.Ionicons
-                        name={'ios-arrow-forward'}
+                        name={'chevron-forward-outline'}
                         size={28}
                         color={'#ccc'}
                         style={styles.serviceArrow}
@@ -282,7 +283,7 @@ export default class HomeScreen extends React.Component {
                     <View style={styles.userHeader}>
                         <TouchableOpacity style={styles.switchIcon} onPress={() => this.props.navigation.navigate('Settings')}>
                             <Icon.Ionicons
-                                name={'ios-settings'}
+                                name={'settings-sharp'}
                                 size={26}
                                 color={'#FFFFFF'}
                             />
@@ -305,7 +306,7 @@ export default class HomeScreen extends React.Component {
                                     this.props.navigation.navigate('Scanner');
                                 }
                             }}
-                            btnIcon={'ios-qr-scanner'}
+                            btnIcon={'scan-outline'}
                             btnText={Translator.t('home.authenticate')}
                         />
                     </View>

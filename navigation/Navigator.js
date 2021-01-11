@@ -1,10 +1,12 @@
 import {
     NavigationRouteConfigMap,
-    StackNavigatorConfig,
-    createStackNavigator as originalCreateStackNavigator,
     createSwitchNavigator as originalCreateSwitchNavigator,
     SwitchNavigatorConfig
 } from "react-navigation";
+import {
+    StackNavigatorConfig,
+    createStackNavigator as originalCreateStackNavigator,
+} from "react-navigation-stack";
 import {Platform} from "react-native";
 import Translator from "../i18n/Translator";
 
