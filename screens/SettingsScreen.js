@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-    View, Alert, AsyncStorage, StyleSheet
+    View, Alert, StyleSheet
 } from 'react-native';
 import Config from "../constants/Config";
 import {UserModel} from "../models/UserModel";
@@ -9,6 +9,7 @@ import NetworkLoader from "../components/NetworkLoader";
 import DarkStatusBar from "../components/DarkStatusBar";
 import Translator from "../i18n/Translator";
 import {SettingsView} from "../components/SettingsView";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default class SettingsScreen extends React.Component {
     static navigationOptions = () => ({

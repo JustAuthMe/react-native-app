@@ -1,8 +1,6 @@
-import {
-    AsyncStorage
-} from "react-native";
 import Config from "../constants/Config";
 import * as SecureStore from "expo-secure-store";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export class UserModel {
     static logout(navigation) {

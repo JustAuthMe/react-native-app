@@ -125,7 +125,7 @@ module.exports = {
         authenticate: 'Authenticate',
         services: 'Services',
         hidden: {
-            size: -80,
+            size: -90,
             delete: 75,
         }
     },
@@ -198,9 +198,18 @@ module.exports = {
         email: 'Send me another confirmation e-mail',
         support: 'Contact support',
         logout: 'Logout',
-        privacy: 'Privacy',
-        tos: 'Terms of use',
-        notice: 'Legal',
+        privacy:  {
+            label: 'Privacy',
+            url: 'en/p/privacy-policy'
+        },
+        tos: {
+            label: 'Terms of use',
+            url: 'en/p/terms-of-service'
+        },
+        notice: {
+            label: 'Legal',
+            url: 'en/p/legal-notice'
+        },
         about: "About",
         dev: "Developers dashboard",
         legal: "Legal",

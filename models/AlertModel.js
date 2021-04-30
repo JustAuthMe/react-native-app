@@ -1,5 +1,5 @@
 import Config from "../constants/Config";
-import {AsyncStorage} from "react-native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export class AlertModel {
     static async getAlert() {

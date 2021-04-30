@@ -58,19 +58,19 @@ export const SettingsView = ({onConfirmEmail, onLogout, showEmailSend}) => {
             header: Translator.t('settings.legal'),
             rows: [
                 {
-                    title: Translator.t("settings.notice"),
+                    title: Translator.t("settings.notice.label"),
                     showDisclosureIndicator: true,
-                    onPress: () => openJamLink('p/mentions-legales')
+                    onPress: () => openJamLink(Translator.t("settings.notice.url"))
                 },
                 {
-                    title: Translator.t("settings.privacy"),
+                    title: Translator.t("settings.privacy.label"),
                     showDisclosureIndicator: true,
-                    onPress: () => openJamLink('p/politique-de-confidentialite')
+                    onPress: () => openJamLink(Translator.t("settings.privacy.url"))
                 },
                 {
-                    title: Translator.t("settings.tos"),
+                    title: Translator.t("settings.tos.label"),
                     showDisclosureIndicator: true,
-                    onPress: () => openJamLink('p/conditions-generales-dutilisation')
+                    onPress: () => openJamLink(Translator.t("settings.tos.url"))
                 }
             ]
         },

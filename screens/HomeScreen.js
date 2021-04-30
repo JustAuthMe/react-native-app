@@ -3,7 +3,6 @@ import {
     Image,
     StyleSheet,
     View,
-    AsyncStorage,
     TouchableOpacity,
     TouchableHighlight,
     StatusBar,
@@ -27,6 +26,7 @@ import {UserModel} from "../models/UserModel";
 import NetworkLoader from "../components/NetworkLoader";
 import Translator from "../i18n/Translator";
 import Text from '../components/JamText'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default class HomeScreen extends React.Component {
     static navigationOptions = {
@@ -425,7 +425,7 @@ const styles = StyleSheet.create({
     },
     backRightBtnRight: {
         backgroundColor: '#ff3838',
-        right: 0,
+        right: 10,
     },
     backTextWhite: {
         color: '#FFF',

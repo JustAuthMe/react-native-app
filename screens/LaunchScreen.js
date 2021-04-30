@@ -5,7 +5,6 @@ import {
     Image,
     TouchableOpacity,
     TextInput,
-    AsyncStorage,
     Platform,
     ScrollView,
     Dimensions,
@@ -30,6 +29,7 @@ import KeyboardShift from "../components/KeyboardShift";
 import Translator from "../i18n/Translator";
 import Text from '../components/JamText'
 import SwiperPage from "../components/SwiperPage";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default class LaunchScreen extends React.Component {
 
@@ -522,7 +522,6 @@ export default class LaunchScreen extends React.Component {
                                     onEndEditing={() => this.onInputChange('lastname', this.personnalInfos['lastname'].trim())}
                                 />
                                 <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('lastname', 'done')} />
-                                <LaunchFooter />
                                 <View style={styles.webview}>
                                     <WebView
                                         source={{uri: 'https://init.justauth.me'}}
@@ -530,6 +529,7 @@ export default class LaunchScreen extends React.Component {
                                         useWebKit={true}
                                     />
                                 </View>
+                                <LaunchFooter />
                             </View>
                         )}
                     </KeyboardShift>

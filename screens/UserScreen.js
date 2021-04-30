@@ -4,7 +4,6 @@ import {
     ScrollView,
     StyleSheet,
     TextInput,
-    AsyncStorage,
     TouchableOpacity,
     Image,
     Text
@@ -27,6 +26,9 @@ import NetworkLoader from "../components/NetworkLoader";
 import {UserModel} from "../models/UserModel";
 import DarkStatusBar from "../components/DarkStatusBar";
 import Translator from "../i18n/Translator";
+import RNDateTimePicker from '@react-native-community/datetimepicker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Localization from 'expo-localization';
 
 export default class UserScreen extends React.Component {
     static navigationOptions = () => ({
@@ -281,7 +283,22 @@ export default class UserScreen extends React.Component {
                                     })}
                                 />
                                 <Text style={styles.textLabel}>{Translator.t('data_list.birthdate')}:</Text>
-                                <TouchableOpacity activeOpacity={.5} style={styles.inputTouchable} onPress={() => {
+                                <RNDateTimePicker
+                                    style={styles.textInput}
+                                    locale={Localization.locale}
+                                    testID="dateTimePicker"
+                                    value={this.state.currentBirthdate}
+                                    mode="date"
+                                    is24Hour={true}
+                                    display="default"
+                                    minimumDate={new Date('1900-01-01T00:00:00')}
+                                    maximumDate={new Date((new Date().getFullYear()) + '-12-31T00:00:00')}
+                                    onChange={async (event, date) => {
+                                        await this.setState({currentBirthdate: date});
+                                        this.changeBirthdate();
+                                    }}
+                                />
+                                {/*<TouchableOpacity activeOpacity={.5} style={styles.inputTouchable} onPress={() => {
                                     DatePickerSingleton.get().open({
                                         date: this.state.currentBirthdate,
                                         onDateChangeCallback: date => this.setState({currentBirthdate: date}),
@@ -300,7 +317,7 @@ export default class UserScreen extends React.Component {
                                         pointerEvents={"none"}
                                         value={this.state.birthdateInputValue}
                                     />
-                                </TouchableOpacity>
+                                </TouchableOpacity>*/}
                                 <Text style={styles.textLabel}>{Translator.t('data_list.birthlocation')}:</Text>
                                 <TextInput
 

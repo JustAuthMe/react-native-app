@@ -3,7 +3,6 @@ import {
     View,
     StyleSheet,
     Image,
-    AsyncStorage,
     ScrollView
 } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
@@ -21,6 +20,7 @@ import NetworkLoader from "../components/NetworkLoader";
 import Translator from "../i18n/Translator";
 import Text from '../components/JamText'
 import {DataModel} from '../models/DataModel';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default class AuthScreen extends React.Component {
     static navigationOptions = () => ({
@@ -281,8 +281,8 @@ const styles = StyleSheet.create({
         textAlign: 'center'
     },
     data: {
-        paddingLeft: 70,
-        paddingRight: 70,
+        paddingLeft: 50,
+        paddingRight: 50,
         paddingBottom: 30,
         marginTop: 20,
         alignItems: 'center'

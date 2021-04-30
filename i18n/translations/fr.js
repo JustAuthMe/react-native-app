@@ -125,7 +125,7 @@ module.exports = {
         authenticate: 'S\'authentifier',
         services: 'Services',
         hidden: {
-            size: -105,
+            size: -115,
             delete: 100,
         }
     },
@@ -197,9 +197,18 @@ module.exports = {
         email: 'Envoyez-moi un nouvel e-mail',
         support: 'Contacter le support',
         logout: 'Déconnexion',
-        privacy: 'Confidentialité',
-        tos: "Conditions d'utilisation",
-        notice: "Mentions légales",
+        privacy: {
+            label: 'Confidentialité',
+            url: 'fr/p/politique-de-confidentialite'
+        },
+        tos: {
+            label: "Conditions d'utilisation",
+            url: 'fr/p/conditions-generales-dutilisation'
+        },
+        notice: {
+            label: "Mentions légales",
+            url: 'fr/p/mentions-legales'
+        },
         about: "À propos",
         dev: "Panel développeurs",
         legal: "Infos légales",

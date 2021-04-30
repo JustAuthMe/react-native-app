@@ -1,13 +1,18 @@
-import {AsyncStorage} from "react-native";
 import Config from "../constants/Config";
 import {DateModel} from "./DateModel";
 import {EncryptionModel} from "./EncryptionModel";
 import * as SecureStore from "expo-secure-store";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export class ServicesModel {
 
     static async getServices() {
-        const services = await AsyncStorage.getItem(Config.servicesKey);
+        let services = await AsyncStorage.getItem(Config.servicesKey);
+        if (services === null) {
+            services = JSON.stringify({});
+            await AsyncStorage.setItem(Config.servicesKey, services);
+        }
+
         return JSON.parse(services);
     }
 

@@ -151,6 +151,7 @@ export default class ServiceScreen extends React.Component {
 
 const styles = StyleSheet.create({
     content: {
+        backgroundColor: 'white',
         flex: 1
     }
 });
