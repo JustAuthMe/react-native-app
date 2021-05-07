@@ -193,12 +193,12 @@ export default class HomeScreen extends React.Component {
                                 onPress={() => this.deletePopupAlert(this.state.services[item.item.key])}
                             >
                                 <Icon.Ionicons
-                                    name={'ios-close'}
+                                    name={'ios-trash-outline'}
                                     size={32}
                                     color={'#fff'}
                                     style={{marginTop:3}}
                                 />
-                                <Text style={styles.backTextWhite}>{Translator.t('delete')}</Text>
+                                <Text style={styles.backTextWhite}>{Translator.t('forget')}</Text>
                             </TouchableOpacity>
                         </View>
                     );
@@ -408,7 +408,7 @@ const styles = StyleSheet.create({
     rowBack: {
         maxHeight: 70,
         alignItems: 'center',
-        backgroundColor: '#ff3838',
+        backgroundColor: '#341f97',
         flex: 1,
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -424,7 +424,7 @@ const styles = StyleSheet.create({
         width: 75,
     },
     backRightBtnRight: {
-        backgroundColor: '#ff3838',
+        backgroundColor: '#341f97',
         right: 10,
     },
     backTextWhite: {

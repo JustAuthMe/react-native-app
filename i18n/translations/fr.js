@@ -18,6 +18,7 @@ module.exports = {
     ignore_step: 'Ignorer cette étape',
     permission_required: 'Permission requise',
     delete: 'Supprimer',
+    forget: 'Oublier',
     error_default: 'Merci de contacter l\'assistance',
     error_too_many: 'Vous avez effectué trop d\'essais. réessayez dans quelques minutes.',
     now_logged_in: 'Vous êtes connecté !',
@@ -117,13 +118,13 @@ module.exports = {
         }
     },
     home:{
-        delete_service_confirm:'Supprimer le service %{name} ?',
+        delete_service_confirm:'Oublier le service %{name} ?',
         delete_service_confirm_message:'Cela ne supprimera PAS votre compte sur %{domain}, cela va uniquement supprimer le service de votre historique de connexions.',
         error_delete: 'Impossible de supprimer le service',
         no_services_yet: 'Vous ne vous êtes pas encore connecté à l\'un de nos sites partenaires ?',
         try_demo: 'Essayez notre démo',
         authenticate: 'S\'authentifier',
-        services: 'Services',
+        services: 'Historique',
         hidden: {
             size: -115,
             delete: 100,

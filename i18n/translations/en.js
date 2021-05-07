@@ -18,6 +18,7 @@ module.exports = {
     ignore_step: 'Ignore this step',
     permission_required: 'Permission required',
     delete: 'Delete',
+    forget: 'Forget',
     error_default: 'Please contact support for further assistance.',
     error_too_many: 'You have tried too many times. Please wait a few minutes.',
     now_logged_in: 'You\'re now logged in!',
@@ -117,13 +118,13 @@ module.exports = {
         }
     },
     home:{
-        delete_service_confirm:'Delete the %{name} service?',
+        delete_service_confirm:'Forget the %{name} service?',
         delete_service_confirm_message:'This will NOT remove your %{domain} account, it will only remove the service from your login history.',
         error_delete: 'Cannot delete service',
         no_services_yet: 'You haven\'t logged to any of our partners website or app yet?',
         try_demo: 'Try our demo',
         authenticate: 'Authenticate',
-        services: 'Services',
+        services: 'History',
         hidden: {
             size: -90,
             delete: 75,
