@@ -17,7 +17,6 @@ import * as Permissions from "expo-permissions";
 import * as ImagePicker from "expo-image-picker";
 import * as Icon from "@expo/vector-icons";
 import KeyboardShift from "../components/KeyboardShift";
-import {DatePickerSingleton} from "../models/DatePickerSingleton";
 import Config from "../constants/Config";
 import {EncryptionModel} from "../models/EncryptionModel";
 import * as SecureStore from "expo-secure-store";
@@ -29,6 +28,8 @@ import Translator from "../i18n/Translator";
 import RNDateTimePicker from '@react-native-community/datetimepicker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Localization from 'expo-localization';
+import {Picker} from '@react-native-picker/picker';
+import Countries from '../constants/Countries';
 
 export default class UserScreen extends React.Component {
     static navigationOptions = () => ({
@@ -201,6 +202,16 @@ export default class UserScreen extends React.Component {
     }
 
     render() {
+        const countriesList = [
+            <Picker.Item label={Translator.t('countries.FR')} value={'FR'} key={76} />,
+            <Picker.Item label={Translator.t('countries.US')} value={'US'} key={239} />
+        ];
+        for (let code in Countries.list) {
+            if (code !== 'FR' && code !== 'US') {
+                countriesList.push(<Picker.Item label={Translator.t('countries.' + code)} value={code} key={Countries.list[code].id}/>);
+            }
+        }
+
         return (
             <View style={styles.container}>
                 <DarkStatusBar />
@@ -434,7 +445,20 @@ export default class UserScreen extends React.Component {
                                     })}
                                 />
                                 <Text style={styles.textLabel}>{Translator.t('data_list.country')}:</Text>
-                                <TextInput
+                                <Picker
+                                    selectedValue={this.state.user.country}
+                                    onValueChange={(value, index) =>
+                                        this.setState({
+                                            user: {
+                                                ...this.state.user,
+                                                country: value
+                                            }
+                                        })
+                                    }
+                                    style={{width:'100%'}}>
+                                    {countriesList}
+                                </Picker>
+                                {/*<TextInput
 
                                     style={styles.textInput}
                                     placeholder={Translator.t('placeholders.country')}
@@ -451,7 +475,7 @@ export default class UserScreen extends React.Component {
                                             country:this.state.user.country?.trim() || null
                                         }
                                     })}
-                                />
+                                />*/}
                                 <Text style={styles.textLabel}>{Translator.t('data_list.job')}:</Text>
                                 <TextInput
 
