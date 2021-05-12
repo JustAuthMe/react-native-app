@@ -6,7 +6,7 @@ import {
     TextInput,
     TouchableOpacity,
     Image,
-    Text
+    Text, Platform
 } from 'react-native';
 import Colors from '../constants/Colors';
 import {DateModel} from "../models/DateModel";
@@ -40,6 +40,7 @@ export default class UserScreen extends React.Component {
         user: {},
         currentBirthdate: new Date(),
         birthdateInputValue: '',
+        showDatePicker: false,
         isLogin: false
     };
 
@@ -71,11 +72,11 @@ export default class UserScreen extends React.Component {
             job: await AsyncStorage.getItem('job'),
             company: await AsyncStorage.getItem('company')
         };
-        const splitDate = user.birthdate !== null ? user.birthdate.split('/') : [];
+
         this.setState({
             user: user,
-            birthdateInputValue: user.birthdate,
-            currentBirthdate: splitDate.length === 3 ? new Date(splitDate[1] + '/' + splitDate[0] + '/' + splitDate[2]) : new Date(),
+            birthdateInputValue: user.birthdate !== null ? this.dateModel.fromJsDateToHumanDate(new Date(user.birthdate)) : '',
+            currentBirthdate: user.birthdate !== null ? new Date(user.birthdate) : new Date(),
             isLogin: this.props.navigation.getParam('login')
         });
     };
@@ -93,11 +94,12 @@ export default class UserScreen extends React.Component {
     changeBirthdate() {
         const date = this.state.currentBirthdate;
         const humanDate = this.dateModel.fromJsDateToHumanDate(date);
+        const storableDate = this.dateModel.fromJsToStorableDate(date);
         this.setState({
             birthdateInputValue: humanDate,
             user: {
                 ...this.state.user,
-                birthdate: humanDate
+                birthdate: storableDate
             }
         });
     }
@@ -294,6 +296,7 @@ export default class UserScreen extends React.Component {
                                     })}
                                 />
                                 <Text style={styles.textLabel}>{Translator.t('data_list.birthdate')}:</Text>
+                                {(Platform.OS === 'ios' || this.state.showDatePicker) &&
                                 <RNDateTimePicker
                                     style={styles.textInput}
                                     locale={Localization.locale}
@@ -301,21 +304,19 @@ export default class UserScreen extends React.Component {
                                     value={this.state.currentBirthdate}
                                     mode="date"
                                     is24Hour={true}
-                                    display="default"
+                                    prompt={Translator.t('data_list.birthdate')}
+                                    display={Platform.OS === 'ios' ? "default" : "spinner"}
                                     minimumDate={new Date('1900-01-01T00:00:00')}
                                     maximumDate={new Date((new Date().getFullYear()) + '-12-31T00:00:00')}
                                     onChange={async (event, date) => {
-                                        await this.setState({currentBirthdate: date});
+                                        await this.setState({showDatePicker: false, currentBirthdate: date});
                                         this.changeBirthdate();
                                     }}
-                                />
-                                {/*<TouchableOpacity activeOpacity={.5} style={styles.inputTouchable} onPress={() => {
-                                    DatePickerSingleton.get().open({
-                                        date: this.state.currentBirthdate,
-                                        onDateChangeCallback: date => this.setState({currentBirthdate: date}),
-                                        onDone: () => this.changeBirthdate()
-                                    })
-                                }}>
+                                />}
+                                {Platform.OS === 'android' &&
+                                <TouchableOpacity activeOpacity={.5} style={styles.inputTouchable} onPress={() =>
+                                    this.setState({showDatePicker: true})
+                                }>
                                     <TextInput
 
                                         style={styles.textInput}
@@ -324,11 +325,10 @@ export default class UserScreen extends React.Component {
                                         autoCorrect={false}
                                         spellCheck={false}
                                         editable={false}
-                                        onChangeText={(text) => this.setState({user:{...this.state.user, birthdate:text}})}
                                         pointerEvents={"none"}
                                         value={this.state.birthdateInputValue}
                                     />
-                                </TouchableOpacity>*/}
+                                </TouchableOpacity>}
                                 <Text style={styles.textLabel}>{Translator.t('data_list.birthlocation')}:</Text>
                                 <TextInput
 
@@ -455,7 +455,7 @@ export default class UserScreen extends React.Component {
                                             }
                                         })
                                     }
-                                    style={{width:'100%'}}>
+                                    style={{width: Platform.OS === 'ios' ? '100%' : '70%'}}>
                                     {countriesList}
                                 </Picker>
                                 {/*<TextInput
@@ -542,6 +542,7 @@ const styles = StyleSheet.create({
         marginTop: 20
     },
     textInput: {
+        color: '#000',
         width: '70%',
         height: 50,
         marginBottom: 20,

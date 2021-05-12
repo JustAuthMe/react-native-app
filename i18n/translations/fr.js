@@ -24,6 +24,7 @@ module.exports = {
     now_logged_in: 'Vous êtes connecté !',
     are_you_sure: 'Êtes-vous sur ?',
     back_btn: 'Retour',
+    date_format: '%{day}/%{month}/%{year}',
     data_list: {
         email: 'Adresse e-mail',
         firstname: 'Prénom',

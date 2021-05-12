@@ -24,6 +24,7 @@ module.exports = {
     now_logged_in: 'You\'re now logged in!',
     are_you_sure: 'Are you sure?',
     back_btn: 'Back',
+    date_format: '%{month}/%{day}/%{year}',
     data_list: {
         email: 'e-mail address',
         firstname: 'Firstname',

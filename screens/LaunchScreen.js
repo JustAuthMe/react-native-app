@@ -40,7 +40,8 @@ export default class LaunchScreen extends React.Component {
     state = {
         step: this.props.navigation.getParam('step') ? this.props.navigation.state.params.step : 'launch',
         explanationTitle: Translator.t('welcome'),
-        termsAccept: !(this.props.navigation.getParam('step') && this.props.navigation.getParam('step') === 'explanation')
+        termsAccept: !(this.props.navigation.getParam('step') && this.props.navigation.getParam('step') === 'explanation'),
+        showWebView: true
     };
 
     constructor(props) {
@@ -192,11 +193,12 @@ export default class LaunchScreen extends React.Component {
         await SecureStore.setItemAsync(Config.storageKeys.publicKey, data.x, {
             keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY
         });
-        const pubkey = await SecureStore.getItemAsync(Config.storageKeys.publicKey);
 
         await SecureStore.setItemAsync(Config.storageKeys.privateKey, data.y, {
             keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY
         });
+
+        await this.setState({showWebView: false});
     }
 
     async register() {
@@ -220,6 +222,7 @@ export default class LaunchScreen extends React.Component {
                 }
             );
             let responseJson = await response.json();
+
             if (responseJson.status === 'success') {
                 await SecureStore.setItemAsync(Config.storageKeys.jamID, responseJson.user.username, {
                     keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY
@@ -460,13 +463,13 @@ export default class LaunchScreen extends React.Component {
                                     }}
                                 />
                                 <ContinueButton text={'Login'} ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.login()} />
-                                <View style={styles.webview}>
+                                {this.state.showWebView && <View style={styles.webview}>
                                     <WebView
                                         source={{uri: 'https://init.justauth.me'}}
                                         onMessage={msg => this.onMessage(msg)}
                                         useWebKit={true}
                                     />
-                                </View>
+                                </View>}
                                 <LaunchFooter />
                             </View>
                         )}
@@ -522,13 +525,13 @@ export default class LaunchScreen extends React.Component {
                                     onEndEditing={() => this.onInputChange('lastname', this.personnalInfos['lastname'].trim())}
                                 />
                                 <ContinueButton ref={ref => this.continueBtn = ref} disabled={true} onPress={() => this.storeValue('lastname', 'done')} />
-                                <View style={styles.webview}>
+                                {this.state.showWebView && <View style={styles.webview}>
                                     <WebView
                                         source={{uri: 'https://init.justauth.me'}}
                                         onMessage={msg => this.onMessage(msg)}
                                         useWebKit={true}
                                     />
-                                </View>
+                                </View>}
                                 <LaunchFooter />
                             </View>
                         )}
