@@ -21,12 +21,13 @@ import {ServicesModel} from "../models/ServicesModel";
 import {AlertModel} from "../models/AlertModel";
 import {SwipeListView} from "react-native-swipe-list-view";
 import {DropdownSingleton} from "../models/DropdownSingleton";
-import * as Permissions from "expo-permissions";
+import * as Camera from "expo-camera";
 import {UserModel} from "../models/UserModel";
 import NetworkLoader from "../components/NetworkLoader";
 import Translator from "../i18n/Translator";
 import Text from '../components/JamText'
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 export default class HomeScreen extends React.Component {
     static navigationOptions = {
@@ -299,7 +300,7 @@ export default class HomeScreen extends React.Component {
                         <Text style={styles.userIdentity}>{this.state.user.firstname + ' ' + this.state.user.lastname}</Text>
                         <ActionBtn
                             onPress={async () => {
-                                const permissionResponse = await Permissions.askAsync(Permissions.CAMERA);
+                                const permissionResponse = await Camera.requestPermissionsAsync();
                                 if (permissionResponse.status !== 'granted') {
                                     DropdownSingleton.get().alertWithType('info', Translator.t('permission_required'), Translator.t('permission.camera'));
                                 } else {

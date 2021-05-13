@@ -13,7 +13,6 @@ import {DateModel} from "../models/DateModel";
 import ActionBtn from "../components/ActionBtn";
 import {DropdownSingleton} from "../models/DropdownSingleton";
 import Constants from "expo-constants";
-import * as Permissions from "expo-permissions";
 import * as ImagePicker from "expo-image-picker";
 import * as Icon from "@expo/vector-icons";
 import KeyboardShift from "../components/KeyboardShift";
@@ -107,7 +106,7 @@ export default class UserScreen extends React.Component {
 
     _pickImage = async () => {
         if (Constants.platform.ios) {
-            const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+            const { status } = await ImagePicker.getMediaLibraryPermissionsAsync();
             if (status !== 'granted') {
                 DropdownSingleton.get().alertWithType('info', Translator.t('permission_required'), Translator.t('permission.camera_roll'));
                 return;
