@@ -8,7 +8,7 @@
       "ios",
       "android"
     ],
-    "version": "1.6.0-rc5",
+    "version": "1.6.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "splash": {
