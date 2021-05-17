@@ -72,6 +72,10 @@ module.exports = {
         cancel: 'Close the date picker',
         done: 'Validate the date picker'
     },
+    nonetwork: {
+        title: 'No connection',
+        text: 'The connection to our servers is impossible. Please check your internet connection or contact support.'
+    },
     launch:{
         explanation1: 'Welcome to JustAuthMe! This app is meant to help you login to any website or app with the "Sign in with JAM" button, without a single password.',
         explanation2: 'To login to apps or websites, just to click the "Sign in with JAM" button and accept the login from the App, where you can check which informations you want to share.',
@@ -235,10 +239,6 @@ module.exports = {
             noupdate: {
                 title: 'You are up to date!',
                 text: 'You already have the latest version of JustAuthMe, You have nothing more to do.'
-            },
-            nonetwork: {
-                title: 'No internet connection',
-                text: 'You need to be connected to the internet in order to download the latest updates.'
             }
         }
     },

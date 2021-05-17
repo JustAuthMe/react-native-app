@@ -30,6 +30,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Localization from 'expo-localization';
 import {Picker} from '@react-native-picker/picker';
 import Countries from '../constants/Countries';
+import {NetworkModel} from "../models/NetworkModel";
 
 export default class UserScreen extends React.Component {
     static navigationOptions = () => ({
@@ -147,37 +148,48 @@ export default class UserScreen extends React.Component {
                 timestamp: dateModel.getUnixTimestamp()
             };
             const sign = await enc.sign(enc.urlencode(enc.json_encode(dataToSend)));
-            const response = await fetch(
-                Config.apiUrl + 'mail/update',
-                {
-                    method: 'POST',
-                    headers: {
-                        Accept: 'application/json',
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        data: dataToSend,
-                        sign: sign
-                    })
+            const isInternetReachable = await NetworkModel.isInternetReachable();
+            if (!isInternetReachable) {
+                DropdownSingleton.get().alertWithType(
+                    'warn',
+                    Translator.t('nonetwork.title'),
+                    Translator.t('nonetwork.text')
+                );
+            } else {
+                const response = await fetch(
+                    Config.apiUrl + 'mail/update',
+                    {
+                        method: 'POST',
+                        headers: {
+                            Accept: 'application/json',
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            data: dataToSend,
+                            sign: sign
+                        })
+                    }
+                );
+
+                if (response.status === 200) {
+                    await AsyncStorage.setItem('email', this.state.user.email);
+                    hasEmailChanged = true;
+                } else if (response.status === 423) {
+                    UserModel.logout(this.props.navigation);
+                } else if (response.status === 429) {
+                    DropdownSingleton.get().alertWithType('warn', Translator.t('user.error.email_exists.title'), Translator.t('user.error.email_exists.text'));
+                } else {
+                    DropdownSingleton.get().alertWithType('error', Translator.t('user.error.email_update'), Translator('error_default'));
                 }
-            );
+            }
 
             this.networkLoader.setState({visible: false});
-
-            if (response.status === 200 ) {
-                await AsyncStorage.setItem('email', this.state.user.email);
-                hasEmailChanged = true;
-            } else if (response.status === 423) {
-                UserModel.logout(this.props.navigation);
-            } else if (response.status === 429) {
-                DropdownSingleton.get().alertWithType('warn', Translator.t('user.error.email_exists.title'), Translator.t('user.error.email_exists.text'));
-            } else {
-                DropdownSingleton.get().alertWithType('error', Translator.t('user.error.email_update'), Translator('error_default'));
-            }
         }
 
         for (let i in this.state.user) {
-            await AsyncStorage.setItem(i, this.state.user[i] ? this.state.user[i] : '');
+            if (i !== 'email' || hasEmailChanged) {
+                await AsyncStorage.setItem(i, this.state.user[i] ? this.state.user[i] : '');
+            }
         }
 
         if (!this.state.isLogin) {

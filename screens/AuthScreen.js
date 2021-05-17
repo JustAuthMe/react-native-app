@@ -21,6 +21,7 @@ import Translator from "../i18n/Translator";
 import Text from '../components/JamText'
 import {DataModel} from '../models/DataModel';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {NetworkModel} from "../models/NetworkModel";
 
 export default class AuthScreen extends React.Component {
     static navigationOptions = () => ({
@@ -44,6 +45,17 @@ export default class AuthScreen extends React.Component {
     }
 
     async getAuthDetails() {
+        const isInternetReachable = await NetworkModel.isInternetReachable();
+        if (!isInternetReachable) {
+            this.networkLoader.setState({visible: false});
+            DropdownSingleton.get().alertWithType(
+                'warn',
+                Translator.t('nonetwork.title'),
+                Translator.t('nonetwork.text')
+            );
+            this.props.navigation.goBack();
+        }
+
         const endpointUrl = Config.apiUrl + 'auth/' + this.state.token;
         this.services = await ServicesModel.getServices();
 
@@ -81,14 +93,7 @@ export default class AuthScreen extends React.Component {
                     isFirstLogin: isFirstLogin
                 });
             } else {
-
-                const resetAction = StackActions.reset({
-                    index: 0,
-                    actions: [NavigationActions.navigate({
-                        routeName: 'Home'
-                    })],
-                });
-                this.props.navigation.dispatch(resetAction);
+                this.props.navigation.goBack();
                 DropdownSingleton.get().alertWithType(
                     'error',
                     Translator.t('auth.invalid_token'),
@@ -140,6 +145,17 @@ export default class AuthScreen extends React.Component {
 
             try {
                 this.networkLoader.setState({visible: true});
+
+                const isInternetReachable = await NetworkModel.isInternetReachable();
+                if (!isInternetReachable) {
+                    DropdownSingleton.get().alertWithType(
+                        'warn',
+                        Translator.t('nonetwork.title'),
+                        Translator.t('nonetwork.text')
+                    );
+                    this.props.navigation.pop(2);
+                }
+
                 const response = await fetch(
                     endpointUrl,
                     {

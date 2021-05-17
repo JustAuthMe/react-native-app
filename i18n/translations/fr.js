@@ -72,6 +72,10 @@ module.exports = {
         cancel: 'Fermer le sélecteur de date',
         done: 'Valider la date'
     },
+    nonetwork: {
+        title: 'Connexion impossible',
+        text: 'La connexion à nos serveurs est impossible, veuillez vérifier votre connexion à internet ou contacter le support.'
+    },
     launch:{
         explanation1: 'Bienvenue sur JustAuthMe ! Cette application vous permet de vous connecter aux sites web et applis arborant le bouton "Se connecter avec JustAuthMe", sans mot de passe.',
         explanation2: 'Pour vous connecter aux sites et applis, cliquez sur "Se connecter avec JustAuthMe" et validez la connexion dans l\'application après avoir choisi les informations à partager.',
@@ -235,10 +239,6 @@ module.exports = {
             noupdate: {
                 title: 'Vous êtes à jour !',
                 text: 'Vous possédez déjà la dernière version de JustAuthMe, vous n\'avez rien d\'autre à faire.'
-            },
-            nonetwork: {
-                title: 'Aucune connexion internet',
-                text: 'Vous devez être connecté à internet pour pouvoir télécharger les dernières mises à jour.'
             }
         }
     },
@@ -262,7 +262,7 @@ module.exports = {
             },
             email_update: 'Si vous changez d\'adresse e-mail, vous devrez confirmez la nouvelle adresse avant de continuer d\'utiliser JustAuthMe'
         },
-        success: 'Sauvegardées avec succès',
+        success: 'Sauvegardé avec succès',
         save: 'Sauvegarder'
     },
     continue: 'Continuer',
