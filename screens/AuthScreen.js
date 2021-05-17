@@ -54,53 +54,54 @@ export default class AuthScreen extends React.Component {
                 Translator.t('nonetwork.text')
             );
             this.props.navigation.goBack();
-        }
+        } else {
+            const endpointUrl = Config.apiUrl + 'auth/' + this.state.token;
+            this.services = await ServicesModel.getServices();
 
-        const endpointUrl = Config.apiUrl + 'auth/' + this.state.token;
-        this.services = await ServicesModel.getServices();
+            try {
+                this.networkLoader.setState({visible: true});
 
-        try {
-            this.networkLoader.setState({visible: true});
+                const response = await fetch(endpointUrl);
+                const responseJson = await response.json();
+                const isFirstLogin = !this.services.hasOwnProperty(responseJson.auth.client_app.app_id);
 
-            const response = await fetch(endpointUrl);
-            const responseJson = await response.json();
-            const isFirstLogin = !this.services.hasOwnProperty(responseJson.auth.client_app.app_id);
+                this.networkLoader.setState({visible: false});
 
-            this.networkLoader.setState({visible: false});
+                if (responseJson.status === 'success') {
+                    this.actualData = {};
+                    let currentData = '';
+                    for (let i = 0; i < responseJson.auth.client_app.data.length; i++) {
+                        currentData = await AsyncStorage.getItem(DataModel.getDataSlug(responseJson.auth.client_app.data[i]));
+                        this.actualData[responseJson.auth.client_app.data[i]] = currentData !== null && currentData !== '';
 
-            if (responseJson.status === 'success') {
-                this.actualData = {};
-                let currentData = '';
-                for (let i = 0; i < responseJson.auth.client_app.data.length; i++) {
-                    currentData = await AsyncStorage.getItem(DataModel.getDataSlug(responseJson.auth.client_app.data[i]));
-                    this.actualData[responseJson.auth.client_app.data[i]] = currentData !== null && currentData !== '';
-
-                    if (isFirstLogin && !this.actualData[responseJson.auth.client_app.data[i]] && DataModel.isDataRequired(responseJson.auth.client_app.data[i])) {
-                        DropdownSingleton.get().alertWithType(
-                            'warn',
-                            Translator.t('auth.missing_data'),
-                            Translator.t('auth.missing_data_message', {
-                                data: DataModel.getDataLabelFromID(responseJson.auth.client_app.data[i]),
-                                name: responseJson.auth.client_app.name
-                            })
-                        );
-                        this.props.navigation.navigate('User');
+                        if (isFirstLogin && !this.actualData[responseJson.auth.client_app.data[i]] && DataModel.isDataRequired(responseJson.auth.client_app.data[i])) {
+                            DropdownSingleton.get().alertWithType(
+                                'warn',
+                                Translator.t('auth.missing_data'),
+                                Translator.t('auth.missing_data_message', {
+                                    data: DataModel.getDataLabelFromID(responseJson.auth.client_app.data[i]),
+                                    name: responseJson.auth.client_app.name
+                                })
+                            );
+                            this.props.navigation.navigate('User');
+                        }
                     }
-                }
 
-                this.setState({
-                    auth: responseJson.auth,
-                    isFirstLogin: isFirstLogin
-                });
-            } else {
-                this.props.navigation.goBack();
-                DropdownSingleton.get().alertWithType(
-                    'error',
-                    Translator.t('auth.invalid_token'),
-                    Translator.t('auth.invalid_token_message')
-                );
+                    this.setState({
+                        auth: responseJson.auth,
+                        isFirstLogin: isFirstLogin
+                    });
+                } else {
+                    this.props.navigation.goBack();
+                    DropdownSingleton.get().alertWithType(
+                        'error',
+                        Translator.t('auth.invalid_token'),
+                        Translator.t('auth.invalid_token_message')
+                    );
+                }
+            } catch (error) {
             }
-        } catch (error) {}
+        }
     }
 
     async getUserDataFromDataset() {
@@ -154,79 +155,80 @@ export default class AuthScreen extends React.Component {
                         Translator.t('nonetwork.text')
                     );
                     this.props.navigation.pop(2);
-                }
-
-                const response = await fetch(
-                    endpointUrl,
-                    {
-                        method: 'POST',
-                        headers: {
-                            Accept: 'application/json',
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            data: data,
-                            sign: sign
-                        })
-                    }
-                );
-
-                const responseJson = await response.json();
-                this.networkLoader.setState({visible: false});
-
-                if (responseJson.status === 'success') {
-                    let dataToStore = {};
-                    for (let i in this.actualData) {
-                        if (this.actualData[i]) {
-                            const dataKey = i.indexOf('!') === i.length - 1 ? i.slice(0, -1) : i;
-                            dataToStore[dataKey] = data[dataKey];
-                        }
-                    }
-
-                    const currentTime = (new Date()).getTime();
-                    let service = {};
-
-                    if (this.state.isFirstLogin) {
-                        service = {
-                            app_id: this.state.auth.client_app.app_id,
-                            name: this.state.auth.client_app.name,
-                            logo: this.state.auth.client_app.logo,
-                            domain: this.state.auth.client_app.domain,
-                            data: dataToStore,
-                            created_at: currentTime,
-                            updated_at: currentTime
-                        };
-
-                    } else {
-                        service = this.services[this.state.auth.client_app.app_id];
-                        service.name = this.state.auth.client_app.name;
-                        service.logo = this.state.auth.client_app.logo;
-                        service.domain = this.state.auth.client_app.domain;
-                        service.updated_at = currentTime;
-                    }
-
-                    await ServicesModel.saveService(this.state.auth.client_app.app_id, service);
-                    this.props.navigation.navigate('Success', {service: service});
                 } else {
-                    if (response.status === 401) {
-                        DropdownSingleton.get().alertWithType('error', Translator.t('auth.unauthorized_login'), Translator.t('auth.unauthorized_login_message'));
-                    } else if (response.status === 403) {
-                        DropdownSingleton.get().alertWithType('error', Translator.t('auth.non_confirmed_email'), Translator.t('auth.non_confirmed_email_message'));
-                    } else if (response.status === 404) {
-                        DropdownSingleton.get().alertWithType('error', Translator.t('auth.invalid_token'), Translator.t('auth.token_not_found'));
-                    } else if (response.status === 423) {
-                        UserModel.logout(this.props.navigation);
-                    } else {
-                        DropdownSingleton.get().alertWithType('error', Translator.t('auth.unknown_error'), Translator.t('auth.error_login'));
-                    }
 
-                    const resetAction = StackActions.reset({
-                        index: 0,
-                        actions: [NavigationActions.navigate({
-                            routeName: 'Home'
-                        })],
-                    });
-                    this.props.navigation.dispatch(resetAction);
+                    const response = await fetch(
+                        endpointUrl,
+                        {
+                            method: 'POST',
+                            headers: {
+                                Accept: 'application/json',
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                data: data,
+                                sign: sign
+                            })
+                        }
+                    );
+
+                    const responseJson = await response.json();
+                    this.networkLoader.setState({visible: false});
+
+                    if (responseJson.status === 'success') {
+                        let dataToStore = {};
+                        for (let i in this.actualData) {
+                            if (this.actualData[i]) {
+                                const dataKey = i.indexOf('!') === i.length - 1 ? i.slice(0, -1) : i;
+                                dataToStore[dataKey] = data[dataKey];
+                            }
+                        }
+
+                        const currentTime = (new Date()).getTime();
+                        let service = {};
+
+                        if (this.state.isFirstLogin) {
+                            service = {
+                                app_id: this.state.auth.client_app.app_id,
+                                name: this.state.auth.client_app.name,
+                                logo: this.state.auth.client_app.logo,
+                                domain: this.state.auth.client_app.domain,
+                                data: dataToStore,
+                                created_at: currentTime,
+                                updated_at: currentTime
+                            };
+
+                        } else {
+                            service = this.services[this.state.auth.client_app.app_id];
+                            service.name = this.state.auth.client_app.name;
+                            service.logo = this.state.auth.client_app.logo;
+                            service.domain = this.state.auth.client_app.domain;
+                            service.updated_at = currentTime;
+                        }
+
+                        await ServicesModel.saveService(this.state.auth.client_app.app_id, service);
+                        this.props.navigation.navigate('Success', {service: service});
+                    } else {
+                        if (response.status === 401) {
+                            DropdownSingleton.get().alertWithType('error', Translator.t('auth.unauthorized_login'), Translator.t('auth.unauthorized_login_message'));
+                        } else if (response.status === 403) {
+                            DropdownSingleton.get().alertWithType('error', Translator.t('auth.non_confirmed_email'), Translator.t('auth.non_confirmed_email_message'));
+                        } else if (response.status === 404) {
+                            DropdownSingleton.get().alertWithType('error', Translator.t('auth.invalid_token'), Translator.t('auth.token_not_found'));
+                        } else if (response.status === 423) {
+                            UserModel.logout(this.props.navigation);
+                        } else {
+                            DropdownSingleton.get().alertWithType('error', Translator.t('auth.unknown_error'), Translator.t('auth.error_login'));
+                        }
+
+                        const resetAction = StackActions.reset({
+                            index: 0,
+                            actions: [NavigationActions.navigate({
+                                routeName: 'Home'
+                            })],
+                        });
+                        this.props.navigation.dispatch(resetAction);
+                    }
                 }
             } catch (error) {}
         }
