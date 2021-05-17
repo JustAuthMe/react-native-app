@@ -196,7 +196,8 @@ module.exports = {
     settings: {
         title: 'Paramètres',
         version: 'Version',
-        email: 'Envoyez-moi un nouvel e-mail',
+        email: 'Renvoyer l\'e-mail de confirmation',
+        update: 'Vérifer les mises à jour',
         support: 'Contacter le support',
         logout: 'Déconnexion',
         privacy: {
@@ -230,6 +231,14 @@ module.exports = {
             unknow: {
                 title: 'Erreur inconnue',
                 text: 'Une erreur inconnue s\'est produite. Merci de contacter support@justauth.me en mentionnant qu\'une erreur HTTP %{status} est apparue lors de la demande d\'e-mail de confirmation.'
+            },
+            noupdate: {
+                title: 'Vous êtes à jour !',
+                text: 'Vous possédez déjà la dernière version de JustAuthMe, vous n\'avez rien d\'autre à faire.'
+            },
+            nonetwork: {
+                title: 'Aucune connexion internet',
+                text: 'Vous devez être connecté à internet pour pouvoir télécharger les dernières mises à jour.'
             }
         }
     },

@@ -196,7 +196,8 @@ module.exports = {
     settings: {
         title: 'Settings',
         version: 'Version',
-        email: 'Send me another confirmation e-mail',
+        email: 'Re-send confirmation e-mail',
+        update: 'Check for updates',
         support: 'Contact support',
         logout: 'Logout',
         privacy:  {
@@ -230,6 +231,14 @@ module.exports = {
             unknow: {
                 title: 'Uknown error',
                 text: 'An unknow error occured. Please contact support@justauth.me, mentionning that a HTTP %{status} appeared at E-Mail confirmation request.'
+            },
+            noupdate: {
+                title: 'You are up to date!',
+                text: 'You already have the latest version of JustAuthMe, You have nothing more to do.'
+            },
+            nonetwork: {
+                title: 'No internet connection',
+                text: 'You need to be connected to the internet in order to download the latest updates.'
             }
         }
     },

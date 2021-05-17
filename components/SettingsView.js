@@ -5,8 +5,9 @@ import Translator from "../i18n/Translator";
 import Constants from "expo-constants";
 import {Ionicons, FontAwesome} from '@expo/vector-icons';
 import * as WebBrowser from 'expo-web-browser';
+import Colors from '../constants/Colors';
 
-export const SettingsView = ({onConfirmEmail, onLogout, showEmailSend}) => {
+export const SettingsView = ({onConfirmEmail, onUpdate, onLogout, showEmailSend}) => {
     const {manifest} = Constants;
 
     const openJamLink = (uri?: string, external?: boolean) => {
@@ -29,6 +30,11 @@ export const SettingsView = ({onConfirmEmail, onLogout, showEmailSend}) => {
                     onPress: onConfirmEmail,
                     visible: showEmailSend ?? true,
                     renderBeforeAccessory: () => <ItemIcon icon={"md-mail"} color={'#74b42e'}/>,
+                },
+                {
+                    title: Translator.t('settings.update'),
+                    onPress: onUpdate,
+                    renderBeforeAccessory: () => <ItemIcon icon={"ios-refresh"} color={Colors.tintColor}/>
                 },
                 {
                     title: Translator.t('settings.support'),

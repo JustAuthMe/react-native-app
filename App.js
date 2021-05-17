@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, View, AsyncStorage} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import AppLoading from 'expo-app-loading';
 import * as Icon from '@expo/vector-icons';
 import * as Font from 'expo-font';
@@ -8,8 +8,8 @@ import {AudioModel} from "./models/AudioModel";
 import AudioLibrary from "./constants/AudioLibrary";
 import DropdownAlert from "react-native-dropdownalert";
 import {DropdownSingleton} from "./models/DropdownSingleton";
-import UniversalDatePicker from "./components/UniversalDatePicker";
-import {DatePickerSingleton} from "./models/DatePickerSingleton";
+import * as Network from "expo-network";
+import * as Updates from 'expo-updates';
 
 export default class App extends React.Component {
     state = {
@@ -21,7 +21,7 @@ export default class App extends React.Component {
         if (!this.state.isLoadingComplete) {
             return (
                 <AppLoading
-                    startAsync={this._loadResourcesAsync}
+                    startAsync={this._startAsync()}
                     onError={this._handleLoadingError}
                     onFinish={this._handleFinishLoading}
                     autoHideSplash={false}
@@ -35,6 +35,20 @@ export default class App extends React.Component {
                 <AppNavigator/>
             </View>
         );
+    }
+
+    _startAsync = async () => {
+        await this._loadResourcesAsync();
+        const networkState = await Network.getNetworkStateAsync();
+        if (networkState.isInternetReachable) {
+            const hasUpdates = await Updates.checkForUpdateAsync();
+            if (hasUpdates.isAvailable) {
+                const update = await Updates.fetchUpdateAsync();
+                if (update.isNew) {
+                    await Updates.reloadAsync();
+                }
+            }
+        }
     }
 
     _loadResourcesAsync = async () => {

@@ -10,6 +10,8 @@ import DarkStatusBar from "../components/DarkStatusBar";
 import Translator from "../i18n/Translator";
 import {SettingsView} from "../components/SettingsView";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Network from "expo-network";
+import * as Updates from "expo-updates";
 
 export default class SettingsScreen extends React.Component {
     static navigationOptions = () => ({
@@ -66,6 +68,39 @@ export default class SettingsScreen extends React.Component {
         });
     };
 
+    update = async () => {
+        this.networkLoader.setState({visible: true});
+        const networkState = await Network.getNetworkStateAsync();
+        if (networkState.isInternetReachable) {
+            const hasUpdates = await Updates.checkForUpdateAsync();
+            if (hasUpdates.isAvailable) {
+                const update = await Updates.fetchUpdateAsync();
+                if (update.isNew) {
+                    await Updates.reloadAsync();
+                } else {
+                    DropdownSingleton.get().alertWithType(
+                        'success',
+                        Translator.t('settings.dropdown.noupdate.title'),
+                        Translator.t('settings.dropdown.noupdate.text')
+                    );
+                }
+            } else {
+                DropdownSingleton.get().alertWithType(
+                    'success',
+                    Translator.t('settings.dropdown.noupdate.title'),
+                    Translator.t('settings.dropdown.noupdate.text')
+                );
+            }
+        } else {
+            DropdownSingleton.get().alertWithType(
+                'warn',
+                Translator.t('settings.dropdown.nonetwork.title'),
+                Translator.t('settings.dropdown.nonetwork.text')
+            );
+        }
+        this.networkLoader.setState({visible: false});
+    };
+
     logout = () => {
         Alert.alert(Translator.t('are_you_sure'), '', [
             {text: Translator.t('cancel'), onPress: () => {}, style:'cancel'},
@@ -80,7 +115,7 @@ export default class SettingsScreen extends React.Component {
         return <View style={styles.container}>
             <DarkStatusBar />
             <NetworkLoader ref={ref => this.networkLoader = ref} />
-            <SettingsView onLogout={() => this.logout()} onConfirmEmail={() => this.confirmEmail()} showEmailSend={true} />
+            <SettingsView onLogout={() => this.logout()} onUpdate={() => this.update()} onConfirmEmail={() => this.confirmEmail()} showEmailSend={true} />
         </View>;
     }
 }
