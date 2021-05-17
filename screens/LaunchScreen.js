@@ -41,7 +41,7 @@ export default class LaunchScreen extends React.Component {
         step: this.props.navigation.getParam('step') ? this.props.navigation.state.params.step : 'launch',
         explanationTitle: Translator.t('welcome'),
         termsAccept: !(this.props.navigation.getParam('step') && this.props.navigation.getParam('step') === 'explanation'),
-        showWebView: true
+        showWebView: false
     };
 
     constructor(props) {
@@ -72,6 +72,20 @@ export default class LaunchScreen extends React.Component {
                 });
             }
         });
+    }
+
+    componentDidMount() {
+        if (['login', 'lastname'].indexOf(this.state.step) !== -1) {
+            this.focusListener = this.props.navigation.addListener('didFocus', () => {
+                this.setState({showWebView: true});
+            });
+        }
+    }
+
+    componentWillUnmount() {
+        if (['login', 'lastname'].indexOf(this.state.step) !== -1) {
+            this.focusListener.remove();
+        }
     }
 
     isLoggedIn = async () => {
