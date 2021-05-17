@@ -10,6 +10,7 @@ import DropdownAlert from "react-native-dropdownalert";
 import {DropdownSingleton} from "./models/DropdownSingleton";
 import * as Network from "expo-network";
 import * as Updates from 'expo-updates';
+import {NetworkModel} from "./models/NetworkModel";
 
 export default class App extends React.Component {
     state = {
@@ -39,8 +40,8 @@ export default class App extends React.Component {
 
     _startAsync = async () => {
         await this._loadResourcesAsync();
-        const networkState = await Network.getNetworkStateAsync();
-        if (networkState.isInternetReachable) {
+        const isInternetReachable = await NetworkModel.isInternetReachable();
+        if (isInternetReachable) {
             const hasUpdates = await Updates.checkForUpdateAsync();
             if (hasUpdates.isAvailable) {
                 const update = await Updates.fetchUpdateAsync();

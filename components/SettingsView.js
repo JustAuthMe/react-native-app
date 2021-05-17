@@ -129,7 +129,8 @@ const ItemIcon = ({icon, color, children}) => {
         }}>
             {children || <Ionicons style={{
                 alignContent: 'center',
-                marginBottom: -1
+                marginBottom: -1,
+                marginLeft: 1
             }} name={icon} color={'white'} size={20}/> }
         </View>
     </View>

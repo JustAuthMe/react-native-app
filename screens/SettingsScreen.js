@@ -10,8 +10,8 @@ import DarkStatusBar from "../components/DarkStatusBar";
 import Translator from "../i18n/Translator";
 import {SettingsView} from "../components/SettingsView";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Network from "expo-network";
 import * as Updates from "expo-updates";
+import {NetworkModel} from "../models/NetworkModel";
 
 export default class SettingsScreen extends React.Component {
     static navigationOptions = () => ({
@@ -70,8 +70,8 @@ export default class SettingsScreen extends React.Component {
 
     update = async () => {
         this.networkLoader.setState({visible: true});
-        const networkState = await Network.getNetworkStateAsync();
-        if (networkState.isInternetReachable) {
+        const isInternetReachable = await NetworkModel.isInternetReachable();
+        if (isInternetReachable) {
             const hasUpdates = await Updates.checkForUpdateAsync();
             if (hasUpdates.isAvailable) {
                 const update = await Updates.fetchUpdateAsync();
