@@ -22,7 +22,7 @@ export default class App extends React.Component {
         if (!this.state.isLoadingComplete) {
             return (
                 <AppLoading
-                    startAsync={this._startAsync()}
+                    startAsync={this._loadResourcesAsync}
                     onError={this._handleLoadingError}
                     onFinish={this._handleFinishLoading}
                     autoHideSplash={false}
@@ -38,6 +38,12 @@ export default class App extends React.Component {
         );
     }
 
+    /**
+     * @function _statAsync
+     * Not used, dead code, because I don't trust myself
+     * If one of these promises would fail, the app may never
+     * finish loading
+     * */
     _startAsync = async () => {
         await this._loadResourcesAsync();
         const isInternetReachable = await NetworkModel.isInternetReachable();
