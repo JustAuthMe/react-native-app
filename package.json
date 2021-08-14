@@ -49,8 +49,8 @@
     "react-navigation": "^4.4.3",
     "react-navigation-stack": "^2.10.2",
     "@react-native-picker/picker": "1.9.11",
-    "expo-network": "~2.4.0",
-    "expo-updates": "~0.4.1"
+    "expo-network": "~3.1.1",
+    "expo-updates": "~0.5.4"
   },
   "devDependencies": {
     "babel-preset-expo": "8.3.0",
