@@ -6,7 +6,7 @@ import {
     TextInput,
     TouchableOpacity,
     Image,
-    Text, Platform
+    Text, Platform, Button
 } from 'react-native';
 import Colors from '../constants/Colors';
 import {DateModel} from "../models/DateModel";
@@ -32,8 +32,13 @@ import Countries from '../constants/Countries';
 import {NetworkModel} from "../models/NetworkModel";
 
 export default class UserScreen extends React.Component {
-    static navigationOptions = () => ({
+    static navigationOptions = ({navigation}) => ({
         title: Translator.t('user.title'),
+        headerBackTitle: '  ' + Translator.t('cancel'),
+        headerBackImage: () => null,
+        headerRight: () => (
+            <Button title={Translator.t('done') + '  '} onPress={navigation.getParam('save')} />
+        )
     });
 
     state = {
@@ -79,6 +84,8 @@ export default class UserScreen extends React.Component {
             currentBirthdate: user.birthdate !== null ? new Date(user.birthdate) : new Date(),
             isLogin: this.props.navigation.getParam('login')
         });
+
+        this.props.navigation.setParams({save: this._save});
     };
 
     componentDidMount() {
@@ -212,6 +219,10 @@ export default class UserScreen extends React.Component {
         } else {
             setTimeout(() => DropdownSingleton.get().alertWithType('success', Translator.t('user.title'), Translator.t('user.success')), 300);
         }
+    }
+
+    _save = () => {
+        this.updateInfos().then();
     }
 
     render() {
@@ -525,7 +536,6 @@ export default class UserScreen extends React.Component {
                                         }
                                     })}
                                 />
-                                <ActionBtn btnText={Translator.t('user.save')} btnIcon={'md-checkmark'} onPress={() => this.updateInfos()}/>
                             </View>
                         </ScrollView>
                     )}
