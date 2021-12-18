@@ -111,8 +111,8 @@ export default class AuthScreen extends React.Component {
             token: this.state.token
         };
 
-        if (this.services.hasOwnProperty(this.state.auth.client_app.app_id)) {
-            return data;
+        if (!this.state.isFirstLogin) {
+            return {...data, ...this.state.services[this.state.auth.client_app.app_id].data};
         }
 
         const authData = this.state.auth.client_app.data;
@@ -179,7 +179,7 @@ export default class AuthScreen extends React.Component {
                         let dataToStore = {};
                         for (let i in this.actualData) {
                             if (this.actualData[i]) {
-                                const dataKey = i.indexOf('!') === i.length - 1 ? i.slice(0, -1) : i;
+                                const dataKey = DataModel.getDataSlug(i);
                                 dataToStore[dataKey] = data[dataKey];
                             }
                         }
