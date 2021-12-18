@@ -536,6 +536,8 @@ export default class UserScreen extends React.Component {
                                         }
                                     })}
                                 />
+                                {this.state.isLogin &&
+                                <ActionBtn btnText={Translator.t('user.save')} btnIcon={'md-checkmark'} onPress={() => this.updateInfos()}/>}
                             </View>
                         </ScrollView>
                     )}

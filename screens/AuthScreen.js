@@ -112,7 +112,7 @@ export default class AuthScreen extends React.Component {
         };
 
         if (!this.state.isFirstLogin) {
-            return {...data, ...this.state.services[this.state.auth.client_app.app_id].data};
+            return {...data, ...this.services[this.state.auth.client_app.app_id].data};
         }
 
         const authData = this.state.auth.client_app.data;
