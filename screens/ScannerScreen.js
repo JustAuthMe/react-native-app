@@ -6,7 +6,7 @@ import {
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import {AuthSingleton} from "../models/AuthSingleton";
 import DarkStatusBar from "../components/DarkStatusBar";
-import * as Permissions from 'expo-permissions';
+import * as Camera from 'expo-camera';
 import {DropdownSingleton} from "../models/DropdownSingleton";
 import Translator from "../i18n/Translator";
 
@@ -24,7 +24,7 @@ export default class ScannerScreen extends React.Component {
     }
 
     getPermissionsAsync = async () => {
-        const permissionResponse = await Permissions.askAsync(Permissions.CAMERA);
+        const permissionResponse = await Camera.requestPermissionsAsync();
         if (permissionResponse.status !== 'granted') {
             this.props.navigation.goBack();
             DropdownSingleton.get().alertWithType('info', Translator.t('permission_required'), Translator.t('permission.camera'));
